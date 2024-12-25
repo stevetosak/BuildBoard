@@ -1,0 +1,40 @@
+Use Cases
+
+User
+	- Kreirat topic.
+	- Kreirat discussion thread vo topic thread.
+	- Pravi reply na discussion thread.
+	- Stava like na thread. 
+	- Korisnik prijavuva drug korisnik za nesoodvetno odnesuvanje. 
+	- Korisnikot se prijavuva za uchestvo vo proekt.
+	- Referencira drug thread.
+	
+Moderator
+	- Nadgleduvat odreden Topic/Project thraed.
+	- Dodavat/Kreirat tagoj na dadeni topics. 
+	- Otstranuvat korisnik od topicot. 
+	
+Developer
+	- Kreirat kanal vo project.
+	- Pisuva poraka vo kanal.
+
+Project Owner
+	- Odobruva ili odbiva baranja za ucestvo vo negoviot proekt.
+	- Otstranuva developer od proekt.
+	- Kreira roles za daden proekt
+	- Dodava roles na daden developer
+	
+# SQL
+Kaj e smenato: 
+	- Discussion 
+	- Moderation
+	- Topics 
+	
+	
+	
+	# ne mozit dva topici so isto ime da imat vo eden thread ako sa sozdrzat. 
+	
+	
+KVERINJA
+
+- 
