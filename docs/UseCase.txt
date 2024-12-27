@@ -23,18 +23,4 @@ Project Owner
 	- Otstranuva developer od proekt.
 	- Kreira roles za daden proekt
 	- Dodava roles na daden developer
-	
-# SQL
-Kaj e smenato: 
-	- Discussion 
-	- Moderation
-	- Topics 
-	
-	
-	
-	# ne mozit dva topici so isto ime da imat vo eden thread ako sa sozdrzat. 
-	
-	
-KVERINJA
-
-- 
+	 

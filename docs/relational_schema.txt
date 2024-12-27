@@ -45,3 +45,59 @@
 22. **channel** (_**name**_, description, logo_url, _**project_id#(thread)**_, developer#(users))
 
 23. **messages** (_**sent_at**_, content, _**sent_by#(users)**_, _**project_id#(thread)**_, _**channel_name#(channel)**_)
+
+
+
+
+V2
+
+
+## Relational Schema
+
+1. **users** (_**username**_, is_activate, password, description, registered_at, sex)
+
+2. **moderator** (_**username#(users)**_)
+
+3. **developer** (_**username#(users)**_)
+
+4. **project_manager** (_**username#(users)**_)
+
+5. **thread** (_**id**_, content, _**username#(users)**_)
+
+6. **likes** (_**username#(users)**_, _**thread_id#(thread)**_)
+
+7. **topic_threads_moderators** (_**thread_id#(thread)**_, _**username#(users)**_)
+
+8. **tag** (_**name**_)
+
+9. **tag_threads** (_**thread_id#(thread)**_, _**tag_name#(tag)**_)
+
+10. **topic_thread** (_**id#(thread)**_, title, guidelines, next_discussion_id, parent_topic_id#(thread))
+
+11. **topic_belongs_to_project** (_**topic_id#(thread)**_, _**project_id#(thread)**_)
+
+12. **topic_blacklist** (_**topic_id#(thread)**_, _**username#(users)**_, _**moderator#(users)**_)
+
+13. **project_thread** (_**id#(thread)**_, title, repo_url)
+
+14. **discussion_thread** (_**id#(thread)**_, _**created_by_user#(users)**_, reply_discussion_id#(thread), topic_id#(thread))
+
+15. **developer_associated_with_project** (_**project_id#(thread)**_, _**developer#(users)**_, _**started_at**_, ended_at)
+
+16. **permissions** (_**name**_)
+
+17. **project_roles** (_**name**_, _**project_id#(thread)**_, description)
+
+18. **users_project_roles** (_**username#(users)**_, _**project_id#(thread)**_, _**role_name#(project_roles)**_)
+
+19. **project_roles_permissions** (_**permission_name#(permissions)**_, _**role_name#(project_roles)**_, _**project_id#(thread)**_)
+
+20. **project_request** (_**id**_, description, status, _**submited_by_user#(users)**_, _**project_id#(thread)**_)
+
+21. **report** (_**id**_, created_at, description, status, _**thread_id#(thread)**_, _**for_user#(users)**_, _**by_user#(users)**_)
+
+22. **channel** (_**name**_, description, logo_url, _**project_id#(thread)**_, _**developer#(users)**_)
+
+23. **messages** (_**sent_at**_, content, _**sent_by#(users)**_, _**project_id#(thread)**_, _**channel_name#(channel)**_)
+
+
