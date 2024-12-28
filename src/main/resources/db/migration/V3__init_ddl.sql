@@ -2,6 +2,8 @@
 --- Trigger za ko ke adnit dete na topic thread sho e vo proekt, da go dodajt kako belongs_to vo proektot
 --- Trigger za check dali reply na discussion thread pripagjat na ist topic thread kako na toj so mu pret reply
 --- IMENUVANJE: triggeri so provervat nesto prefix = check, funkcii za istite prefix = validate
+--- Nemame contraint sho velit deka sekoj topic thread trebat da e moderiran 
+
 ---- DROP TABLES
 DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS moderator CASCADE;
@@ -27,6 +29,7 @@ DROP TABLE IF EXISTS report CASCADE;
 DROP TABLE IF EXISTS channel CASCADE;
 DROP TABLE IF EXISTS messages CASCADE;
 DROP TABLE IF EXISTS threads_moderators CASCADE;
+drop table if exists blacklisted_user CASCADE; 
 drop type if exists status;
 drop function if exists add_child_topic;
 drop function if exists validate_same_parent;
@@ -35,10 +38,10 @@ drop function if exists validate_topic_title;
 create table users(
                       id serial PRIMARY key,
                       username varchar(32) UNIQUE NOT NULL,
-                      is_activate bool,
+                      is_activate bool not null,
                       password varchar(72),
                       description varchar(200),
-                      registered_at timestamp,
+                      registered_at timestamp not null, 
                       sex varchar(1)
 );
 create table moderator() inherits (users);
@@ -46,8 +49,8 @@ create table developer() inherits (users);
 create table project_manager() inherits (users);
 create table thread (
                         id serial primary key,
-                        content text,
-                        user_id int references users(id)
+                        content text not null,
+                        user_id int references users(id) not null 
 );
 create table likes(
                       user_id int references users(id),
@@ -68,8 +71,8 @@ create table tag_threads(
                             primary key(thread_id, tag_name)
 );
 create table topic_thread (
-                              title varchar(32),
-                              guidelines jsonb,
+                              title varchar(32) not null,
+                              guidelines jsonb not null,
                               next_discussion_id int,
                               parent_topic_id int REFERENCES thread(id)
 ) inherits (thread);
@@ -78,7 +81,7 @@ create table topic_belongs_to_project(
                                          project_id int references thread(id) on delete cascade,
                                          primary key(topic_id,project_id)
 );
-create table topic_blacklist(
+create table blacklisted_user(
                                 topic_id int REFERENCES thread(id) ON DELETE CASCADE,
                                 user_id int references users(id) on delete cascade,
                                 moderator_id int references users(id) on delete cascade,
@@ -87,13 +90,13 @@ create table topic_blacklist(
                                 primary key(user_id,moderator_id,topic_id,start_date)
 );
 create table project_thread (
-                                title varchar(32),
+                                title varchar(32) not null,
                                 repo_url text
 ) inherits (thread);
 create table discussion_thread(
-                                  user_id int not null references users(id),
+                                  user_id int references users(id),
                                   reply_discussion_id int REFERENCES thread(id),
-                                  topic_id int REFERENCES thread(id)
+                                  topic_id int REFERENCES thread(id) not null 
 ) inherits(thread);
 create table developer_associated_with_project(
                                                   project_id int references thread(id),
@@ -113,49 +116,49 @@ create table project_roles(
 );
 create table users_project_roles(
                                     user_id int references users(id),
-                                    project_id int,
-                                    role_name varchar(32),
+                                    project_id int ,
+                                    role_name varchar(32) ,
                                     FOREIGN KEY (role_name, project_id)
                                         REFERENCES project_roles(name, project_id),
                                     primary key(user_id, project_id, role_name)
 );
 create table project_roles_permissions(
                                           permission_name varchar(32) references permissions(name),
-                                          role_name varchar(32),
+                                          role_name varchar(32) ,
                                           project_id int,
                                           primary key(permission_name, role_name, project_id),
                                           FOREIGN KEY (role_name, project_id)
-                                              REFERENCES project_roles(name, project_id)
+                                              REFERENCES project_roles(name, project_id) 
 );
 CREATE TYPE status AS ENUM ('ACCEPTED', 'DENIED', 'PENDING');
 create table project_request(
                                 id serial primary key,
-                                description varchar (200),
-                                status status,
+                                description varchar (200) not null,
+                                status status not null,
                                 user_id int references users(id) not null,
                                 project_id int references thread(id) not null
 );
 create table report(
-                       id serial primary key,
-                       created_at timestamp,
-                       description varchar(200),
-                       status status,
-                       thread_id int references thread(id) not null,
-                       for_user_id int references users(id) not null,
-                       by_user_id int references users(id) not null
+                       id serial, 
+                       created_at timestamp not null,
+                       description varchar(200) not null,
+                       status status not null,
+                       thread_id int references thread(id),
+                       for_user_id int references users(id),
+                       by_user_id int references users(id), 
+                       primary key(id,thread_id,for_user_id,by_user_id)
 );
 create table channel (
                          name varchar (64),
                          description varchar(200),
-                         logo_url text,
                          project_id int references thread(id) on delete cascade,
                          developer_id int references users(id),
                          primary key(name, project_id)
 );
 create table messages (
                           sent_at timestamp,
-                          content varchar(200),
-                          sent_by int references users(id) not null,
+                          content varchar(200) not null,
+                          sent_by int references users(id),
                           project_id int,
                           channel_name varchar(64),
                           FOREIGN KEY (channel_name, project_id)
@@ -208,16 +211,33 @@ END IF;
 RETURN NEW;
 END;
 $$;
+
+create function validate_topics_moderation()
+returns trigger 
+LANGUAGE plpgsql 
+as $$
+BEGIN
+    
+END; 
+$$;  
 -------------------------- TRIGGERS ----------------------
+
 CREATE or replace TRIGGER check_topic_name
 	BEFORE INSERT OR UPDATE ON topic_thread
                                 FOR EACH ROW
                                 EXECUTE FUNCTION validate_topic_title();
+
 CREATE OR REPLACE TRIGGER project_insert_child_topic
 	AFTER INSERT ON topic_thread
 	FOR EACH ROW
 	EXECUTE FUNCTION add_child_topic();
+
 CREATE OR REPLACE TRIGGER check_same_parent
 	BEFORE INSERT ON discussion_thread
 	FOR EACH ROW
 	EXECUTE FUNCTION validate_same_parent();
+
+create or replace trigger check_topics_moderation
+    before insert on topic_thread
+    for each row 
+    EXECUTE function validate_topics_moderation
