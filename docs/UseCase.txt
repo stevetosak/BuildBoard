@@ -39,12 +39,12 @@ SQL ideas
 	- Site developeri vo daden proekt so dadena permisija p - (primer za kreiranje kanali)
 	- Vo kolku proekti imat ucestvuvano daden developer d.
 	- Od proektite so ucestvuval, vo koj najdolgo ucestvuval daden developer d.
-	- Kolku poraki imat pusteno nekoj developer d vo nekoj kanal k.
-	- Kolku poraki imat pusteno nekoj developer d vo vkupno vo site kanali na proekt p.
-	- Kolku developers imat vo proekt p
-	- Kolku razlicni developeri blacklistnal proektot p.
+	- Site poraki od daden developer vo daden kanal ili od site kanali
+	- Search spored content na poraka vo kanal
+	- Koi developers imat vo proekt p
+	//- Kolku razlicni developeri blacklistnal proektot p.
 	- Kolu pati daden developer d imat ucevstvuvano vo proekt p (primer ako zaprit pa pak vlezit pa pak...)
-	- Kolku kanali imat kreirano daden developer d
+	- Kolku kanali imat kreirano daden developer d (mozda za badge)
 	- Kolku useri vlegle vo proekt p vo daden interval na vreme i.
 	
 	
