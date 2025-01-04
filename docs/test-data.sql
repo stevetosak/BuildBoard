@@ -1,10 +1,10 @@
 INSERT INTO users (username, is_activate, password, description, registered_at, sex)
 VALUES
-    ('user1', true, 'password1', 'First user', NOW(), 'M'),
-    ('user2', true, 'password2', 'Second user', NOW(), 'F'),
-    ('user3', true, 'password3', 'Third user', NOW(), 'M'),
-    ('user4', true, 'password4', 'Fourth user', NOW(), 'F'),
-    ('user5', true, 'password5', 'Fifth user', NOW(), 'M');
+    ('user1', true, '$2a$12$0f.x7aBM2wFBZBXoLPj0BObVsk.J1kXFYo5nb4niAWkI4hk5tHvDy', 'First user', NOW(), 'M'),
+    ('user2', true, '$2a$12$VkR0a47LDVM6aUqFcEJGSu9jhZCz.05tCoyiRicFObt4f2x2gijKa', 'Second user', NOW(), 'F'),
+    ('user3', true, '$2a$12$eSLdHHJ1KFgv.dOupmloXeItjrt2o1IB6ER6Nq7WYj9Jfr2bEwK2a', 'Third user', NOW(), 'M'),
+    ('user4', true, '$2a$12$dF5SXcNhMulgU3Qre3nh1e.aatRiJZsnfoBSqReGnXe9rIbHYVWhe', 'Fourth user', NOW(), 'F'),
+    ('user5', true, '$2a$12$zHrloz8WG2zo5S6MTf1C0ez1raMlmDJdB8OOa2I1S2pVy9oI76YTa', 'Fifth user', NOW(), 'M');
 
 INSERT INTO thread (content, user_id)
 VALUES

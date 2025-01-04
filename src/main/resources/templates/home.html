@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home Page</title>
+</head>
+<body>
+
+<nav>
+    Test
+<!--    nezz zosto e null ova i od ko ke sa  najavit-->
+    <div th:if="${session.user != null}">
+        <p th:text="${session.user.getUsername()}">uasdasd</p>
+    </div>
+    <a href="/login">Log in</a>
+
+</nav>
+<section>
+
+</section>
+</body>
+</html>

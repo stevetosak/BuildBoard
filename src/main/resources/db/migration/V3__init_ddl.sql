@@ -34,8 +34,11 @@ DROP VIEW IF EXISTS v_discussion_thread CASCADE;
 DROP VIEW IF EXISTS v_developer CASCADE;
 DROP VIEW IF EXISTS v_project_owner CASCADE;
 DROP VIEW IF EXISTS v_moderator CASCADE;
-DROP FUNCTION IF EXISTS fn_project_insert_child_topic CASCADE;
-DROP FUNCTION IF EXISTS fn_validate_same_parent CASCADE;
+drop function if exists fn_insert_project_manager CASCADE;
+drop function if exists fn_insert_topics_creator_as_moderator CASCADE;
+drop function if exists fn_validate_topic_title CASCADE;
+drop function if exists clean_tables CASCADE;
+drop function if exists clean_routines CASCADE;
 DROP TRIGGER IF EXISTS validate_same_parent ON discussion_thread CASCADE;
 ---- DDL
 CREATE TABLE users
