@@ -5,7 +5,6 @@ import com.db.finki.www.build_board.entity.threads.multi_valued_attributes.Guide
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Map;
 import java.util.List;
 
 @Data

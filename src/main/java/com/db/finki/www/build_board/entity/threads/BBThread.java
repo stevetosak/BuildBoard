@@ -2,6 +2,9 @@ package com.db.finki.www.build_board.entity.threads;
 
 import com.db.finki.www.build_board.entity.user_types.BBUser;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.*;
 
 import java.util.ArrayList;

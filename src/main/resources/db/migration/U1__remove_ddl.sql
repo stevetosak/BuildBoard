@@ -35,4 +35,3 @@ drop function if exists fn_validate_topic_title CASCADE;
 drop function if exists clean_tables CASCADE;
 drop function if exists clean_routines CASCADE;
 DROP TRIGGER IF EXISTS validate_same_parent ON discussion_thread CASCADE;
-
