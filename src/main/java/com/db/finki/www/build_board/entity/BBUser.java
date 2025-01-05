@@ -1,5 +1,6 @@
 package com.db.finki.www.build_board.entity;
 
+import com.db.finki.www.build_board.entity.threads.BBThread;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,6 +27,9 @@ public class BBUser implements UserDetails, Serializable {
     @Column(name = "is_activate")
     private boolean isEnabled;
     private String sex;
+
+    @OneToMany(mappedBy = "user")
+    private List<BBThread> threads;
 
     @Override
     public boolean isEnabled() {
