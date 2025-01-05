@@ -1,4 +1,4 @@
-package com.db.finki.www.build_board.service.threads;
+package com.db.finki.www.build_board.service.threads.impl;
 
 import com.db.finki.www.build_board.entity.threads.interfaces.NamedThread;
 import org.springframework.stereotype.Service;

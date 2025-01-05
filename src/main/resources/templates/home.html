@@ -11,7 +11,7 @@
 <body>
 <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
     <div class="container">
-        <a class="navbar-brand" href="/">Forum App</a>
+        <a class="navbar-brand" href="/">BuildBoard</a>
         <div th:if="${session.user != null}" class="d-flex align-items-center">
             <span class="me-2" th:text="${session.user.getUsername()}">Username</span>
             <a href="/logout" class="btn btn-outline-primary btn-sm">Log out</a>
@@ -29,7 +29,7 @@
         <div class="list-group-item" th:each="thread : ${threads}">
             <div class="d-flex w-100 justify-content-between">
                 <h5 class="mb-1">
-                    <a th:href="@{/{type}/{id} (type=${thread.getTypeName()},id=${thread.getId()})}"
+                    <a th:href="@{/{type}/{name} (type=${thread.getTypeName()},name=${thread.getTitle()})}"
                        th:text="${thread.getTitle()}" class="text-decoration-none"></a>
                 </h5>
 <!--                <small th:text="${thread.getFormattedDate()}">Date</small>-->

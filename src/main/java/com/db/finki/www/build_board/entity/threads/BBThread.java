@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -31,7 +32,7 @@ public class BBThread {
             joinColumns = @JoinColumn(name = "thread_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_name")
     )
-    protected List<Tag> tags;
+    protected List<Tag> tags = new ArrayList<>();
 
     public Integer getId() {return id;}
 
@@ -45,5 +46,17 @@ public class BBThread {
 
     public void setUser(BBUser user) {
         this.user = user;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public BBUser getUser() {
+        return user;
+    }
+
+    public List<Tag> getTags() {
+        return tags;
     }
 }

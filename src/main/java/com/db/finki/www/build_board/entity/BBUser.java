@@ -50,4 +50,24 @@ public class BBUser implements UserDetails, Serializable {
         return List.of();
     }
 
+
+    public int getId() {
+        return id;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public LocalDateTime getRegisteredAt() {
+        return registeredAt;
+    }
+
+    public String getSex() {
+        return sex;
+    }
+
+    public List<BBThread> getThreads() {
+        return threads;
+    }
 }

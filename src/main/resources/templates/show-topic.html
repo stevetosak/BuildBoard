@@ -2,9 +2,113 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Topic</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${topic.getTitle()}"></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
 
+<main class="container mt-5">
+    <!-- Topic Title and Description -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h3 th:text="${topic.getTitle()}">Topic Title</h3>
+            <!-- Add Tag Button -->
+            <button class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#addTagModal">Add Tag</button>
+        </div>
+        <div class="card-body">
+            <p th:text="${topic.getContent()}">Description of the topic goes here.</p>
+            <!-- Tags Section -->
+            <div>
+                <h6>Tags:</h6>
+                <ul class="list-inline">
+                    <li th:each="tag : ${topic.getTags()}" class="list-inline-item">
+                        <span class="badge bg-info text-dark" th:text="${tag.getName()}">Tag Name</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <!-- Delete Topic Button -->
+        <div th:if="${session.user.getId() != null && session.user.getId() == topic.getUser().getId()}" class="card-footer d-flex justify-content-between">
+            <form th:action="@{/topic/delete/{id} (id=${topic.getId()})}" method="post" style="display:inline;">
+                <input type="hidden" name="id" th:value="${topic.getId()}" />
+                <button type="submit" class="btn btn-danger btn-sm">Delete Topic</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Reply Form -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">Add a Reply</h5>
+        </div>
+        <div class="card-body">
+            <form action="/topic/reply" method="post">
+                <div class="mb-3">
+                    <label for="reply" class="form-label">Your Reply</label>
+                    <textarea id="reply" name="reply" class="form-control" rows="3" placeholder="Write your reply here" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-success w-100">Post Reply</button>
+            </form>
+        </div>
+    </div>
+</main>
+
+<!-- Add Tag Modal -->
+<div class="modal fade" id="addTagModal" tabindex="-1" aria-labelledby="addTagModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addTagModalLabel">Add a Tag</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form th:action="@{/topic/add-tag/{id} (id=${topic.getId()})}" method="post" id="addTagForm">
+                    <div class="mb-3">
+                        <label for="tagName" class="form-label">Tag Name</label>
+                        <!-- Dropdown Select -->
+                        <select id="existingTags" class="form-select mb-3" name="tagName">
+                            <option value="" selected disabled>Select an existing tag</option>
+                            <option th:each="tag : ${tags}" th:value="${tag.getName()}" th:text="${tag.getName()}">Example Tag</option>
+                            <option value="custom">Enter a custom tag...</option>
+                        </select>
+
+                        <input type="text" id="customTag" class="form-control d-none" placeholder="Enter custom tag name" />
+
+
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Add Tag</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const existingTags = document.getElementById("existingTags");
+        const customTagInput = document.getElementById("customTag");
+
+        existingTags.addEventListener("change", function () {
+            if (this.value === "custom") {
+                customTagInput.classList.remove("d-none");
+                customTagInput.required = true;
+                customTagInput.name = "tagName";
+                existingTags.name = "";
+            } else {
+                customTagInput.classList.add("d-none");
+                customTagInput.required = false;
+                customTagInput.name = "";
+                existingTags.name = "tagName";
+                customTagInput.value = "";
+            }
+        });
+    });
+
+</script>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

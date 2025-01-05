@@ -1,6 +1,6 @@
 package com.db.finki.www.build_board.controller;
 
-import com.db.finki.www.build_board.service.threads.NamedThreadService;
+import com.db.finki.www.build_board.service.threads.impl.NamedThreadService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;

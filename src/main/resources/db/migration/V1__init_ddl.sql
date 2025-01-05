@@ -40,6 +40,7 @@ drop function if exists fn_validate_topic_title CASCADE;
 drop function if exists clean_tables CASCADE;
 drop function if exists clean_routines CASCADE;
 DROP TRIGGER IF EXISTS validate_same_parent ON discussion_thread CASCADE;
+
 ---- DDL
 CREATE TABLE users
 (
@@ -71,19 +72,19 @@ CREATE TABLE thread
 );
 CREATE TABLE topic_thread
 (
-    title           VARCHAR(32) NOT NULL,
+    title           VARCHAR(256) NOT NULL,
     guidelines      jsonb,
     parent_id INT REFERENCES thread (id),
     id              INT PRIMARY KEY REFERENCES thread (id) on delete cascade
 );
 CREATE TABLE discussion_thread
 (
-    parent_id           INT REFERENCES thread (id) NOT NULL,
+    parent_id           INT REFERENCES thread (id) on delete cascade NOT NULL,
     id                  INT PRIMARY KEY REFERENCES thread (id) on delete cascade
 );
 CREATE TABLE project_thread
 (
-    title    VARCHAR(32) NOT NULL,
+    title    VARCHAR(256) NOT NULL,
     repo_url TEXT,
     id       INT PRIMARY KEY REFERENCES thread (id) on delete cascade
 );
@@ -105,8 +106,8 @@ CREATE TABLE tag
 );
 CREATE TABLE tag_threads
 (
-    thread_id INT REFERENCES thread (id),
-    tag_name  VARCHAR(64) REFERENCES tag (name),
+    thread_id INT REFERENCES thread (id) ON DELETE CASCADE ,
+    tag_name  VARCHAR(64) REFERENCES tag (name) ON DELETE CASCADE,
     PRIMARY KEY (thread_id, tag_name)
 );
 
