@@ -1,0 +1,59 @@
+Use Cases
+
+User
+	- Kreirat topic.
+	- Kreirat discussion thread vo topic thread.
+	- Pravi reply na discussion thread.
+	- Stava like na thread. 
+	- Korisnik prijavuva drug korisnik za nesoodvetno odnesuvanje. 
+	- Korisnikot se prijavuva za uchestvo vo proekt.
+	- Referencira drug thread.
+	
+Moderator
+	- Nadgleduvat odreden Topic/Project thraed.
+	- Dodavat/Kreirat tagoj na dadeni topics. 
+	- Otstranuvat korisnik od topicot. 
+	
+Developer
+	- Kreirat kanal vo project.
+	- Pisuva poraka vo kanal.
+
+Project Owner
+	- Odobruva ili odbiva baranja za ucestvo vo negoviot proekt.
+	- Otstranuva developer od proekt.
+	- Kreira roles za daden proekt
+	- Dodava roles na daden developer
+	
+	
+SQL ideas
+	
+	- Site replies na daden thread t
+	- Site replies na daden thread t do dadeno nivo n - (primer ako imas thread -> reply1 -> reply2 -> reply3 -> reply2a, da gi prikazis site threads do reply2 i reply2a (ova znacit deka sa na isto nivo), znacit ke gi imas: thread -> reply1 -> reply2 -> reply2a. )
+	- Site vgnezdeni topic threads vo daden root topic thread t
+	- Kolku pati daden user u bil blacklistnat od nekoj topic/ project i/ili globalno od koj bilo
+	- Broj na replies na daden discussion thread ( ke trebit za sortiranje )
+	- Broj na likes na daden discussion thread.
+	- Broj na useri vo daden topic t (spored liked relacijata mozit ova da sa presmetat)
+	- Broj na reports so imat user submitnato vkupno
+	- Broj na reports so sa imat podneseno protiv daden user u
+	- Site developeri vo daden proekt so dadena permisija p - (primer za kreiranje kanali)
+	- Vo kolku proekti imat ucestvuvano daden developer d.
+	- Od proektite so ucestvuval, vo koj najdolgo ucestvuval daden developer d.
+	- Site poraki od daden developer vo daden kanal ili od site kanali
+	- Search spored content na poraka vo kanal
+	- Koi developers imat vo proekt p
+	//- Kolku razlicni developeri blacklistnal proektot p.
+	- Kolu pati daden developer d imat ucevstvuvano vo proekt p (primer ako zaprit pa pak vlezit pa pak...)
+	- Kolku kanali imat kreirano daden developer d (mozda za badge)
+	- Kolku useri vlegle vo proekt p vo daden interval na vreme i.
+	
+	
+	--- Ideja za achievements
+		Sekoj user so nad N likes na nekoj discussion thread vo daden topic thread da dobiet nekakov achievement(badge)
+		Developer so ucestvuval vo nad N proekti nekoj badge
+		
+		
+		
+
+
+	 
