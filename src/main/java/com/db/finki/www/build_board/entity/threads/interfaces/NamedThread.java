@@ -1,8 +1,6 @@
 package com.db.finki.www.build_board.entity.threads.interfaces;
 
-import java.math.BigInteger;
-
-public interface ThreadsWithTittle {
+public interface NamedThread {
     String getTitle();
     String getTypeName();
     Integer getId();

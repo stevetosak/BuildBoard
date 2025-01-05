@@ -1,7 +1,6 @@
 package com.db.finki.www.build_board.controller;
 
-import com.db.finki.www.build_board.service.threads.ThreadsWithTittleService;
-import com.db.finki.www.build_board.service.threads.TopicsService;
+import com.db.finki.www.build_board.service.threads.NamedThreadService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,15 +9,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("/")
 public class HomePageController {
-    private final ThreadsWithTittleService threadsWithTittleService;
+    private final NamedThreadService namedThreadService;
 
-    public HomePageController(ThreadsWithTittleService threadsWithTittleService) {
-        this.threadsWithTittleService = threadsWithTittleService;
+    public HomePageController(NamedThreadService namedThreadService) {
+        this.namedThreadService = namedThreadService;
     }
 
     @GetMapping
     public String homePage(Model model) {
-        model.addAttribute("threads",threadsWithTittleService.findAll());
+        model.addAttribute("threads", namedThreadService.findAll());
         return "home";
     }
 }

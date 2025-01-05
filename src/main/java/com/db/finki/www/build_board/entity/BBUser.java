@@ -14,6 +14,7 @@ import java.util.List;
 @Entity
 @Table(name = "users")
 @Getter @Setter
+@Inheritance(strategy = InheritanceType.JOINED)
 public class BBUser implements UserDetails, Serializable {
 
     @Id

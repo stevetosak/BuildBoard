@@ -1,23 +1,23 @@
 package com.db.finki.www.build_board.entity.threads;
 
-import com.db.finki.www.build_board.entity.threads.interfaces.ThreadsWithTittle;
+import com.db.finki.www.build_board.entity.threads.interfaces.NamedThread;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
-import java.math.BigInteger;
 import java.util.Map;
 
 @Entity
-@Data
 @NoArgsConstructor
 @Table(name = "topic_thread")
-public class Topic extends BBThread implements ThreadsWithTittle {
+public class Topic extends BBThread implements NamedThread {
 
     private String title;
 
@@ -34,4 +34,5 @@ public class Topic extends BBThread implements ThreadsWithTittle {
     public Integer getId() {return super.getId();}
     @Override
     public String getTitle() {return this.title;}
+    public void setTitle(String title) {this.title = title;}
 }

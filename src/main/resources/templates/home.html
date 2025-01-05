@@ -1,28 +1,45 @@
 <!DOCTYPE html>
 <html lang="en"
       xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:th="http://www.thymeleaf.org"
->
+      xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home Page</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-<nav>
-    <div th:if="${session.user != null}">
-        <p th:text="${session.user.getUsername()}">uasdasd</p>
+<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+    <div class="container">
+        <a class="navbar-brand" href="/">Forum App</a>
+        <div th:if="${session.user != null}" class="d-flex align-items-center">
+            <span class="me-2" th:text="${session.user.getUsername()}">Username</span>
+            <a href="/logout" class="btn btn-outline-primary btn-sm">Log out</a>
+        </div>
+        <a href="/login" class="btn btn-primary btn-sm ms-auto" th:if="${session.user == null}">Log in</a>
     </div>
-    <a href="/login">Log in</a>
 </nav>
-<main>
-    <ol>
-        <li th:each="thread:${threads}">
-            <a th:href="@{/{type}/{id} (type=${thread.getTypeName()},id=${thread.getId()})}"
-               th:text="${thread.getTitle()}"></a>
-        </li>
-    </ol>
+
+<main class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h4">Threads</h1>
+        <a href="/topic/create" class="btn btn-success btn-sm">Create Topic</a>
+    </div>
+    <div class="list-group">
+        <div class="list-group-item" th:each="thread : ${threads}">
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">
+                    <a th:href="@{/{type}/{id} (type=${thread.getTypeName()},id=${thread.getId()})}"
+                       th:text="${thread.getTitle()}" class="text-decoration-none"></a>
+                </h5>
+<!--                <small th:text="${thread.getFormattedDate()}">Date</small>-->
+            </div>
+<!--            <p class="mb-1 text-muted" th:text="${thread.getDescription()}">Thread description here...</p>-->
+<!--            <small th:text="${thread.getAuthor()}">Posted by Author</small>-->
+        </div>
+    </div>
 </main>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
