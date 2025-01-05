@@ -39,20 +39,6 @@ VALUES
     (3, 5),
     (4, 6),
     (5, 7);
-
-INSERT INTO tag (name)
-VALUES
-    ('Tag1'),
-    ('Tag2'),
-    ('Tag3');
-
-INSERT INTO tag_threads (thread_id, tag_name)
-VALUES
-    (1, 'Tag1'),
-    (3, 'Tag2'),
-    (5, 'Tag3'),
-    (6, 'Tag1');
-
 INSERT INTO topic_belongs_to_project (topic_id, project_id)
 VALUES
     (1, 5),
@@ -108,3 +94,4 @@ INSERT INTO messages (sent_at, content, sent_by, project_id, channel_name)
 VALUES
     (NOW(), 'Hello, team!', 2, 5, 'General'),
     (NOW(), 'We need to push the deadline.', 3, 5, 'Updates');
+   
