@@ -8,13 +8,15 @@
 </head>
 <body>
 
+
+
 <main class="container mt-5">
     <!-- Topic Title and Description -->
     <div class="card shadow-sm mb-4">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
             <h3 th:text="${topic.getTitle()}">Topic Title</h3>
             <!-- Add Tag Button -->
-            <button class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#addTagModal">Add Tag</button>
+            <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#addTagModal">Add Tag</button>
         </div>
         <div class="card-body">
             <p th:text="${topic.getContent()}">Description of the topic goes here.</p>
@@ -23,17 +25,31 @@
                 <h6>Tags:</h6>
                 <ul class="list-inline">
                     <li th:each="tag : ${topic.getTags()}" class="list-inline-item">
-                        <span class="badge bg-info text-dark" th:text="${tag.getName()}">Tag Name</span>
+            <span class="badge bg-info text-dark d-inline-flex align-items-center">
+                <span th:text="${tag.getName()}">Tag Name</span>
+                <form th:action="@{/topic/delete-tag/{topicId}/{tagName} (topicId=${topic.getId()}, tagName=${tag.getName()})}"
+                      method="post" style="margin-left: 5px;">
+                    <button type="submit" class="btn btn-sm btn-link text-danger p-0 ms-1" style="line-height: 1;">
+                        &times;
+                    </button>
+                </form>
+            </span>
                     </li>
                 </ul>
             </div>
+
+
+
         </div>
-        <!-- Delete Topic Button -->
+        <!-- Edit and Delete Buttons for Topic -->
         <div th:if="${session.user.getId() != null && session.user.getId() == topic.getUser().getId()}" class="card-footer d-flex justify-content-between">
-            <form th:action="@{/topic/delete/{id} (id=${topic.getId()})}" method="post" style="display:inline;">
-                <input type="hidden" name="id" th:value="${topic.getId()}" />
-                <button type="submit" class="btn btn-danger btn-sm">Delete Topic</button>
-            </form>
+            <div>
+                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editTopicModal">Edit Topic</button>
+                <form th:action="@{/topic/delete/{id} (id=${topic.getId()})}" method="post" style="display:inline;">
+                    <input type="hidden" name="id" th:value="${topic.getId()}" />
+                    <button type="submit" class="btn btn-danger btn-sm">Delete Topic</button>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -52,6 +68,20 @@
             </form>
         </div>
     </div>
+
+    <!-- Replies Section -->
+<!--    <div th:each="reply : ${replies}" class="card shadow-sm mt-4">-->
+<!--        <div class="card-header bg-light d-flex justify-content-between align-items-center">-->
+<!--            <span th:text="${reply.getUser().getName()}">Reply Author</span>-->
+<!--            &lt;!&ndash; Edit Button for Replies &ndash;&gt;-->
+<!--            <div th:if="${session.user.getId() != null && session.user.getId() == reply.getUser().getId()}">-->
+<!--                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editReplyModal" th:attr="data-reply-id=${reply.getId()}">Edit Reply</button>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--        <div class="card-body">-->
+<!--            <p th:text="${reply.getContent()}">Reply content goes here.</p>-->
+<!--        </div>-->
+<!--    </div>-->
 </main>
 
 <!-- Add Tag Modal -->
@@ -66,16 +96,12 @@
                 <form th:action="@{/topic/add-tag/{id} (id=${topic.getId()})}" method="post" id="addTagForm">
                     <div class="mb-3">
                         <label for="tagName" class="form-label">Tag Name</label>
-                        <!-- Dropdown Select -->
                         <select id="existingTags" class="form-select mb-3" name="tagName">
                             <option value="" selected disabled>Select an existing tag</option>
                             <option th:each="tag : ${tags}" th:value="${tag.getName()}" th:text="${tag.getName()}">Example Tag</option>
                             <option value="custom">Enter a custom tag...</option>
                         </select>
-
                         <input type="text" id="customTag" class="form-control d-none" placeholder="Enter custom tag name" />
-
-
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Add Tag</button>
                 </form>
@@ -84,30 +110,51 @@
     </div>
 </div>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const existingTags = document.getElementById("existingTags");
-        const customTagInput = document.getElementById("customTag");
+<!-- Edit Topic Modal -->
+<div class="modal fade" id="editTopicModal" tabindex="-1" aria-labelledby="editTopicModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editTopicModalLabel">Edit Topic</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form th:action="@{/topic/edit/{id} (id=${topic.getId()})}" method="post">
+                    <div class="mb-3">
+                        <label for="topicTitle" class="form-label">Title</label>
+                        <input type="text" id="topicTitle" name="title" class="form-control" th:value="${topic.getTitle()}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="topicContent" class="form-label">Content</label>
+                        <textarea id="topicContent" name="content" class="form-control" rows="5" th:text="${topic.getContent()}" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
-        existingTags.addEventListener("change", function () {
-            if (this.value === "custom") {
-                customTagInput.classList.remove("d-none");
-                customTagInput.required = true;
-                customTagInput.name = "tagName";
-                existingTags.name = "";
-            } else {
-                customTagInput.classList.add("d-none");
-                customTagInput.required = false;
-                customTagInput.name = "";
-                existingTags.name = "tagName";
-                customTagInput.value = "";
-            }
-        });
-    });
-
-</script>
-
-
+<!-- Edit Reply Modal -->
+<!--<div class="modal fade" id="editReplyModal" tabindex="-1" aria-labelledby="editReplyModalLabel" aria-hidden="true">-->
+<!--    <div class="modal-dialog">-->
+<!--        <div class="modal-content">-->
+<!--            <div class="modal-header">-->
+<!--                <h5 class="modal-title" id="editReplyModalLabel">Edit Reply</h5>-->
+<!--                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>-->
+<!--            </div>-->
+<!--            <div class="modal-body">-->
+<!--                <form th:action="@{/reply/edit/{id} (id=${reply.getId()})}" method="post">-->
+<!--                    <div class="mb-3">-->
+<!--                        <label for="replyContent" class="form-label">Reply Content</label>-->
+<!--                        <textarea id="replyContent" name="content" class="form-control" rows="3" th:text="${reply.getContent()}" required></textarea>-->
+<!--                    </div>-->
+<!--                    <button type="submit" class="btn btn-primary w-100">Save Changes</button>-->
+<!--                </form>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
