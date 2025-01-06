@@ -10,8 +10,10 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Entity
+@NoArgsConstructor
 @Table(name = "topic_thread")
 public class Topic extends BBThread implements NamedThread {
+
     private String title;
 
     @OneToMany(mappedBy = "topic")
