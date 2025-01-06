@@ -6,5 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ProjectRepository extends JpaRepository<Project, Long> {
-
+    Project findByTitleStartingWith(String title);
+    void deleteByTitle(String title);
 }

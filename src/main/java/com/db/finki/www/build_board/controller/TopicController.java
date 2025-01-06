@@ -1,6 +1,6 @@
 package com.db.finki.www.build_board.controller;
 
-import com.db.finki.www.build_board.entity.BBUser;
+import com.db.finki.www.build_board.entity.user_types.BBUser;
 import com.db.finki.www.build_board.entity.threads.Topic;
 import com.db.finki.www.build_board.service.threads.itfs.TagService;
 import com.db.finki.www.build_board.service.threads.itfs.TopicService;

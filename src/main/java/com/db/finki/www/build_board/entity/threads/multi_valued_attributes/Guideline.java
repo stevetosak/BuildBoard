@@ -1,0 +1,20 @@
+package com.db.finki.www.build_board.entity.threads.multi_valued_attributes;
+
+import com.db.finki.www.build_board.entity.threads.Topic;
+import jakarta.persistence.*;
+import lombok.Data;
+
+@Data
+@Entity
+@Table(name = "topic_guidelines")
+public class Guideline {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "topic_id")
+    private Topic topic;
+
+    private String description;
+}

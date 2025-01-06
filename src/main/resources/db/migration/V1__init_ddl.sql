@@ -54,15 +54,15 @@ CREATE TABLE users
 );
 CREATE TABLE moderator
 (
-    id INT PRIMARY KEY REFERENCES users (id)  on delete cascade
+    id INT PRIMARY KEY REFERENCES users (id) on delete cascade
 );
 CREATE TABLE developer
 (
-    id INT PRIMARY KEY REFERENCES users (id)  on delete cascade
+    id INT PRIMARY KEY REFERENCES users (id) on delete cascade
 );
 CREATE TABLE project_manager
 (
-    id INT PRIMARY KEY REFERENCES users (id)  on delete cascade
+    id INT PRIMARY KEY REFERENCES users (id) on delete cascade
 );
 CREATE TABLE thread
 (
@@ -72,15 +72,21 @@ CREATE TABLE thread
 );
 CREATE TABLE topic_thread
 (
-    title           VARCHAR(256) NOT NULL,
-    guidelines      jsonb,
+    title     VARCHAR(256) NOT NULL,
     parent_id INT REFERENCES thread (id),
-    id              INT PRIMARY KEY REFERENCES thread (id) on delete cascade
+    id        INT PRIMARY KEY REFERENCES thread (id) on delete cascade
+);
+create table topic_guidelines
+(
+    id          serial,
+    topic_id    int references topic_thread (id),
+    description text,
+    PRIMARY KEY (id, topic_id)
 );
 CREATE TABLE discussion_thread
 (
-    parent_id           INT REFERENCES thread (id) on delete cascade NOT NULL,
-    id                  INT PRIMARY KEY REFERENCES thread (id) on delete cascade
+    parent_id INT REFERENCES thread (id) on delete cascade NOT NULL,
+    id        INT PRIMARY KEY REFERENCES thread (id) on delete cascade
 );
 CREATE TABLE project_thread
 (
@@ -106,7 +112,7 @@ CREATE TABLE tag
 );
 CREATE TABLE tag_threads
 (
-    thread_id INT REFERENCES thread (id) ON DELETE CASCADE ,
+    thread_id INT REFERENCES thread (id) ON DELETE CASCADE,
     tag_name  VARCHAR(64) REFERENCES tag (name) ON DELETE CASCADE,
     PRIMARY KEY (thread_id, tag_name)
 );
@@ -204,6 +210,8 @@ CREATE TABLE messages
         REFERENCES channel (name, project_id) ON DELETE CASCADE,
     PRIMARY KEY (channel_name, project_id, sent_at, sent_by)
 );
+
+
 ------------------------VIEWS-----------------------------
 CREATE OR REPLACE VIEW v_project_thread
 AS
@@ -213,13 +221,13 @@ FROM project_thread project
               ON project.id = thread.id;
 CREATE OR REPLACE VIEW v_discussion_thread
 AS
-SELECT thread.id, content, user_id,parent_id
+SELECT thread.id, content, user_id, parent_id
 FROM discussion_thread discussion
          JOIN thread
               ON discussion.id = thread.id;
 CREATE OR REPLACE VIEW v_topic_thread
 AS
-SELECT thread.id, content, user_id, title, guidelines, parent_id
+SELECT thread.id, content, user_id, title, parent_id
 FROM topic_thread topic
          JOIN thread
               ON topic.id = thread.id;
@@ -266,11 +274,12 @@ BEGIN
        (SELECT title
         FROM topic_thread
                  AS t
-        WHERE t.parent_id = new.parent_id OR (t.parent_id IS NULL AND new.parent_id IS NULL))
+        WHERE t.parent_id = new.parent_id
+           OR (t.parent_id IS NULL AND new.parent_id IS NULL))
     THEN
         RAISE EXCEPTION 'There already exists a topic with title % in parent topic with id %',new.title,new.parent_id;
-END IF;
-RETURN new;
+    END IF;
+    RETURN new;
 END;
 $$;
 CREATE OR REPLACE FUNCTION fn_insert_topics_creator_as_moderator()
@@ -279,36 +288,37 @@ CREATE OR REPLACE FUNCTION fn_insert_topics_creator_as_moderator()
 AS
 $$
 DECLARE
-v_user_id INT;
+    v_user_id INT;
 BEGIN
-SELECT v_topic_thread.user_id
-INTO v_user_id
-FROM v_topic_thread
-WHERE v_topic_thread.id = new.id;
-INSERT INTO topic_threads_moderators(thread_id, user_id) VALUES (new.id, v_user_id);
-RETURN NEW;
+    SELECT v_topic_thread.user_id
+    INTO v_user_id
+    FROM v_topic_thread
+    WHERE v_topic_thread.id = new.id;
+    INSERT INTO topic_threads_moderators(thread_id, user_id) VALUES (new.id, v_user_id);
+    RETURN NEW;
 END;
 $$;
 
 CREATE OR REPLACE FUNCTION fn_insert_project_manager()
-RETURNS TRIGGER
-LANGUAGE plpgsql
+    RETURNS TRIGGER
+    LANGUAGE plpgsql
 AS
-    $$
-    DECLARE usrId INT;
+$$
+DECLARE
+    usrId INT;
 BEGIN
-SELECT user_id INTO usrId FROM v_project_thread p WHERE NEW.id = p.id;
-INSERT INTO developer VALUES (usrId);
-INSERT INTO project_manager VALUES (usrId);
-RETURN NEW;
+    SELECT user_id INTO usrId FROM v_project_thread p WHERE NEW.id = p.id;
+    INSERT INTO developer VALUES (usrId);
+    INSERT INTO project_manager VALUES (usrId);
+    RETURN NEW;
 END;
-    $$;
+$$;
 -------------------------- TRIGGERS ----------------------
 CREATE OR REPLACE TRIGGER tr_check_topic_name
     BEFORE INSERT OR UPDATE
-                                ON topic_thread
-                                FOR EACH ROW
-                                EXECUTE FUNCTION fn_validate_topic_title();
+    ON topic_thread
+    FOR EACH ROW
+EXECUTE FUNCTION fn_validate_topic_title();
 CREATE OR REPLACE TRIGGER tr_insert_topics_creator_as_moderator
     AFTER INSERT
     ON topic_thread
@@ -318,4 +328,6 @@ CREATE OR REPLACE TRIGGER tr_insert_project_manager
     AFTER INSERT
     ON project_thread
     FOR EACH ROW
-    EXECUTE FUNCTION fn_insert_project_manager();
+EXECUTE FUNCTION fn_insert_project_manager();
+
+---TODO: trigeri za trgnanje na project_owner ako se trgnit project i nekoj takvi dependencies

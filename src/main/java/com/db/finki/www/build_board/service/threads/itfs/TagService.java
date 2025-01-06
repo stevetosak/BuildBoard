@@ -8,4 +8,5 @@ import java.util.List;
 public interface TagService {
     Tag findByName(String name);
     List<Tag> findAll();
+    Tag create(String name);
 }

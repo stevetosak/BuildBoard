@@ -23,7 +23,10 @@
 <main class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1 class="h4">Threads</h1>
-        <a href="/topic/create" class="btn btn-success btn-sm">Create Topic</a>
+        <div>
+            <a href="/topic/create" class="btn btn-success btn-sm">Create Topic</a>
+            <a href="project/create" class="btn btn-success btn-sm">Create Project</a>
+        </div>
     </div>
     <div class="list-group">
         <div class="list-group-item" th:each="thread : ${threads}">
@@ -32,10 +35,10 @@
                     <a th:href="@{/{type}/{name} (type=${thread.getTypeName()},name=${thread.getTitle()})}"
                        th:text="${thread.getTitle()}" class="text-decoration-none"></a>
                 </h5>
-<!--                <small th:text="${thread.getFormattedDate()}">Date</small>-->
+                <!--                <small th:text="${thread.getFormattedDate()}">Date</small>-->
             </div>
-<!--            <p class="mb-1 text-muted" th:text="${thread.getDescription()}">Thread description here...</p>-->
-<!--            <small th:text="${thread.getAuthor()}">Posted by Author</small>-->
+            <!--            <p class="mb-1 text-muted" th:text="${thread.getDescription()}">Thread description here...</p>-->
+            <!--            <small th:text="${thread.getAuthor()}">Posted by Author</small>-->
         </div>
     </div>
 </main>

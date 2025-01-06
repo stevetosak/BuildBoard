@@ -1,6 +1,6 @@
 package com.db.finki.www.build_board.service.threads.impl;
 
-import com.db.finki.www.build_board.entity.BBUser;
+import com.db.finki.www.build_board.entity.user_types.BBUser;
 import com.db.finki.www.build_board.entity.threads.Tag;
 import com.db.finki.www.build_board.entity.threads.Topic;
 import com.db.finki.www.build_board.repository.threads.TagRepository;
@@ -23,12 +23,12 @@ public class TopicServiceImpl implements TopicService {
 
 
     @Override
-    public void create(String title, String description, BBUser user) {
+    public Topic create(String title, String description, BBUser user) {
         Topic topic = new Topic();
         topic.setTitle(title);
         topic.setContent(description);
         topic.setUser(user);
-        topicRepository.save(topic);
+        return topicRepository.save(topic);
     }
 
     @Override

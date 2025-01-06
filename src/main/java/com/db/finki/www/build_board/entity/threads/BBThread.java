@@ -1,18 +1,14 @@
 package com.db.finki.www.build_board.entity.threads;
 
-import com.db.finki.www.build_board.entity.BBUser;
+import com.db.finki.www.build_board.entity.user_types.BBUser;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
 @Table(name = "thread")
 @Inheritance(strategy = InheritanceType.JOINED)
 public class BBThread {
@@ -33,30 +29,4 @@ public class BBThread {
             inverseJoinColumns = @JoinColumn(name = "tag_name")
     )
     protected List<Tag> tags = new ArrayList<>();
-
-    public Integer getId() {return id;}
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public void setTags(List<Tag> tags) {
-        this.tags = tags;
-    }
-
-    public void setUser(BBUser user) {
-        this.user = user;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public BBUser getUser() {
-        return user;
-    }
-
-    public List<Tag> getTags() {
-        return tags;
-    }
 }

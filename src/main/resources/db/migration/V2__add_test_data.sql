@@ -99,4 +99,4 @@ INSERT INTO messages (sent_at, content, sent_by, project_id, channel_name)
 VALUES
     (NOW(), 'Hello, team!', 2, 5, 'General'),
     (NOW(), 'We need to push the deadline.', 3, 5, 'Updates');
-   
+
