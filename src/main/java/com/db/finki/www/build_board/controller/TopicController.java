@@ -29,7 +29,7 @@ public class TopicController {
     public String showTopic(@PathVariable(name = "topic-name") String topicName, Model model) {
         Topic t = topicService.getByTitle(topicName);
         model.addAttribute("topic", t);
-        model.addAttribute("tags", tagService.findAll().stream().filter(tag -> !t.getTags().contains(tag)));
+        model.addAttribute("tags", tagService.findAllNotUsed(t));
         return "show-topic";
     }
     @PostMapping("/add")
@@ -51,6 +51,22 @@ public class TopicController {
         Topic t = topicService.getById(id);
         topicService.addTagToTopic(t,tagName);
         model.addAttribute("topic", t);
+        model.addAttribute("tags", tagService.findAllNotUsed(t));
+        return "redirect:/topic/" + t.getTitle();
+    }
+
+    @PostMapping("/edit/{id}")
+    public String editTopic(@PathVariable long id,@RequestParam String title, @RequestParam String content, Model model) {
+        Topic t = topicService.save(id,title,content);
+        model.addAttribute("topic", t);
+        model.addAttribute("tags", tagService.findAllNotUsed(t));
+        return "redirect:/topic/" + t.getTitle();
+    }
+    @PostMapping("/delete-tag/{topicId}/{tagName}")
+    public String deleteTag(@PathVariable long topicId, @PathVariable String tagName, Model model) {
+        Topic t = topicService.deleteTagFromTopic(topicId,tagName);
+        model.addAttribute("topic", t);
+        model.addAttribute("tags", tagService.findAllNotUsed(t));
         return "redirect:/topic/" + t.getTitle();
     }
 }

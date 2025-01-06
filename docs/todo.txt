@@ -1,1 +1,5 @@
 description na project
+
+Brisenje na tag
+	Notifikacija za site so go koristat tagot
+	Mu izlegvit na moderatorot so go brisit negoviot tag kolku dusi go koristat tagot.

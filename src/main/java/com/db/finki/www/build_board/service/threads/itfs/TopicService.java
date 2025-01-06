@@ -12,4 +12,7 @@ public interface TopicService {
     void deleteTopicByTitle(String title);
     Topic getById(Long id);
     void addTagToTopic(Topic topic, String tagName);
+
+    Topic save(long id, String title, String description);
+    Topic deleteTagFromTopic(long id, String tagName);
 }

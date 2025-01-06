@@ -72,4 +72,22 @@ public class TopicServiceImpl implements TopicService {
             topicRepository.save(topic);
         });
     }
+
+    @Override
+    public Topic save(long id, String title, String description) {
+        Topic t = getById(id);
+        t.setTitle(title);
+        t.setContent(description);
+        return topicRepository.save(t);
+    }
+
+    @Override
+    @Transactional
+    public Topic deleteTagFromTopic(long id, String tagName) {
+        Topic t = getById(id);
+        boolean removed = t.getTags().remove(new Tag(tagName));
+        if(!removed) throw new IllegalArgumentException("Tag not found");
+        return topicRepository.save(t);
+    }
+
 }
