@@ -14,12 +14,31 @@ VALUES
     ('Discussion content for topic 2', 2),
     ('Project-specific thread content', 3),
     ('Reply to topic 1', 4),
+    ('Further discussion on topic 2', 5),
+    ('Main content for topic thread', 1),
+    ('Main content for topic thread', 2),
+    ('Discussion content for topic 1', 1),
+    ('Discussion content for topic 2', 2),
+    ('Project-specific thread content', 3),
+    ('Reply to topic 1', 4),
+    ('Further discussion on topic 2', 5),
+    ('Further discussion on topic 2', 5),
+    ('Main content for topic thread', 1),
+    ('Main content for topic thread', 2),
+    ('Discussion content for topic 1', 1),
+    ('Discussion content for topic 2', 2),
+    ('Project-specific thread content', 3),
+    ('Reply to topic 1', 4),
     ('Further discussion on topic 2', 5);
 
 INSERT INTO topic_thread (id, title, parent_id)
 VALUES
     (1, 'Topic 1' , NULL),
-    (2, 'Topic 2', NULL);
+    (2, 'Topic 2', NULL),
+    (8, 'Topic 7' , NULL),
+    (9, 'Topic 8', NULL),
+    (16, 'Topic 9' , NULL),
+    (17, 'Topic 10', NULL);
 
 insert into topic_guidelines(topic_id,description)
 values
@@ -35,7 +54,9 @@ VALUES
 
 INSERT INTO project_thread (id, title, repo_url)
 VALUES
-    (5, 'Project 1 Thread', 'http://github.com/project1');
+    (5, 'Project 1 Thread', 'http://github.com/project1'),
+    (10, 'Project 2 Thread', 'http://github.com/project1'),
+    (15, 'Project 3 Thread', 'http://github.com/project1');
 
 INSERT INTO likes (user_id, thread_id)
 VALUES

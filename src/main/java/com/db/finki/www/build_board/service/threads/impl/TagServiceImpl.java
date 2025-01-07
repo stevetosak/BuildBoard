@@ -7,7 +7,6 @@ import com.db.finki.www.build_board.service.threads.itfs.TagService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class TagServiceImpl implements TagService {

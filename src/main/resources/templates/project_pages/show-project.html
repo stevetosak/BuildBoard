@@ -26,8 +26,16 @@
                 </button>
             </div>
         </div>
-        <div class="card-body">
-            <p th:text="${project.getContent()}">Description of the project goes here.</p>
+        <div class="d-flex flex-column gap-3 justify-content-between card-body">
+            <div>
+                <h4>Description</h4>
+                <p th:text="${project.getContent()}">Description of the project goes here.</p>
+            </div>
+            <div th:with="hasRepoUrl=${!#strings.isEmpty(project.getRepoUrl())}">
+                <h4>Repository</h4>
+                <a th:if="${hasRepoUrl}" th:href="${project.repoUrl}" th:text="${project.getRepoUrl()}"></a>
+                <span th:if="!${hasRepoUrl}">There's no provided url for this project</span>
+            </div>
             <div th:if="${!project.getTags().isEmpty()}">
                 <h6>Tags:</h6>
                 <ul class="list-inline">
@@ -54,7 +62,8 @@
             </div>
         </div>
         <div th:if="${isManager}" class="card-footer d-flex justify-content-between">
-            <form th:action="@{/project/delete/{title} (title=${project.getTitle()})}" method="post" style="display:inline;">
+            <form th:action="@{/project/delete/{title} (title=${project.getTitle()})}" method="post"
+                  style="display:inline;">
                 <input type="hidden" name="id" th:value="${project.getId()}"/>
                 <button type="submit" class="btn btn-danger btn-sm">Delete Project</button>
             </form>
@@ -72,15 +81,19 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form th:action="@{/project/{title}/add-tag(title=${project.getTitle()})}" method="post" id="addTagForm">
+                <form th:action="@{/project/{title}/add-tag(title=${project.getTitle()})}" method="post"
+                      id="addTagForm">
                     <div class="mb-3">
                         <label for="existingTags" class="form-label">Tag Name</label>
                         <select id="existingTags" class="form-select mb-3" name="tagName">
                             <option value="" selected disabled>Select an existing tag</option>
-                            <option th:each="tag : ${tags}" th:value="${tag.getName()}" th:text="${tag.getName()}">Example Tag</option>
+                            <option th:each="tag : ${tags}" th:value="${tag.getName()}" th:text="${tag.getName()}">
+                                Example Tag
+                            </option>
                             <option value="custom">Enter a custom tag...</option>
                         </select>
-                        <input type="text" id="customTag" class="form-control d-none" placeholder="Enter custom tag name" />
+                        <input type="text" id="customTag" class="form-control d-none"
+                               placeholder="Enter custom tag name"/>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Add Tag</button>
                 </form>

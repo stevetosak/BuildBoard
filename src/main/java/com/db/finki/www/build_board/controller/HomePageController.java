@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/")
 public class HomePageController {
     private final NamedThreadService namedThreadService;
 
@@ -15,9 +14,13 @@ public class HomePageController {
         this.namedThreadService = namedThreadService;
     }
 
-    @GetMapping
+    @GetMapping("/")
     public String homePage(Model model) {
         model.addAttribute("threads", namedThreadService.findAll());
+        return "home";
+    }
+    @GetMapping("/home")
+    public String home(Model model) {
         return "home";
     }
 }
