@@ -10,12 +10,11 @@ import java.util.Map;
 import java.util.function.Function;
 
 @Component
-@Scope("prototype")
 public class FilterMap<T extends NamedThread> {
     private final Map<String, Function<String, Specification<T>>> filterMap;
+
     public FilterMap() {
         filterMap = new HashMap<>();
-        filterMap.put("all", s -> Specification.where(null));
         filterMap.put("title", (param) -> {
             if (param == null) {
                 return (root, query, cb) -> null;
@@ -23,15 +22,21 @@ public class FilterMap<T extends NamedThread> {
                 return (root, query, cb) -> cb.like(cb.lower(root.get("title")), "%" + param.toLowerCase() + "%");
             }
         });
-        filterMap.put("content",(param) -> {
+        filterMap.put("content", (param) -> {
             if (param == null) {
                 return (root, query, cb) -> null;
             } else {
                 return (root, query, cb) -> cb.like(cb.lower(root.get("content")), "%" + param.toLowerCase() + "%");
             }
         });
+        filterMap.put("all", (param) -> {
+            Specification<T> spec = (root, query, cb) -> null;
+
+            return spec.or(filterMap.get("title").apply(param)).or(filterMap.get("content").apply(param));
+        });
 
     }
+
     public Function<String, Specification<T>> getFilter(String filter) {
         return filterMap.get(filter);
     }

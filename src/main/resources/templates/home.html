@@ -48,14 +48,20 @@
 <div class="container">
     <div class="row justify-content-end">
         <div class="col-md-8 pt-5">
-            <form action="/search" method="post" class="row g-3 align-items-center">
+            <form action="/" method="get" class="row g-3 align-items-center">
                 <!-- Search Input and Button -->
                 <div class="col-auto flex-grow-1">
-                    <div class="input-group">
-                        <span class="input-group-text bg-light border-0">
-                            <i class="fas fa-search"></i>
-                        </span>
-                        <input type="text" class="form-control" placeholder="Search..." name="query">
+                    <div class="input-group position-relative">
+        <span class="input-group-text bg-light border-0">
+            <i class="fas fa-search"></i>
+        </span>
+                        <input type="text" class="form-control" placeholder="Search..." name="query" id="search-input">
+                        <!-- Dropdown container -->
+                        <div>
+                            <div id="suggestions" class="dropdown-menu show position-absolute"
+                                 style="top: 100%; left: 0; z-index: 1000; display: none;">
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="col-auto">
@@ -64,18 +70,23 @@
                     </button>
                 </div>
 
+
                 <!-- Filters -->
-                <div class="col-12 d-flex align-items-center">
-                    <span class="me-2">Filters:</span>
-                    <div class="form-check me-3">
-                        <input class="form-check-input" type="checkbox" id="filterTitle" name="filters" value="title">
-                        <label class="form-check-label" for="filterTitle">Title</label>
+                <div class="col-12 d-flex gap-2 flex-column">
+                    <div class="col-12 d-flex">
+                        <span class="me-2">Filters:</span>
+                        <div class="form-check me-3 d-flex align-items-center">
+                            <input class="form-check-input me-2" type="checkbox" id="filterTitle" name="filters"
+                                   value="title">
+                            <label class="form-check-label" for="filterTitle">Title</label>
+                        </div>
+                        <div class="form-check me-3 d-flex align-items-center">
+                            <input class="form-check-input me-2" type="checkbox" id="filterContent" name="filters"
+                                   value="content">
+                            <label class="form-check-label" for="filterContent">Content</label>
+                        </div>
                     </div>
-                    <div class="form-check me-3">
-                        <input class="form-check-input" type="checkbox" id="filterContent" name="filters" value="content">
-                        <label class="form-check-label" for="filterContent">Content</label>
-                    </div>
-                    <div class="form-group me-3">
+                    <div class="form-group me-3 d-flex flex-row">
                         <label for="filterType" class="me-2">Type:</label>
                         <select class="form-select form-select-sm w-auto" id="filterType" name="type">
                             <option value="all">All</option>
@@ -84,12 +95,12 @@
                         </select>
                     </div>
                 </div>
+
+
             </form>
         </div>
     </div>
 </div>
-
-
 
 
 <main class="container mt-4">
@@ -114,6 +125,47 @@
         </div>
     </div>
 </main>
+
+<script th:inline="javascript">
+    let searchInput = document.getElementById("search-input");
+    let suggestionsContainer = document.getElementById("suggestions");
+    let tags = /*[[${tags}]]*/ []; // kolku e glupa sintaksava gospode boze
+    let tagNames = tags.map(tag => tag.name);
+    let suggestionHeader = document.getElementById("suggestion-header");
+
+    function renderSuggestions(suggestions) {
+        suggestionsContainer.innerHTML = "";
+        if (suggestions.length === 0) {
+            suggestionsContainer.style.display = "none";
+            return;
+        }
+        suggestionsContainer.style.display = "block";
+        suggestions.forEach(tagName => {
+            let suggestionItem = document.createElement("a");
+            suggestionItem.href = "#";
+            suggestionItem.classList.add("dropdown-item");
+            suggestionItem.textContent = tagName;
+            suggestionItem.addEventListener("click", (e) => {
+                e.preventDefault();
+                searchInput.value = tagName;
+                suggestionsContainer.style.display = "none";
+            });
+            suggestionsContainer.appendChild(suggestionItem);
+        });
+    }
+
+    searchInput.addEventListener("input", () => {
+        let value = searchInput.value.toLowerCase();
+        let filteredTags = tagNames.filter(tag => tag.toLowerCase().includes(value));
+        renderSuggestions(filteredTags);
+    });
+
+    document.addEventListener("click", (e) => {
+        if (!suggestionsContainer.contains(e.target) && e.target !== searchInput) {
+            suggestionsContainer.style.display = "none";
+        }
+    });
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

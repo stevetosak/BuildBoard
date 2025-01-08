@@ -1,5 +1,6 @@
 package com.db.finki.www.build_board.entity.threads;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
@@ -7,6 +8,7 @@ import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -15,7 +17,7 @@ import java.util.Objects;
 @Entity
 @NoArgsConstructor
 @Table(name = "tag")
-public class Tag {
+public class Tag implements Serializable {
     @Id
     String name;
 
@@ -23,6 +25,7 @@ public class Tag {
         this.name = name;
     }
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "tags")
     private List<BBThread> threads = new ArrayList<>();
 

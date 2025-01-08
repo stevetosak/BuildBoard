@@ -156,6 +156,27 @@
 <!--    </div>-->
 <!--</div>-->
 
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const existingTags = document.getElementById("existingTags");
+        const customTagInput = document.getElementById("customTag");
+        existingTags.addEventListener("change", function () {
+            if (this.value === "custom") {
+                customTagInput.classList.remove("d-none");
+                customTagInput.required = true;
+                customTagInput.name = "tagName";
+                existingTags.name = "";
+            } else {
+                customTagInput.classList.add("d-none");
+                customTagInput.required = false;
+                customTagInput.name = "";
+                existingTags.name = "tagName";
+                customTagInput.value = "";
+            }
+        });
+    });
+</script>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

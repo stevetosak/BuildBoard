@@ -23,10 +23,10 @@ public class SearchServiceImpl implements SearchService {
     private final NamedThreadService namedThreadService;
 
     @Autowired
-    public SearchServiceImpl(TopicRepository topicRepository, FilterMap<Topic> topicFilterMap, FilterMap<Project> projectFilterMap, ProjectRepository projectRepository, NamedThreadService namedThreadService) {
+    public SearchServiceImpl(TopicRepository topicRepository, FilterMap<Topic> TopicFilterMap, FilterMap<Project> ProjectFilterMap, ProjectRepository projectRepository, NamedThreadService namedThreadService) {
         this.topicRepository = topicRepository;
-        this.topicFilterMap = topicFilterMap;
-        this.projectFilterMap = projectFilterMap;
+        this.topicFilterMap = TopicFilterMap;
+        this.projectFilterMap = ProjectFilterMap;
         this.projectRepository = projectRepository;
         this.namedThreadService = namedThreadService;
     }
@@ -53,6 +53,9 @@ public class SearchServiceImpl implements SearchService {
 
     public List<NamedThread> search(String query, List<String> filters,String type) {
         List<NamedThread> result = new ArrayList<>();
+        if(type == null){
+            type = "all";
+        }
 
         if(Objects.equals(type, "project")){
             System.out.println("PROJECT");

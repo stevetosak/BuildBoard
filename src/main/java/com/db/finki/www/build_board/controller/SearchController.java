@@ -29,6 +29,6 @@ public class SearchController {
             filters.add("all");
         }
         model.addAttribute("threads", searchService.search(query,filters,type));
-        return "home";
+        return "/?";
     }
 }
