@@ -50,6 +50,7 @@ CREATE TABLE users
     password      VARCHAR(72),
     description   VARCHAR(200),
     registered_at TIMESTAMP,
+    avatar_url TEXT,
     sex           VARCHAR(1)
 );
 CREATE TABLE moderator
@@ -219,12 +220,12 @@ SELECT thread.id, content, user_id, title, repo_url
 FROM project_thread project
          JOIN thread
               ON project.id = thread.id;
-CREATE OR REPLACE VIEW v_discussion_thread
-AS
-SELECT thread.id, content, user_id, parent_id
-FROM discussion_thread discussion
-         JOIN thread
-              ON discussion.id = thread.id;
+-- CREATE OR REPLACE VIEW v_discussion_thread
+-- AS
+-- SELECT thread.id, content, user_id, parent_id
+-- FROM discussion_thread discussion
+--          JOIN thread
+--               ON discussion.id = thread.id;
 CREATE OR REPLACE VIEW v_topic_thread
 AS
 SELECT thread.id, content, user_id, title, parent_id
@@ -258,11 +259,30 @@ AS
 SELECT users.id, username, is_activate, password, description, registered_at, sex
 FROM developer
          JOIN users ON developer.id = users.id;
-CREATE OR REPLACE VIEW v_project_owner
-AS
-SELECT users.id, username, is_activate, password, description, registered_at, sex
-FROM project_manager
-         JOIN users ON project_manager.id = users.id;
+
+create or replace view v_discussion_thread
+as
+with recursive depth_table as
+(
+    select parent_id, id, 0 as depth
+    from discussion_thread
+    UNION ALL
+    select discuss.parent_id, dpth.id, dpth.depth + 1
+    from depth_table dpth
+    join discussion_thread discuss
+    on dpth.parent_id=discuss.id
+),
+tmp as (
+    select id,max(depth) as depth
+    from depth_table
+    group by id
+)
+select d.id as id ,t.user_id as user_id ,d.depth as depth, d1.parent_id as parent_id
+from tmp d
+         join depth_table d1
+              on d.id=d1.id and d1.depth=d.depth
+         join thread t
+              on t.id=d.id;
 -------------------------- FUNCTIONS ----------------------
 CREATE OR REPLACE FUNCTION fn_validate_topic_title()
     RETURNS TRIGGER

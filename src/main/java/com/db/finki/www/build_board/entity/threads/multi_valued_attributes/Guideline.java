@@ -2,9 +2,13 @@ package com.db.finki.www.build_board.entity.threads.multi_valued_attributes;
 
 import com.db.finki.www.build_board.entity.threads.Topic;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "topic_guidelines")
 public class Guideline {
@@ -17,4 +21,5 @@ public class Guideline {
     private Topic topic;
 
     private String description;
+
 }

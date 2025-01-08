@@ -2,6 +2,7 @@ package com.db.finki.www.build_board.controller;
 
 import com.db.finki.www.build_board.entity.user_types.BBUser;
 import com.db.finki.www.build_board.entity.threads.Topic;
+import com.db.finki.www.build_board.service.threads.impl.DiscussionService;
 import com.db.finki.www.build_board.service.threads.itfs.TagService;
 import com.db.finki.www.build_board.service.threads.itfs.TopicService;
 import jakarta.servlet.http.HttpSession;
@@ -15,10 +16,12 @@ public class TopicController {
 
     private final TopicService topicService;
     private final TagService tagService;
+    private final DiscussionService discussionService;
 
-    public TopicController(TopicService topicService, TagService tagService) {
+    public TopicController(TopicService topicService, TagService tagService, DiscussionService discussionService) {
         this.topicService = topicService;
         this.tagService = tagService;
+        this.discussionService = discussionService;
     }
 
     @GetMapping("/create")
@@ -30,6 +33,7 @@ public class TopicController {
         Topic t = topicService.getByTitle(topicName);
         model.addAttribute("topic", t);
         model.addAttribute("tags", tagService.findAllNotUsed(t));
+        model.addAttribute("replies", discussionService.findByTopic((long) t.getId()));
         return "show-topic";
     }
     @PostMapping("/add")
@@ -69,4 +73,5 @@ public class TopicController {
         model.addAttribute("tags", tagService.findAllNotUsed(t));
         return "redirect:/topic/" + t.getTitle();
     }
+
 }

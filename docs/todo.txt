@@ -6,3 +6,12 @@ Brisenje na tag
 	
 	
 Ko ke udris search bez filtri da ti gi davat grupirani. -> Edna grupa topics, druga projects treta tagoj so ti matchnale so kverito.
+
+- Developer requests for join
+- Avatar da chuvame
+- Channels da se impl
+- Likes da se impl
+- Discussion da se grupirani spored nekoja metrika koja gi spojvit.
+- Meshan search vo appot, od sve sho imame vo nego.
+- Referencira thread, koga pishi tekst, kaj bilo.
+- Strana za edit user details

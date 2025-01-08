@@ -8,7 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 @Table(name = "thread")
 @Inheritance(strategy = InheritanceType.JOINED)
 public class BBThread {
