@@ -34,13 +34,15 @@ public class WebSecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request ->
-                        request
+                        request.requestMatchers("/","topic/*").permitAll()
                                 .anyRequest().authenticated()
                 ).formLogin(formLogin ->
                         formLogin.permitAll()
                                 .defaultSuccessUrl("/")
                                 .successHandler(successHandler)
-                        );
+                        )
+                .logout(logout ->
+                        logout.logoutSuccessUrl("/"));
 
         return http.build();
 

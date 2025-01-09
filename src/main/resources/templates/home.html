@@ -34,15 +34,46 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
     <div class="container">
         <a class="navbar-brand" href="/">BuildBoard</a>
-        <div th:if="${session.user != null}" class="d-flex align-items-center">
-            <span class="me-2" th:text="${session.user.getUsername()}">Username</span>
-            <a href="/logout" class="btn btn-outline-primary btn-sm">Log out</a>
+        <button class="navbar-toggler w-25" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav justify-content-center d-flex align-items-center w-100"> <!-- Use mx-auto for centering the nav items -->
+                <li class="nav-item">
+                    <a class="nav-link" href="/" th:href="@{/}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/about" th:href="@{/about}">About</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/contact" th:href="@{/contact}">Contact</a>
+                </li>
+                <li th:if="${session.user != null}" class="nav-item">
+                    <a class="nav-link" th:href="@{'/' + ${session.user.getUsername()} + '/profile'}">Profile</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav justify-content-end d-flex align-items-center w-25">
+                <li class="nav-item d-flex align-items-center" th:if="${session.user != null}">
+                    <span class="nav-link mb-0" th:text="${session.user.getUsername()}">Username</span>
+                </li>
+                <li class="nav-item d-flex align-items-center" th:if="${session.user != null}">
+                    <img th:src="${session.user.getAvatarUrl()}" alt="Profile Picture" id="profileImage" class="rounded-circle border border-1 border-info" style="width: 50px; height: 50px; object-fit: cover; vertical-align: middle;">
+                </li>
+                <li class="nav-item d-flex align-items-center ms-5" th:if="${session.user != null}">
+                    <a href="/logout" class="btn btn-outline-primary btn-sm ms-2">Log out</a>
+                </li>
+                <!-- Display login button if user is not logged in -->
+                <li class="nav-item d-flex align-items-center" th:if="${session.user == null}">
+                    <a href="/login" class="btn btn-primary btn-sm ms-2">Log in</a>
+                </li>
+            </ul>
         </div>
-        <a href="/login" class="btn btn-primary btn-sm ms-auto" th:if="${session.user == null}">Log in</a>
     </div>
-    <a href="/login">Log in</a>
-
 </nav>
+
+
+
+
 
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 <div class="container">

@@ -50,7 +50,6 @@ CREATE TABLE users
     password      VARCHAR(72),
     description   VARCHAR(200),
     registered_at TIMESTAMP,
-    avatar_url TEXT,
     sex           VARCHAR(1)
 );
 CREATE TABLE moderator

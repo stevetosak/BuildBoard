@@ -80,7 +80,10 @@
     <div th:each="reply : ${replies}" class="card shadow-sm mt-4"
          th:style="'margin-left: ' + (${reply.depth + 1} * 5) + '%'">
         <div class="card-header bg-light d-flex justify-content-between align-items-center">
-            <span th:text="${reply.getUser().getUsername()}">Reply Author</span>
+            <div>
+                <img th:src="${reply.getUser().getAvatarUrl()}" alt="Profile Picture" id="profileImage" class="rounded-circle border border-1 border-info me-3" style="width: 50px; height: 50px; object-fit: cover; vertical-align: middle;">
+                <span th:text="${reply.getUser().getUsername()}">Reply Author</span>
+            </div>
             <div th:if="${session.user.getId() != null && session.user.getId() == reply.getUser().getId()}">
                 <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editReplyModal"
                         th:attr="data-reply-id=${reply}">Edit Reply

@@ -1,6 +1,8 @@
 package com.db.finki.www.build_board.entity.user_types;
 
 import com.db.finki.www.build_board.entity.threads.BBThread;
+import com.db.finki.www.build_board.service.threads.impl.FileUploadService;
+import jakarta.annotation.PostConstruct;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
@@ -9,7 +11,10 @@ import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.io.File;
 import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -44,10 +49,17 @@ public class BBUser implements UserDetails, Serializable {
         return isEnabled;
     }
 
+     @Transient
+    private String avatarUrl;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();
     }
 
+    public String getAvatarUrl() {
+        Path path = Path.of(FileUploadService.USER_AVATAR_DIR + File.separator + "avatar-" + id);
+        return Files.exists(path) ? File.separator + "avatars" + File.separator + "avatar-"+id : File.separator + "avatars" + File.separator + "default-avatar.jpg";
+    }
 
 }
