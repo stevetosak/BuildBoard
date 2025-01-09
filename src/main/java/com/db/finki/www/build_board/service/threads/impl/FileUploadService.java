@@ -1,6 +1,7 @@
 package com.db.finki.www.build_board.service.threads.impl;
 
 
+import jakarta.annotation.PostConstruct;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -33,11 +34,6 @@ public class FileUploadService {
             throw new IOException("File size exceeds the limit.");
         }
 
-        File directory = new File(USER_AVATAR_DIR);
-        if (!directory.exists()) {
-            directory.mkdirs();
-        }
-
 
         String fileName = "avatar-" + userId;
         File saveFile = new File(USER_AVATAR_DIR + File.separator + fileName);
@@ -49,8 +45,12 @@ public class FileUploadService {
         file.transferTo(saveFile);
     }
 
-    public String getAvatar(int id) {
-        Path path = Path.of(USER_AVATAR_DIR + File.separator + "avatar-" + id);
-        return Files.exists(path) ? File.separator + "avatars" + File.separator + "avatar-"+id : File.separator + "avatars" + File.separator + "default-avatar.jpg";
+    @PostConstruct
+    public void initDirectories(){
+        File directory = new File(USER_AVATAR_DIR);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
     }
+
 }

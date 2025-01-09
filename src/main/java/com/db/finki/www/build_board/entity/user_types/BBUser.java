@@ -59,7 +59,7 @@ public class BBUser implements UserDetails, Serializable {
 
     public String getAvatarUrl() {
         Path path = Path.of(FileUploadService.USER_AVATAR_DIR + File.separator + "avatar-" + id);
-        return Files.exists(path) ? File.separator + "avatars" + File.separator + "avatar-"+id : File.separator + "avatars" + File.separator + "default-avatar.jpg";
+        return Files.exists(path) ? File.separator + "avatars" + File.separator + "avatar-"+id : File.separator + "default-avatar.jpg";
     }
 
 }
