@@ -79,7 +79,7 @@ CREATE TABLE topic_thread
 create table topic_guidelines
 (
     id          serial,
-    topic_id    int references topic_thread (id),
+    topic_id    int references topic_thread (id) on delete cascade,
     description text,
     PRIMARY KEY (id, topic_id)
 );
@@ -186,9 +186,9 @@ CREATE TABLE report
     created_at  TIMESTAMP,
     description VARCHAR(200) NOT NULL,
     status      status,
-    thread_id   INT REFERENCES thread (id),
-    for_user_id INT REFERENCES users (id),
-    by_user_id  INT REFERENCES users (id),
+    thread_id   INT REFERENCES thread (id) on delete cascade,
+    for_user_id INT REFERENCES users (id) on delete cascade,
+    by_user_id  INT REFERENCES users (id) on delete cascade,
     PRIMARY KEY (id, thread_id, for_user_id, by_user_id)
 );
 CREATE TABLE channel

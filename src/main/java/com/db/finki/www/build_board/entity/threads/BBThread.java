@@ -31,4 +31,15 @@ public class BBThread {
             inverseJoinColumns = @JoinColumn(name = "tag_name")
     )
     protected List<Tag> tags = new ArrayList<>();
+    @ManyToMany
+    @JoinTable(
+            name = "likes",
+            joinColumns = @JoinColumn(name = "thread_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    protected List<BBUser> likes = new ArrayList<>();
+
+    public int getNumLikes(){
+        return likes.size();
+    }
 }

@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface BBThreadRepository extends JpaRepository<BBThread, Long> {
+    BBThread findById(long id);
 }

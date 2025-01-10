@@ -8,5 +8,6 @@ import java.util.List;
 
 @Repository
 public interface VDiscussRepo extends JpaRepository<VDiscussion,Long> {
-    List<VDiscussion> findVDiscussionByParentTopicId(Long topicId);
+    List<VDiscussion> findVDiscussionByParentTopicId(Integer topicId);
+    VDiscussion findVDiscussionByDiscussionId(Integer discussionId);
 }

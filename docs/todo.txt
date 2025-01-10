@@ -15,3 +15,14 @@ Ko ke udris search bez filtri da ti gi davat grupirani. -> Edna grupa topics, dr
 - Meshan search vo appot, od sve sho imame vo nego.
 - Referencira thread, koga pishi tekst, kaj bilo.
 - Strana za edit user details
+
+
+--------------------
+
+- searchni vo show-topic "todo-func", ke vidis
+- Security za post baranjava, sega samo sa kriet kopceto za edit i delete na discussion i takvi stvari, ama ne sa prat proverki vo metodite.
+- Reorganizacija ke trebit vo TopicController deka premn raboti msm imat tamu, mozit ubo ke e ako po generalni raboti so vazat za sive threads ko likes da e vo drug.
+- Vo pravo bese trebit posebni servisi da sa VDiscussionService i DiscussionService :)
+
+
+

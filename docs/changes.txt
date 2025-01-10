@@ -1,0 +1,9 @@
+- Cascade na reports i na guidelines
+- Likes impl*
+- Crud na replies
+- Ko ke vrakajs posle post baranje redirect, ta nosit do kaj so bese scrollnat na pageot ko si go pustil baranjeto.
+
+
+* kladov dislike, samo odzemat od likes msm ubo e taka ne ni trebat i dislikes da cuvame.
+
+Vidi vo todo za so da napres/dovrsis ti.
