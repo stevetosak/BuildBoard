@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Immutable;
 
-//todo: uste avatar_url da imat
 @Entity
 @Immutable
 @Table(name="v_discussion_thread")
@@ -31,6 +30,10 @@ public class VDiscussion {
     @ManyToOne
     @JoinColumn(name="user_id")
     private BBUser user;
+
+    public String getAvatarUrl(){
+        return user.getAvatarUrl();
+    }
 
     @ManyToOne
     @JoinColumn(name="parent_id")

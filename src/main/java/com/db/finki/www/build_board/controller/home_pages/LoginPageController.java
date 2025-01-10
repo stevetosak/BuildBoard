@@ -1,4 +1,4 @@
-package com.db.finki.www.build_board.controller;
+package com.db.finki.www.build_board.controller.home_pages;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Controller;

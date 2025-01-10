@@ -2,6 +2,7 @@ package com.db.finki.www.build_board.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -13,6 +14,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.util.matcher.AndRequestMatcher;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -34,13 +37,26 @@ public class WebSecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request ->
-                        request.requestMatchers("/","topic/*").permitAll()
+                        request.requestMatchers(
+                                        "/",
+                                        "/contact",
+                                        "/about",
+                                    "/project_imgs/buildboard-logo.jpg",
+                                    "static/**"
+                                ).permitAll()
+                                .requestMatchers(
+                                        new AntPathRequestMatcher("/topic/*", HttpMethod.GET.name()),
+                                        new AntPathRequestMatcher("/project/*",HttpMethod.GET.name()),
+                                        new AntPathRequestMatcher("/avatars/**",HttpMethod.GET.name())
+                                ).permitAll()
+                                .requestMatchers("/topic/**","/project/**").authenticated()
+
                                 .anyRequest().authenticated()
                 ).formLogin(formLogin ->
                         formLogin.permitAll()
                                 .defaultSuccessUrl("/")
                                 .successHandler(successHandler)
-                        )
+                )
                 .logout(logout ->
                         logout.logoutSuccessUrl("/"));
 

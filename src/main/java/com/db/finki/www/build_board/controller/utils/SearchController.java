@@ -1,6 +1,5 @@
-package com.db.finki.www.build_board.controller;
+package com.db.finki.www.build_board.controller.utils;
 
-import com.db.finki.www.build_board.entity.threads.interfaces.NamedThread;
 import com.db.finki.www.build_board.service.search.SearchService;
 import com.db.finki.www.build_board.service.threads.itfs.TopicService;
 import org.springframework.stereotype.Controller;

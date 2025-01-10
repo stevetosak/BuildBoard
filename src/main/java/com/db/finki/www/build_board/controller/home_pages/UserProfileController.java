@@ -1,4 +1,4 @@
-package com.db.finki.www.build_board.controller;
+package com.db.finki.www.build_board.controller.home_pages;
 
 import com.db.finki.www.build_board.entity.user_types.BBUser;
 import com.db.finki.www.build_board.service.BBUserDetailsService;
@@ -22,13 +22,15 @@ public class UserProfileController {
         this.fileUploadService = fileUploadService;
     }
 
-
     @GetMapping("/profile")
-    public String getProfilePage(@PathVariable String username, Model model) {
-        BBUser u = (BBUser) userService.loadUserByUsername(username);
-
-        model.addAttribute("user", u);
-        return "profile";
+    public String getProfilePage(@PathVariable String username, @SessionAttribute BBUser user, Model model) {
+        try {
+            model.addAttribute("user", userService.loadUserByUsername(username));
+            model.addAttribute("canEdit", user.getUsername().equals(username));
+            return "home_pages/profile";
+        }catch(Exception ignore){
+            return "redirect:/";
+        }
     }
     @PostMapping("/upload-avatar")
     public String uploadAvatar(Model model, @PathVariable String username, @RequestParam MultipartFile userImage, RedirectAttributes redirectAttributes) {
@@ -41,6 +43,6 @@ public class UserProfileController {
             System.out.println(e.getMessage());
         }
 
-        return "redirect:/" + username + "/profile";
+        return "redirect:/" + username + "home_pages/profile";
     }
 }

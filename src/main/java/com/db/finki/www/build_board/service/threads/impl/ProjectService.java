@@ -67,4 +67,10 @@ public class ProjectService {
         project.setTitle(newTitle);
         return projectRepository.save(project);
     }
+
+    public void removeTagFromProjectWithTitle(String projectTitle, String tagName) {
+        final Project project = findByTitle(projectTitle);
+        project.getTags().remove(tagService.findByName(tagName));
+        projectRepository.save(project);
+    }
 }

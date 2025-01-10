@@ -1,15 +1,11 @@
-package com.db.finki.www.build_board.controller;
+package com.db.finki.www.build_board.controller.home_pages;
 
 import com.db.finki.www.build_board.service.search.SearchService;
-import com.db.finki.www.build_board.service.threads.impl.NamedThreadService;
 import com.db.finki.www.build_board.service.threads.itfs.TagService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +15,7 @@ public class HomePageController {
     private final SearchService searchService;
     private final TagService tagService;
 
-    public HomePageController(SearchService searchService, TagService tagService) {
+    public HomePageController(SearchService searchService, TagService tagService ) {
         this.searchService = searchService;
         this.tagService = tagService;
     }
@@ -35,6 +31,12 @@ public class HomePageController {
 
         System.out.println("TAGS: " + tagService.findAll());
         model.addAttribute("tags",tagService.findAll());
-        return "home";
+        return "home_pages/home";
     }
+
+    @GetMapping("/about")
+    public String getAboutPage(){
+        return "home_pages/project_description";
+    }
+
 }

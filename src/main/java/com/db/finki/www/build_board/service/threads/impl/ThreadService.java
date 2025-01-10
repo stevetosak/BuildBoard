@@ -7,6 +7,7 @@ import com.db.finki.www.build_board.repository.threads.BBThreadRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class ThreadService {
@@ -22,7 +23,7 @@ public class ThreadService {
         BBThread thread = bbThreadRepository.findById(threadId);
         BBUser user = userRepository.findById(userId);
         if(like){
-            List<BBUser> users = thread.getLikes();
+            Set<BBUser> users = thread.getLikes();
             if(!users.contains(user)){
                 thread.getLikes().add(user);
             }

@@ -1,4 +1,4 @@
-package com.db.finki.www.build_board.controller;
+package com.db.finki.www.build_board.controller.thread_controllers;
 
 import com.db.finki.www.build_board.entity.threads.Project;
 import com.db.finki.www.build_board.entity.user_types.BBUser;
@@ -95,16 +95,6 @@ public class ProjectController {
     public String delete(@RequestParam Long id) {
         projectService.deleteById(id);
         return "redirect:/" ;
-    }
-
-    @PostMapping("/{title}/add-tag")
-    public String addTag(
-            @PathVariable String title,
-            @RequestParam(name = "tagName") String tagName
-    )
-    {
-        projectService.addTagToProjectWithTitle(title,tagName);
-        return "redirect:/project/" + title;
     }
 }
 ///projects/topics/add

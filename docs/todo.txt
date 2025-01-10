@@ -5,7 +5,7 @@ Brisenje na tag
 	Mu izlegvit na moderatorot so go brisit negoviot tag kolku dusi go koristat tagot.
 	
 	
-Ko ke udris search bez filtri da ti gi davat grupirani. -> Edna grupa topics, druga projects treta tagoj so ti matchnale so kverito.
+Ko ke udris search bez filtri da ti gi davat grupirani. -> Edna grupa topics, druga projects treta tagoj so ti matchnale so kverito. -> Ne trebit deka nemat smisla za filterot sho go koristime spored type sho ti gi grupirat
 
 - Developer requests for join
 - Avatar da chuvame

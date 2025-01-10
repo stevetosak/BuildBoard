@@ -5,7 +5,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -30,14 +32,14 @@ public class BBThread {
             joinColumns = @JoinColumn(name = "thread_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_name")
     )
-    protected List<Tag> tags = new ArrayList<>();
+    protected Set<Tag> tags = new HashSet<>();
     @ManyToMany
     @JoinTable(
             name = "likes",
             joinColumns = @JoinColumn(name = "thread_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    protected List<BBUser> likes = new ArrayList<>();
+    protected Set<BBUser> likes = new HashSet<>();
 
     public int getNumLikes(){
         return likes.size();

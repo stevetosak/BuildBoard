@@ -8,7 +8,9 @@ import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
 
-//TODO: implement crud opertaions on project and associated features
+//TODO: project request
+//TODO: implement likes method for project
+//TODO: crud na kanali
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)

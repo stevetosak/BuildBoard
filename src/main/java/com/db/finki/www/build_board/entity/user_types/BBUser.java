@@ -18,6 +18,9 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
+
+//TODO: user regsitration
 
 @Getter
 @Setter
@@ -34,6 +37,9 @@ public class BBUser implements UserDetails, Serializable {
     private String password;
     private String description;
 
+    private String name;
+    private String email;
+
     @Column(name = "registered_at")
     private LocalDateTime registeredAt;
 
@@ -49,7 +55,7 @@ public class BBUser implements UserDetails, Serializable {
         return isEnabled;
     }
 
-     @Transient
+    @Transient
     private String avatarUrl;
 
     @Override
@@ -62,4 +68,17 @@ public class BBUser implements UserDetails, Serializable {
         return Files.exists(path) ? File.separator + "avatars" + File.separator + "avatar-"+id : File.separator + "default-avatar.jpg";
     }
 
+    @Override
+    public boolean equals(Object other){
+        if(!other.getClass().equals(this.getClass())){
+            return false;
+        }
+        BBUser otherCasted = (BBUser) other;
+        return otherCasted.getId() == this.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
 }

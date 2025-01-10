@@ -10,7 +10,7 @@
 
     <style>
         .search-container {
-            position: relative;
+            position:  relative;
         }
 
         .search-input {
@@ -28,56 +28,59 @@
             transform: translateY(-50%);
             color: #888;
         }
+
+        .content-max-width{
+            width: max-content;
+        }
     </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+<nav th:fragment="navigation" class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
     <div class="container">
-        <a class="navbar-brand" href="/">BuildBoard</a>
-        <button class="navbar-toggler w-25" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <a class="navbar-brand" href="/static">BuildBoard</a>
+        <button class="navbar-toggler w-25" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav justify-content-center d-flex align-items-center w-100"> <!-- Use mx-auto for centering the nav items -->
+            <ul class="navbar-nav justify-content-center d-flex align-items-center w-100">
+                <!-- Use mx-auto for centering the nav items -->
                 <li class="nav-item">
-                    <a class="nav-link" href="/" th:href="@{/}">Home</a>
+                    <a class="nav-link" href="/">Home</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/about" th:href="@{/about}">About</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/contact" th:href="@{/contact}">Contact</a>
                 </li>
                 <li th:if="${session.user != null}" class="nav-item">
                     <a class="nav-link" th:href="@{'/' + ${session.user.getUsername()} + '/profile'}">Profile</a>
                 </li>
             </ul>
-            <ul class="navbar-nav justify-content-end d-flex align-items-center w-25">
-                <li class="nav-item d-flex align-items-center" th:if="${session.user != null}">
-                    <span class="nav-link mb-0" th:text="${session.user.getUsername()}">Username</span>
-                </li>
-                <li class="nav-item d-flex align-items-center" th:if="${session.user != null}">
-                    <img th:src="${session.user.getAvatarUrl()}" alt="Profile Picture" id="profileImage" class="rounded-circle border border-1 border-info" style="width: 50px; height: 50px; object-fit: cover; vertical-align: middle;">
-                </li>
-                <li class="nav-item d-flex align-items-center ms-5" th:if="${session.user != null}">
-                    <a href="/logout" class="btn btn-outline-primary btn-sm ms-2">Log out</a>
-                </li>
+            <div class="navbar-nav justify-content-center d-flex align-items-center w-25-md w-100-xs gap-3 mt-3 gap-l-0">
+                <div class="d-flex flex-row gap-3">
+                    <div class="nav-item d-flex align-items-center" th:if="${session.user != null}">
+                        <img th:src="${session.user.getAvatarUrl()}" alt="Profile Picture" id="profileImage"
+                             class="rounded-circle border border-1 border-info"
+                             style="width: 50px; height: 50px; object-fit: cover; vertical-align: middle;">
+                    </div>
+                    <div class="nav-item d-flex align-items-center" th:if="${session.user != null}">
+                        <span class="nav-link mb-0" th:text="${session.user.getUsername()}">Username</span>
+                    </div>
+                </div>
+                <div class="nav-item d-flex align-items-center ms-xs-5 ms-0  mt-xs-5" th:if="${session.user != null}">
+                    <a href="/logout" class="content-max-width btn btn-outline-primary btn-sm ">Log out</a>
+                </div>
                 <!-- Display login button if user is not logged in -->
-                <li class="nav-item d-flex align-items-center" th:if="${session.user == null}">
-                    <a href="/login" class="btn btn-primary btn-sm ms-2">Log in</a>
-                </li>
-            </ul>
+                <div class="nav-item d-flex align-items-center mt-xs-5" th:if="${session.user == null}">
+                    <a href="/login" class="content-max-width btn btn-primary btn-sm ms-2 ms-xs-0">Log in</a>
+                </div>
+            </div>
         </div>
     </div>
 </nav>
 
-
-
-
-
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-<div class="container">
-    <div class="row justify-content-end">
+<div class="container mb-5">
+    <div class="row justify-content-center align-items-center pt-3">
         <div class="col-md-8 pt-5">
             <form action="/" method="get" class="row g-3 align-items-center">
                 <!-- Search Input and Button -->
@@ -137,7 +140,7 @@
 <main class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1 class="h4">Threads</h1>
-        <div>
+        <div th:if="${authenticated}">
             <a href="/topic/create" class="btn btn-success btn-sm">Create Topic</a>
             <a href="project/create" class="btn btn-success btn-sm">Create Project</a>
         </div>
