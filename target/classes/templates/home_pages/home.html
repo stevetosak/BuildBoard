@@ -73,6 +73,9 @@
                 <div class="nav-item d-flex align-items-center mt-xs-5" th:if="${session.user == null}">
                     <a href="/login" class="content-max-width btn btn-primary btn-sm ms-2 ms-xs-0">Log in</a>
                 </div>
+                <div class="nav-item d-flex align-items-center mt-xs-5" th:if="${session.user == null}">
+                    <a href="/register" class="content-max-width btn btn-primary btn-sm ms-2 ms-xs-0">Register</a>
+                </div>
             </div>
         </div>
     </div>
@@ -140,7 +143,7 @@
 <main class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1 class="h4">Threads</h1>
-        <div th:if="${authenticated}">
+        <div th:if="${session.user!=null}">
             <a href="/topic/create" class="btn btn-success btn-sm">Create Topic</a>
             <a href="project/create" class="btn btn-success btn-sm">Create Project</a>
         </div>

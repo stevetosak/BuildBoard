@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 //TODO: project request
-//TODO: implement likes method for project
 //TODO: crud na kanali
 @Data
 @NoArgsConstructor
@@ -30,12 +29,7 @@ public class Project extends BBThread implements NamedThread {
         setUser(user);
     }
 
-    @OneToMany(cascade = {CascadeType.PERSIST,CascadeType.MERGE})
-    @JoinTable(
-            name = "topic_belongs_to_project",
-            joinColumns = @JoinColumn(name = "project_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "topic_id")
-    )
+    @OneToMany(cascade = {CascadeType.PERSIST,CascadeType.MERGE}, mappedBy = "parent")
     private List<Topic> topics = new ArrayList<>();
 
     @Override

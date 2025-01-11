@@ -46,12 +46,12 @@ CREATE TABLE users
 (
     id            SERIAL PRIMARY KEY,
     username      VARCHAR(32) UNIQUE NOT NULL,
-    email varchar(60) not null,
-    name varchar(32) not null,
-    is_activate   bool,
+    email         varchar(60)        not null,
+    name          varchar(32)        not null,
+    is_activate   bool DEFAULT true,
     password      VARCHAR(72),
     description   VARCHAR(200),
-    registered_at TIMESTAMP,
+    registered_at TIMESTAMP DEFAULT NOW(),
     sex           VARCHAR(1)
 );
 CREATE TABLE moderator
@@ -75,7 +75,7 @@ CREATE TABLE thread
 CREATE TABLE topic_thread
 (
     title     VARCHAR(256) NOT NULL,
-    parent_id INT REFERENCES thread (id),
+    parent_id INT REFERENCES thread (id) on delete cascade,
     id        INT PRIMARY KEY REFERENCES thread (id) on delete cascade
 );
 create table topic_guidelines
@@ -98,8 +98,8 @@ CREATE TABLE project_thread
 );
 CREATE TABLE likes
 (
-    user_id   INT REFERENCES users (id),
-    thread_id INT REFERENCES thread (id),
+    user_id   INT REFERENCES users (id) on delete cascade ,
+    thread_id INT REFERENCES thread (id) on delete cascade,
     PRIMARY KEY (user_id, thread_id)
 );
 CREATE TABLE topic_threads_moderators
@@ -138,9 +138,9 @@ CREATE TABLE blacklisted_user
 
 CREATE TABLE developer_associated_with_project
 (
-    project_id   INT REFERENCES thread (id),
-    developer_id INT REFERENCES users (id),
-    started_at   TIMESTAMP,
+    project_id   INT REFERENCES thread (id) on delete cascade,
+    developer_id INT REFERENCES users (id) on delete cascade,
+    started_at   TIMESTAMP DEFAULT NOW(),
     ended_at     TIMESTAMP,
     PRIMARY KEY (project_id, developer_id, started_at)
 );
@@ -157,11 +157,11 @@ CREATE TABLE project_roles
 );
 CREATE TABLE users_project_roles
 (
-    user_id    INT REFERENCES users (id),
+    user_id    INT REFERENCES users (id) on delete cascade,
     project_id INT,
     role_name  VARCHAR(32),
     FOREIGN KEY (role_name, project_id)
-        REFERENCES project_roles (name, project_id),
+        REFERENCES project_roles (name, project_id) ON DELETE CASCADE,
     PRIMARY KEY (user_id, project_id, role_name)
 );
 CREATE TABLE project_roles_permissions
@@ -171,7 +171,7 @@ CREATE TABLE project_roles_permissions
     project_id      INT,
     PRIMARY KEY (permission_name, role_name, project_id),
     FOREIGN KEY (role_name, project_id)
-        REFERENCES project_roles (name, project_id)
+        REFERENCES project_roles (name, project_id) ON DELETE CASCADE
 );
 CREATE TYPE status AS ENUM ('ACCEPTED', 'DENIED', 'PENDING');
 CREATE TABLE project_request
@@ -179,8 +179,8 @@ CREATE TABLE project_request
     id          SERIAL PRIMARY KEY,
     description VARCHAR(200),
     status      status                     NOT NULL,
-    user_id     INT REFERENCES users (id)  NOT NULL,
-    project_id  INT REFERENCES thread (id) NOT NULL
+    user_id     INT REFERENCES users (id)  ON DELETE CASCADE NOT NULL ,
+    project_id  INT REFERENCES thread (id) ON DELETE CASCADE NOT NULL
 );
 CREATE TABLE report
 (
@@ -263,27 +263,24 @@ FROM developer
 
 create or replace view v_discussion_thread
 as
-with recursive depth_table as
-(
-    select parent_id, id, 0 as depth
-    from discussion_thread
-    UNION ALL
-    select discuss.parent_id, dpth.id, dpth.depth + 1
-    from depth_table dpth
-    join discussion_thread discuss
-    on dpth.parent_id=discuss.id
-),
-tmp as (
-    select id,max(depth) as depth
-    from depth_table
-    group by id
-)
-select d.id as id ,t.user_id as user_id ,d.depth as depth, d1.parent_id as parent_id
+with recursive
+    depth_table as
+        (select parent_id, id, 0 as depth
+         from discussion_thread
+         UNION ALL
+         select discuss.parent_id, dpth.id, dpth.depth + 1
+         from depth_table dpth
+                  join discussion_thread discuss
+                       on dpth.parent_id = discuss.id),
+    tmp as (select id, max(depth) as depth
+            from depth_table
+            group by id)
+select d.id as id, t.user_id as user_id, d.depth as depth, d1.parent_id as parent_id
 from tmp d
          join depth_table d1
-              on d.id=d1.id and d1.depth=d.depth
+              on d.id = d1.id and d1.depth = d.depth
          join thread t
-              on t.id=d.id;
+              on t.id = d.id;
 -------------------------- FUNCTIONS ----------------------
 CREATE OR REPLACE FUNCTION fn_validate_topic_title()
     RETURNS TRIGGER
@@ -303,6 +300,18 @@ BEGIN
     RETURN new;
 END;
 $$;
+create function check_if_user_exists_in(table_name text, field_name text, field_value text) returns boolean
+    language plpgsql
+as
+$$
+DECLARE
+    result BOOL;
+BEGIN
+    EXECUTE format('SELECT EXISTS (SELECT 1 FROM %I WHERE %I = %L)', table_name, field_name, field_value)
+        INTO result;
+    RETURN result;
+END
+$$;
 CREATE OR REPLACE FUNCTION fn_insert_topics_creator_as_moderator()
     RETURNS TRIGGER
     LANGUAGE plpgsql
@@ -315,9 +324,11 @@ BEGIN
     INTO v_user_id
     FROM v_topic_thread
     WHERE v_topic_thread.id = new.id;
-    INSERT INTO topic_threads_moderators(thread_id, user_id) VALUES (new.id, v_user_id);
+    IF not check_if_user_exists_in('moderator', 'id', v_user_id::text) THEN
+        INSERT INTO topic_threads_moderators(thread_id, user_id) VALUES (new.id, v_user_id);
+    END IF;
     RETURN NEW;
-END;
+END
 $$;
 
 CREATE OR REPLACE FUNCTION fn_insert_project_manager()
@@ -326,14 +337,83 @@ CREATE OR REPLACE FUNCTION fn_insert_project_manager()
 AS
 $$
 DECLARE
-    usrId INT;
+    usrId      INT;
+    new_project_id INT;
 BEGIN
-    SELECT user_id INTO usrId FROM v_project_thread p WHERE NEW.id = p.id;
-    INSERT INTO developer VALUES (usrId);
-    INSERT INTO project_manager VALUES (usrId);
+    SELECT user_id, id
+    into usrId,new_project_id
+    FROM v_project_thread p
+    WHERE NEW.id = p.id;
+    IF not check_if_user_exists_in('developer', 'id', usrId::text) THEN
+        INSERT INTO developer VALUES (usrId);
+        IF NOT EXISTS (
+            select 1
+            from developer_associated_with_project dp
+            where dp.project_id=new_project_id and dp.developer_id=usrId
+        )
+        THEN
+            INSERT INTO developer_associated_with_project(project_id, developer_id, started_at)
+            values (new_project_id, usrId, NOW());
+        END IF;
+    end if;
+    IF not check_if_user_exists_in('project_manager', 'id', usrId::text) THEN
+        INSERT INTO project_manager VALUES (usrId);
+    end if;
     RETURN NEW;
-END;
+END
 $$;
+create or replace function fn_remove_unused_tags()
+    returns trigger
+    language plpgsql
+as
+$$
+BEGIN
+    IF not check_if_user_exists_in('tag_threads', 'tag_name', old.tag_name)
+    THEN
+        raise notice 'kakosi';
+        delete from tag t where t.name = old.tag_name;
+    end if;
+    return old;
+end;
+$$;
+create or replace function fn_remove_not_active_project_manager()
+    returns trigger
+    language plpgsql
+as
+$$
+DECLARE
+    creator_id int;
+begin
+    select user_id
+    into creator_id
+    from thread t
+    where t.id = old.id;
+
+    IF NOT EXISTS(select 1
+                  from thread t
+                  where t.id in (select id from project_thread)
+                    and t.user_id = creator_id) THEN
+        delete from project_manager where id = creator_id;
+    end if;
+    return new;
+end
+$$;
+
+create or replace function fn_remove_not_active_developer()
+    returns trigger
+    language plpgsql
+as
+$$
+begin
+    IF not check_if_user_exists_in('developer_associated_with_project','developer_id',old.developer_id::text)
+    THEN
+        delete from developer d
+        where d.id=old.developer_id;
+    end if;
+    return new;
+end
+$$;
+
 -------------------------- TRIGGERS ----------------------
 CREATE OR REPLACE TRIGGER tr_check_topic_name
     BEFORE INSERT OR UPDATE
@@ -351,4 +431,21 @@ CREATE OR REPLACE TRIGGER tr_insert_project_manager
     FOR EACH ROW
 EXECUTE FUNCTION fn_insert_project_manager();
 
----TODO: trigeri za trgnanje na project_owner ako se trgnit project i nekoj takvi dependencies
+create or replace trigger tr_remove_unused_tags
+    after delete
+    on tag_threads
+    for each row
+execute function fn_remove_unused_tags();
+
+create trigger tr_remove_not_project_managers
+    after delete
+    on project_thread
+    for each row
+execute function fn_remove_not_active_project_manager();
+
+create trigger tr_remove_not_active_developer
+    after delete
+    on developer_associated_with_project
+    for each row
+execute function fn_remove_not_active_developer();
+

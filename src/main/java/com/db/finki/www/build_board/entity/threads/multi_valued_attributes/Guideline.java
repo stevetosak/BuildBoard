@@ -13,7 +13,8 @@ import lombok.Setter;
 @Table(name = "topic_guidelines")
 public class Guideline {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "guideline_gen")
+    @SequenceGenerator(name = "guideline_gen", sequenceName = "topic_guidelines_id_seq",  allocationSize = 1)
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)

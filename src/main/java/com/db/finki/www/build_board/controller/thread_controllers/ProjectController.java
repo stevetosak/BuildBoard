@@ -6,6 +6,7 @@ import com.db.finki.www.build_board.service.threads.impl.ProjectService;
 import com.db.finki.www.build_board.service.threads.impl.TagServiceImpl;
 import com.db.finki.www.build_board.service.threads.itfs.TagService;
 import org.hibernate.Hibernate;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -23,9 +24,7 @@ public class ProjectController {
     }
 
     @GetMapping("/{title}")
-    public String getProjectPage(@PathVariable String title, Model model) {
-        Project project = projectService.findByTitle(title);
-
+    public String getProjectPage(@PathVariable(name = "title") Project project, Model model) {
         model.addAttribute("project", project);
         model.addAttribute("tags", topicService.findAll());
         Hibernate.initialize(project.getTags());
@@ -52,21 +51,23 @@ public class ProjectController {
 
     @GetMapping("/{pr_title}/modify")
     public String getModifyPage(
-            @PathVariable(name = "pr_title") String title,
+            @PathVariable(name = "pr_title") Project project,
             Model model
     ) {
-        model.addAttribute("project", projectService.findByTitle(title));
+        model.addAttribute("project", project);
         return "project_pages/project-create";
     }
 
+    @PreAuthorize("project.getUser().username.equals(username)")
     @PostMapping("/{title}/modify")
     public String modifyProject(
-            @PathVariable String title,
+            @PathVariable(name = "title") Project project,
             @RequestParam(name = "title") String newTitle,
             @RequestParam(name = "repo_url") String repoUrl,
+            @RequestParam String username,
             @RequestParam String description
     ){
-        return "redirect:/project/" +  projectService.updateProject(title,repoUrl,description,newTitle).getTitle();
+        return "redirect:/project/" +  projectService.updateProject(project,repoUrl,description,newTitle).getTitle();
     }
 
     @PostMapping("/add")
@@ -80,20 +81,25 @@ public class ProjectController {
         return "redirect:/";
     }
 
+    @PreAuthorize("project.getUser().username.equals(username)")
     @PostMapping("/topic/add")
     public String addTopic(
-            @RequestParam(name = "project_title") String projectTitle,
+            @RequestParam(name = "project_title") Project project,
             @RequestParam(name = "title") String topicsTitle,
             @RequestParam String description,
-            @SessionAttribute BBUser user
+            @RequestParam String username
     ){
-        projectService.addToProjectWithIdNewTopic(projectTitle, topicsTitle,description,user);
-        return "redirect:/project/" + projectTitle;
+        projectService.addToProjecNewTopic(project, topicsTitle,description,username);
+        return "redirect:/project/" + project.getTitle();
     }
 
+    @PreAuthorize("project.getUser().username.equals(username)")
     @PostMapping("/delete/*")
-    public String delete(@RequestParam Long id) {
-        projectService.deleteById(id);
+    public String delete(
+            @RequestParam(name = "id") Project project,
+            @RequestParam String username
+    ) {
+        projectService.delete(project);
         return "redirect:/" ;
     }
 }

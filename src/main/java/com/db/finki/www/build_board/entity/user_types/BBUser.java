@@ -31,8 +31,10 @@ import java.util.Objects;
 public class BBUser implements UserDetails, Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_gen")
+    @SequenceGenerator(name = "user_gen", sequenceName = "users_id_seq", allocationSize = 1)
     private int id;
+
     private String username;
     private String password;
     private String description;
@@ -68,6 +70,7 @@ public class BBUser implements UserDetails, Serializable {
         return Files.exists(path) ? File.separator + "avatars" + File.separator + "avatar-"+id : File.separator + "default-avatar.jpg";
     }
 
+
     @Override
     public boolean equals(Object other){
         if(!other.getClass().equals(this.getClass())){
@@ -80,5 +83,17 @@ public class BBUser implements UserDetails, Serializable {
     @Override
     public int hashCode() {
         return Objects.hashCode(id);
+    }
+
+    public BBUser(
+            String username, String email, String name, String password, String description, String sex
+    ){
+        this.username = username;
+        this.email = email;
+        this.name = name;
+        this.password = password;
+        this.description = description;
+        this.sex=sex;
+        this.isEnabled=true;
     }
 }

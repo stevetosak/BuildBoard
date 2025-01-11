@@ -42,7 +42,9 @@ public class WebSecurityConfig {
                                         "/contact",
                                         "/about",
                                     "/project_imgs/buildboard-logo.jpg",
-                                    "static/**"
+                                "*.jpg",
+                                "*.png",
+                                "/register"
                                 ).permitAll()
                                 .requestMatchers(
                                         new AntPathRequestMatcher("/topic/*", HttpMethod.GET.name()),

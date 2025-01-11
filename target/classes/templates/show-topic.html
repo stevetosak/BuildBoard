@@ -43,6 +43,7 @@
                     <button type="submit" class="btn btn-sm btn-link text-danger p-0 ms-1" style="line-height: 1;">
                         &times;
                     </button>
+                    <input th:if="${session.user!=null}" type="hidden" name="username" th:value="${session.user.username}"/>
                 </form>
             </span>
                     </li>
@@ -69,6 +70,27 @@
                                 </button>
                             </div>
                         </div>
+                        <input type="hidden" th:if="${session.user!=null}" name="username" th:value="${session.user.username}">
+                    </form>
+                </div>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mt-3 pt-3">
+                <div class="d-flex flex-row">
+                    <form th:action="'/topic/' + ${topic.getTitle()} + '/discussion/like'" method="post">
+                        <input type="hidden" name="threadId" th:value="${topic.getId()}">
+                        <button th:if="${session.user!=null}"
+                                type="submit" class="btn btn-outline-success btn-sm me-2 like-button">
+                            <!--                                th:attr="data-reply-id=${reply.getDiscussion().getId()}">-->
+                            👍 Like (<span th:text="${topic.getNumLikes()}">0</span>)
+                        </button>
+                    </form>
+                    <form th:action="'/topic/' + ${topic.getTitle()} + '/discussion/dislike'" method="post">
+                        <input type="hidden" name="threadId" th:value="${topic.getId()}">
+                        <button th:if="${session.user!=null}"
+                                class="btn btn-outline-danger btn-sm dislike-button">
+                            <!--                                th:attr="data-reply-id=${reply.getDiscussion().getId()}">-->
+                            👎 Dislike
+                        </button>
                     </form>
                 </div>
             </div>
@@ -85,6 +107,7 @@
                 <form th:action="@{/topic/delete/{id} (id=${topic.getId()})}" method="post" style="display:inline;">
                     <input type="hidden" name="id" th:value="${topic.getId()}"/>
                     <button type="submit" class="btn btn-danger btn-sm">Delete Topic</button>
+                    <input th:if="${session.user!=null}" type="hidden" name="username" th:value="${session.user.username}"/>
                 </form>
             </div>
         </div>
@@ -116,6 +139,7 @@
                     <button class="btn btn-danger btn-sm edit-reply-btn ms-2"
                             th:attr="data-reply-id=${reply.getDiscussion().getId()}">Delete
                     </button>
+                    <input th:if="${session.user!=null}" type="hidden" name="username" th:value="${session.user.username}"/>
                 </form>
             </div>
         </div>
@@ -136,6 +160,7 @@
                     <button type="button" class="btn btn-sm btn-danger mt-2"
                             th:onclick="'hideEditReplyBox(' + ${reply.getDiscussion().getId()} + ')'">Cancel
                     </button>
+                    <input th:if="${session.user!=null}"  type="hidden" name="username" th:value="${session.user.username}"/>
                 </form>
 
             </div>
@@ -218,6 +243,7 @@
                                placeholder="Enter custom tag name"/>
                     </div>
                     <button  type="submit" class="btn btn-primary w-100">Add Tag</button>
+                    <input th:if="${session.user!=null}" type="hidden" name="username" th:value="${session.user.username}"/>
                 </form>
             </div>
         </div>
@@ -245,6 +271,7 @@
                                   th:text="${topic.getContent()}" required></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Save Changes</button>
+                    <input th:if="${session.user!=null}" type="hidden" name="username" th:value="${session.user.username}"/>
                 </form>
             </div>
         </div>

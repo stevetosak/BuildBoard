@@ -23,7 +23,7 @@
                 </button>
                 <button class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#addTagModal">
                     <a class="text-decoration-none text-reset"
-                       th:href="@{/project/{pr_title}/modify(pr_title=${project.getTitle()})}">Modify topic</a>
+                       th:href="@{/project/{pr_title}/modify(pr_title=${project.getTitle()})}">Modify project</a>
                 </button>
             </div>
         </div>
@@ -48,6 +48,7 @@
                             <button type="submit" class="btn btn-sm btn-link text-danger p-0 ms-1" style="line-height: 1;">
                                 &times;
                             </button>
+                            <input th:if="${session.user!=null}"  type="hidden" name="username" th:value="${session.user.getUsername()}">
                         </form>
                     </li>
                 </ul>
@@ -68,12 +69,33 @@
                     </div>
                 </div>
             </div>
+            <div class="d-flex justify-content-between align-items-center mt-3 pt-3">
+                <div class="d-flex flex-row">
+                    <form th:action="'/project/' + ${project.getTitle()} + '/discussion/like'" method="post">
+                        <input type="hidden" name="threadId" th:value="${project.getId()}">
+                        <button th:if="${session.user!=null}"
+                                type="submit" class="btn btn-outline-success btn-sm me-2 like-button">
+                            <!--                                th:attr="data-reply-id=${reply.getDiscussion().getId()}">-->
+                            👍 Like (<span th:text="${project.getNumLikes()}">0</span>)
+                        </button>
+                    </form>
+                    <form th:action="'/project/' + ${project.getTitle()} + '/discussion/dislike'" method="post">
+                        <input type="hidden" name="threadId" th:value="${project.getId()}">
+                        <button th:if="${session.user!=null}"
+                                class="btn btn-outline-danger btn-sm dislike-button">
+                            <!--                                th:attr="data-reply-id=${reply.getDiscussion().getId()}">-->
+                            👎 Dislike
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
         <div th:if="${isManager}" class="card-footer d-flex justify-content-between">
             <form th:action="@{/project/delete/{title} (title=${project.getTitle()})}" method="post"
                   style="display:inline;">
                 <input type="hidden" name="id" th:value="${project.getId()}"/>
                 <button type="submit" class="btn btn-danger btn-sm">Delete Project</button>
+                <input th:if="${session.user!=null}" type="hidden" name="username" th:value="${session.user.getUsername()}">
             </form>
         </div>
     </div>
@@ -102,6 +124,7 @@
                         </select>
                         <input type="text" id="customTag" class="form-control d-none"
                                placeholder="Enter custom tag name"/>
+                        <input th:if="${session.user!=null}" type="hidden" name="username" th:value="${session.user.getUsername()}">
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Add Tag</button>
                 </form>

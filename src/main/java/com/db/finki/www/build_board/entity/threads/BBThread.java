@@ -17,7 +17,8 @@ import java.util.Set;
 @Inheritance(strategy = InheritanceType.JOINED)
 public class BBThread {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "thread_gen")
+    @SequenceGenerator(name = "thread_gen", sequenceName = "thread_id_seq", allocationSize = 1)
     protected Integer id;
 
     protected String content;

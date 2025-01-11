@@ -23,7 +23,7 @@ public class Topic extends BBThread implements NamedThread {
 
     @ManyToOne
     @JoinColumn(name = "parent_id")
-    private Topic parent;
+    private BBThread parent;
 
     @Override
     public String getTypeName() {return "topic";}

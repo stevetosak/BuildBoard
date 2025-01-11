@@ -1,0 +1,35 @@
+<form method="post"
+      class="d-flex gap-2 flex-grow-1 flex-column gap-2 list-group-flush "
+      th:action="${url}"
+      th:fragment="user_fields(url)"
+>
+    <h5>Personal Details</h5>
+    <label class="fw-bold ">Username:
+        <input th:readonly="${!canEdit}"
+               name="username" type="text" th:value="${user.getUsername()}"
+               class="w-100 border border-secondary ps-2 rounded list-group-item">
+    </label>
+    <label class="fw-bold ">Name:
+        <input name="name" th:readonly="${!canEdit}"
+               type="text" th:value="${user.getName()}" class="border ps-2 border-secondary rounded w-100 list-group-item">
+    </label>
+    <label th:readonly="${!canEdit}"
+           class="fw-bold ">Email:
+        <input name="email" type="text" th:value="${user.getEmail()}" class="border ps-2 border-secondary rounded w-100 list-group-item">
+    </label>
+    <label>
+        <span class="fw-bold d-block">Description</span>
+        <textarea name="description" class="border border-secondary ps-2 rounded w-100" th:readonly="${!canEdit}"
+                  th:text="${user.getDescription()}"></textarea>
+    </label>
+    <label th:readonly="${!canEdit}"
+           class="fw-bold ">Password:
+        <input name="password"
+               placeholder="Leave empty if you don't want to change it"
+               type="password" class="w-100 ps-2 list-group-item border border-secondary rounded">
+    </label>
+    <input type="hidden" name="cur_user_username"
+           th:value="${session.user == null} ? '' : ${session.user.getUsername()}">
+    <button th:if="${canEdit}" class="btn btn-success btn-sm w-50 align-self-center">Save changes
+    </button>
+</form>

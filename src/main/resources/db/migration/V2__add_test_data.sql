@@ -34,8 +34,8 @@ VALUES
 
 INSERT INTO topic_thread (id, title, parent_id)
 VALUES
-    (1, 'Topic 1' , NULL),
-    (2, 'Topic 2', NULL),
+    (1, 'Topic 1' , 5),
+    (2, 'Topic 2', 5),
     (8, 'Topic 7' , NULL),
     (9, 'Topic 8', NULL),
     (16, 'Topic 9' , NULL),
@@ -66,20 +66,11 @@ VALUES
     (3, 5),
     (4, 6),
     (5, 7);
-INSERT INTO topic_belongs_to_project (topic_id, project_id)
-VALUES
-    (1, 5),
-    (2, 5);
 
 INSERT INTO blacklisted_user (topic_id, user_id, moderator_id, start_date, end_date, reason)
 VALUES
     (1, 2, 1, NOW(), NOW() + INTERVAL '7 days', 'Spamming'),
     (2, 3, 4, NOW(), NOW() + INTERVAL '3 days', 'Offensive language');
-
-INSERT INTO developer_associated_with_project (project_id, developer_id, started_at)
-VALUES
-    (5, 2, NOW()),
-    (5, 3, NOW());
 
 INSERT INTO permissions (name)
 VALUES

@@ -13,7 +13,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 
-//TODO: security na metodi spored to dali e baranjeto od userot
 @Controller
 @RequestMapping("/topic")
 public class TopicController {
@@ -51,16 +50,16 @@ public class TopicController {
         return "redirect:/";
     }
 
-//    @PreAuthorize("")
+    @PreAuthorize("@topicServiceImpl.getById(id).user.username==username")
     @PostMapping("/delete/{id}")
-    public String deleteTopic(@PathVariable(name = "id") long id, HttpSession session) {
+    public String deleteTopic(@PathVariable(name = "id") long id, HttpSession session, @RequestParam String username) {
         topicService.deleteTopicById(id);
         return "redirect:/";
     }
 
-
+    @PreAuthorize("@topicServiceImpl.getById(id).user.username==username")
     @PostMapping("/edit/{id}")
-    public String editTopic(@PathVariable long id, @RequestParam String title, @RequestParam String content, Model model) {
+    public String editTopic(@PathVariable long id, @RequestParam String title, @RequestParam String content, Model model, @RequestParam String username) {
         Topic t = topicService.save(id, title, content);
         model.addAttribute("topic", t);
         model.addAttribute("tags", tagService.findAllNotUsed(t));

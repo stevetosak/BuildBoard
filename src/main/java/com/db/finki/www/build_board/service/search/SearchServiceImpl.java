@@ -33,7 +33,6 @@ public class SearchServiceImpl implements SearchService {
 
 
     //todo strictmode so and spec
-    // todo: vidi dali ko ke ne e asociran tag da go trgnime
 
     private List<Topic> searchTopics(String query, List<String> filters) {
         Specification<Topic> spec = Specification.where(null);
