@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Channel</title>
+</head>
+<body>
+<h1 th:text="${channel.getName()}"></h1>
+<form th:action="@{/project/{projectTitle}/channels/{channelName}/delete (projectTitle=${channel.getProject().getTitle()},channelName=${channel.getName()})}" method="post">
+    <button type="submit"> Delete</button>
+</form>
+
+</body>
+</html>

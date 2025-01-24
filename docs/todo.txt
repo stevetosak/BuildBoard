@@ -25,6 +25,11 @@ Ko ke udris search bez filtri da ti gi davat grupirani. -> Edna grupa topics, dr
 - Ko ke imas nesto liked ili disliked da ti ostanit highlighted.
 - Izveden atribut status za developer (normal user, incative developer,active developer)
 - Paginacija
+- rename iminja na branch od _ vo -
+- SITE DESCRIPTIONS VO SQL DA SA TEXT ne varchar
+- erot menvenje !!!!
+
+---------------
 
 
 

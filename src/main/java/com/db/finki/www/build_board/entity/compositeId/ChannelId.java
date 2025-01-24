@@ -1,12 +1,16 @@
 package com.db.finki.www.build_board.entity.compositeId;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
 
 @Getter
 @Service
+@AllArgsConstructor
+@NoArgsConstructor
 public class ChannelId {
     private int project;
     private String name;

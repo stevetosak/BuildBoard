@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>All Channels</title>
+</head>
+<body>
+<div >
+    <ul th:each="channel : ${channels}">
+        <li th:text="${channel.getName()}"></li>
+    </ul>
+</div>
+</body>
+</html>

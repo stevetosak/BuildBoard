@@ -8,6 +8,7 @@ import com.db.finki.www.build_board.service.threads.itfs.TagService;
 import com.db.finki.www.build_board.service.threads.itfs.TopicService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -50,16 +51,16 @@ public class TopicController {
         return "redirect:/";
     }
 
-    @PreAuthorize("@topicServiceImpl.getById(id).user.username==username")
+    @PreAuthorize("@topicServiceImpl.getById(#id).getUser().getUsername().equals(#username)")
     @PostMapping("/delete/{id}")
-    public String deleteTopic(@PathVariable(name = "id") long id, HttpSession session, @RequestParam String username) {
+    public String deleteTopic(@PathVariable(name = "id") @P("id") long id, HttpSession session, @RequestParam @P("username") String username) {
         topicService.deleteTopicById(id);
         return "redirect:/";
     }
 
-    @PreAuthorize("@topicServiceImpl.getById(id).user.username==username")
+    @PreAuthorize("@topicServiceImpl.getById(#id).getUser().getUsername().equals(#username)")
     @PostMapping("/edit/{id}")
-    public String editTopic(@PathVariable long id, @RequestParam String title, @RequestParam String content, Model model, @RequestParam String username) {
+    public String editTopic(@PathVariable @P("id") long id, @RequestParam String title, @RequestParam String content, Model model, @RequestParam @P("username")String username) {
         Topic t = topicService.save(id, title, content);
         model.addAttribute("topic", t);
         model.addAttribute("tags", tagService.findAllNotUsed(t));

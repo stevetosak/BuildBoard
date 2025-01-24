@@ -173,6 +173,12 @@ CREATE TABLE project_roles_permissions
     FOREIGN KEY (role_name, project_id)
         REFERENCES project_roles (name, project_id) ON DELETE CASCADE
 );
+
+
+create table submission(
+    id serial primary key
+);
+
 CREATE TYPE status AS ENUM ('ACCEPTED', 'DENIED', 'PENDING');
 CREATE TABLE project_request
 (
@@ -180,17 +186,32 @@ CREATE TABLE project_request
     description VARCHAR(200),
     status      status                     NOT NULL,
     user_id     INT REFERENCES users (id)  ON DELETE CASCADE NOT NULL ,
-    project_id  INT REFERENCES thread (id) ON DELETE CASCADE NOT NULL
+    project_id  INT REFERENCES thread (id) ON DELETE CASCADE NOT NULL,
+    created_at timestamp default now(),
+    submission_id int references submission(id)
 );
+
+-- todo trigger pred kreiranje project request ili report ke kreirat submission
+
+create table feedback (
+    description TEXT,
+    submission_type varchar(1),
+    created_by int references users(id),
+    created_at timestamp default now(),
+    submission_id int references submission(id)
+
+);
+
 CREATE TABLE report
 (
     id          SERIAL,
-    created_at  TIMESTAMP,
+    created_at  TIMESTAMP default now(),
     description VARCHAR(200) NOT NULL,
     status      status,
     thread_id   INT REFERENCES thread (id) on delete cascade,
     for_user_id INT REFERENCES users (id) on delete cascade,
     by_user_id  INT REFERENCES users (id) on delete cascade,
+    submission_id int references submission(id),
     PRIMARY KEY (id, thread_id, for_user_id, by_user_id)
 );
 CREATE TABLE channel

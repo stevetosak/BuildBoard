@@ -7,6 +7,7 @@ import com.db.finki.www.build_board.service.threads.impl.TagServiceImpl;
 import com.db.finki.www.build_board.service.threads.itfs.TagService;
 import org.hibernate.Hibernate;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -68,13 +69,13 @@ public class ProjectController {
         return "project_pages/members";
     }
 
-    @PreAuthorize("project.getUser().username.equals(username)")
+    @PreAuthorize("#project.getUser().getUsername().equals(#username)")
     @PostMapping("/{title}/modify")
     public String modifyProject(
-            @PathVariable(name = "title") Project project,
+            @PathVariable(name = "title") @P("project") Project project,
             @RequestParam(name = "title") String newTitle,
             @RequestParam(name = "repo_url") String repoUrl,
-            @RequestParam String username,
+            @RequestParam @P("username") String username,
             @RequestParam String description
     ){
         return "redirect:/project/" +  projectService.updateProject(project,repoUrl,description,newTitle).getTitle();
@@ -91,23 +92,23 @@ public class ProjectController {
         return "redirect:/";
     }
 
-    @PreAuthorize("project.getUser().username.equals(username)")
+    @PreAuthorize("#project.getUser().getUsername().equals(#username)")
     @PostMapping("/topic/add")
     public String addTopic(
-            @RequestParam(name = "project_title") Project project,
+            @RequestParam(name = "project_title") @P("project") Project project,
             @RequestParam(name = "title") String topicsTitle,
             @RequestParam String description,
-            @RequestParam String username
+            @RequestParam @P("username") String username
     ){
         projectService.addToProjecNewTopic(project,topicsTitle,description,username);
         return "redirect:/project/" + project.getTitle();
     }
 
-    @PreAuthorize("project.getUser().username.equals(username)")
+    @PreAuthorize("#project.getUser().username.equals(#username)")
     @PostMapping("/delete/*")
     public String delete(
-            @RequestParam(name = "id") Project project,
-            @RequestParam String username
+            @RequestParam(name = "id") @P("project") Project project,
+            @RequestParam @P("username") String username
     ) {
         projectService.delete(project);
         return "redirect:/" ;

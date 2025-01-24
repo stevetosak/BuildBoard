@@ -71,7 +71,8 @@ public class BBUser implements UserDetails, Serializable {
 
     @Override
     public boolean equals(Object other){
-        if(!other.getClass().equals(this.getClass())){
+        System.out.println("VLEZE EQUALS");
+        if(!(other instanceof BBUser)){
             return false;
         }
         BBUser otherCasted = (BBUser) other;

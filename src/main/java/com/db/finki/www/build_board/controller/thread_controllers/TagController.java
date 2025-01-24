@@ -7,6 +7,7 @@ import com.db.finki.www.build_board.service.threads.itfs.TagService;
 import com.db.finki.www.build_board.service.threads.itfs.TopicService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,12 +27,12 @@ public class TagController {
         this.projectService = projectService;
     }
 
-    @PreAuthorize("@topicServiceImpl.getById(id).user.username==username")
+    @PreAuthorize("@topicServiceImpl.getById(#id).getUser().getUsername().equals(#username)")
     @PostMapping("/topic/add-tag/{id}")
-    public String addTagToTopic(@PathVariable(name = "id") long id,
+    public String addTagToTopic(@PathVariable(name = "id") @P("id") long id,
                          @RequestParam String tagName,
                          HttpSession session,
-                         String username,
+                         @P("username") String username,
                          Model model) {
         Topic t = topicService.getById(id);
         topicService.addTagToTopic(t, tagName);
@@ -40,33 +41,33 @@ public class TagController {
         return "redirect:/topic/" + t.getTitle();
     }
 
-    @PreAuthorize("@topicServiceImpl.getById(topicId).user.username==username")
+    @PreAuthorize("@topicServiceImpl.getById(#topicId).getUser().getUsername()==#username")
     @PostMapping("/topic/delete-tag/{topicId}/{tagName}")
-    public String deleteTagTopic(@PathVariable long topicId, @PathVariable String tagName, Model model, @RequestParam String username) {
+    public String deleteTagTopic(@PathVariable @P("topicId") long topicId, @PathVariable String tagName, Model model, @RequestParam @P("username") String username) {
         Topic t = topicService.deleteTagFromTopic(topicId, tagName);
         model.addAttribute("topic", t);
         model.addAttribute("tags", tagService.findAllNotUsed(t));
         return "redirect:/topic/" + t.getTitle();
     }
 
-    @PreAuthorize("project.getUser().username==username")
+    @PreAuthorize("#project.getUser().getUsername()==#username")
     @PostMapping("/project/{title}/add-tag")
     public String addTagToProject(
-            @PathVariable(name="title") Project project,
+            @PathVariable(name="title") @P("project") Project project,
             @RequestParam(name = "tagName") String tagName,
-            @RequestParam String username
+            @RequestParam @P("username") String username
     )
     {
         projectService.addTagToProject(project,tagName);
         return "redirect:/project/" + project.getTitle();
     }
 
-    @PreAuthorize("project.getUser().getUsername().equals(username)")
+    @PreAuthorize("#project.getUser().getUsername().equals(#username)")
     @PostMapping("/project/delete-tag/{projectTitle}/{tagName}")
     public String deleteTagProject(
-            @PathVariable(name = "projectTitle") Project project,
+            @PathVariable(name = "projectTitle") @P("project") Project project,
             @PathVariable String tagName,
-            @RequestParam String username
+            @RequestParam @P("username") String username
     ){
         projectService.removeTagFromProject(project,tagName);
         return "redirect:/project/" + project.getTitle();

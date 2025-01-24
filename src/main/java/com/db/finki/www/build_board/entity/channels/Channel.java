@@ -4,7 +4,9 @@ import com.db.finki.www.build_board.entity.compositeId.ChannelId;
 import com.db.finki.www.build_board.entity.threads.Project;
 import com.db.finki.www.build_board.entity.user_types.Developer;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Table(name = "channel")
@@ -12,6 +14,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @IdClass(ChannelId.class)
+@AllArgsConstructor
+@NoArgsConstructor
 public class Channel {
 
     @Id
