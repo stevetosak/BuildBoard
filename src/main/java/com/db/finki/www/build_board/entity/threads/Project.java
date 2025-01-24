@@ -1,5 +1,6 @@
 package com.db.finki.www.build_board.entity.threads;
 
+import com.db.finki.www.build_board.entity.channels.Channel;
 import com.db.finki.www.build_board.entity.requests.ProjectRequests;
 import com.db.finki.www.build_board.entity.user_types.BBUser;
 import com.db.finki.www.build_board.entity.threads.interfaces.NamedThread;
@@ -47,6 +48,8 @@ public class Project extends BBThread implements NamedThread {
 
     @OneToMany(mappedBy = "project")
     private Set<ProjectRequests> requests = new HashSet<>();
+    @OneToMany(mappedBy = "project")
+    private Set<Channel> channels;
 
     @Override
     public String getTypeName() {

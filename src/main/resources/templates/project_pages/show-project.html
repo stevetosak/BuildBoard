@@ -93,21 +93,21 @@
                     </div>
                 </div>
 
-                <div th:if="${!project.getTopics().isEmpty()}" class="w-75 d-flex flex-column align-items-center">
+                <div th:if="${!project.getChannels().isEmpty()}" class="w-75 d-flex flex-column align-items-center">
                     <h4>Channels:</h4>
                     <div class="list-group w-75">
-                        <div class="list-group-item w-100" th:each="topic : ${project.getTopics()}">
+                        <div class="list-group-item w-100" th:each="channel : ${project.getChannels()}">
                             <div class="d-flex">
                                 <h5 class="mb-1">
-                                    <a th:href="@{/topic/{name} (name=${topic.getTitle()})}"
-                                       th:text="${topic.getTitle()}" class="text-decoration-none"></a>
+                                    <a th:href="@{/channel/{name} (name=${channel.getName()})}"
+                                       th:text="${channel.getName()}" class="text-decoration-none"></a>
                                 </h5>
                                 <!--                <small th:text="${thread.getFormattedDate()}">Date</small>-->
                             </div>
                             <!--            <p class="mb-1 text-muted" th:text="${thread.getDescription()}">Thread description here...</p>-->
                             <!--            <small th:text="${thread.getAuthor()}">Posted by Author</small>-->
                         </div>
-                        <button> Add Channel </button>
+                        <button class="btn btn-success mt-3"> Add Channel </button>
                     </div>
                 </div>
 

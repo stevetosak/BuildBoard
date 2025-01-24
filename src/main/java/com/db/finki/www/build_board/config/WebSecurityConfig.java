@@ -44,6 +44,7 @@ public class WebSecurityConfig {
                                         "/contact",
                                         "/about",
                                     "/project_imgs/buildboard-logo.jpg",
+                                "*.ico",
                                 "*.jpg",
                                 "*.png",
                                 "/register"
