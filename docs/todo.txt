@@ -1,0 +1,30 @@
+description na project
+
+Brisenje na tag
+	Notifikacija za site so go koristat tagot
+	Mu izlegvit na moderatorot so go brisit negoviot tag kolku dusi go koristat tagot.
+	
+	
+Ko ke udris search bez filtri da ti gi davat grupirani. -> Edna grupa topics, druga projects treta tagoj so ti matchnale so kverito. -> Ne trebit deka nemat smisla za filterot sho go koristime spored type sho ti gi grupirat
+
+- Developer requests for join
+- Channels da se impl
+- Discussion da se sortirani spored nekoja metrika koja gi spojvit.
+- Meshan search vo appot, od sve sho imame vo nego.
+- Referencira thread, koga pishi tekst, kaj bilo.
+
+
+--------------------
+
+- searchni vo show-topic "todo-func", ke vidis
+- Security za post baranjava, sega samo sa kriet kopceto za edit i delete na discussion i takvi stvari, ama ne sa prat proverki vo metodite.
+- Reorganizacija ke trebit vo TopicController deka premn raboti msm imat tamu, mozit ubo ke e ako po generalni raboti so vazat za sive threads ko likes da e vo drug.
+- Vo pravo bese trebit posebni servisi da sa VDiscussionService i DiscussionService :)
+
+--------------------------
+- Ko ke imas nesto liked ili disliked da ti ostanit highlighted.
+- Izveden atribut status za developer (normal user, incative developer,active developer)
+- Paginacija
+
+
+
