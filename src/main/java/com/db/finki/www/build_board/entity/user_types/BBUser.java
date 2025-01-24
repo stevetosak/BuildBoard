@@ -57,9 +57,6 @@ public class BBUser implements UserDetails, Serializable {
         return isEnabled;
     }
 
-    @Transient
-    private String avatarUrl;
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();
@@ -69,6 +66,7 @@ public class BBUser implements UserDetails, Serializable {
         Path path = Path.of(FileUploadService.USER_AVATAR_DIR + File.separator + "avatar-" + id);
         return Files.exists(path) ? File.separator + "avatars" + File.separator + "avatar-"+id : File.separator + "default-avatar.jpg";
     }
+
 
 
     @Override

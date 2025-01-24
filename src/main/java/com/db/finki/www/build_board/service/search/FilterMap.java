@@ -1,5 +1,6 @@
 package com.db.finki.www.build_board.service.search;
 
+import com.db.finki.www.build_board.entity.threads.BBThread;
 import com.db.finki.www.build_board.entity.threads.interfaces.NamedThread;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.jpa.domain.Specification;
@@ -31,7 +32,6 @@ public class FilterMap<T extends NamedThread> {
         });
         filterMap.put("all", (param) -> {
             Specification<T> spec = (root, query, cb) -> null;
-
             return spec.or(filterMap.get("title").apply(param)).or(filterMap.get("content").apply(param));
         });
 

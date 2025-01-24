@@ -1,5 +1,6 @@
 package com.db.finki.www.build_board.service.search;
 
+import com.db.finki.www.build_board.entity.threads.BBThread;
 import com.db.finki.www.build_board.entity.threads.Project;
 import com.db.finki.www.build_board.entity.threads.Topic;
 import com.db.finki.www.build_board.entity.threads.interfaces.NamedThread;

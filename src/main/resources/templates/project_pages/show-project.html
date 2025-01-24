@@ -9,7 +9,8 @@
 <body>
 <div th:replace="/home_pages/home :: navigation"></div>
 
-<main th:with="isManager=${session.user != null ?  session.user.getId()==project.getUser().getId() : false }" class="container mt-5">
+<main th:with="isManager=${session.user != null ?  session.user.getId()==project.getUser().getId() : false }"
+      class="container mt-5">
     <div class="card shadow-sm mb-4">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
             <h3 th:text="${project.getTitle()}">Project Title</h3>
@@ -40,34 +41,57 @@
             <div th:if="${!project.getTags().isEmpty()}">
                 <h6>Tags:</h6>
                 <ul class="list-inline">
-                    <li th:each="tag : ${project.getTags()}"  class="list-inline-item badge bg-info text-dark d-inline-flex align-items-center">
+                    <li th:each="tag : ${project.getTags()}"
+                        class="list-inline-item badge bg-info text-dark d-inline-flex align-items-center">
                         <span th:text="${tag.getName()}">Tag Name</span>
                         <form th:if="${session.user!=null && session.user.equals(project.getUser())}"
-                                th:action="@{/project/delete-tag/{projectTitle}/{tagName} (projectTitle=${project.getTitle()}, tagName=${tag.getName()})}"
+                              th:action="@{/project/delete-tag/{projectTitle}/{tagName} (projectTitle=${project.getTitle()}, tagName=${tag.getName()})}"
                               method="post" style="margin-left: 5px;">
-                            <button type="submit" class="btn btn-sm btn-link text-danger p-0 ms-1" style="line-height: 1;">
+                            <button type="submit" class="btn btn-sm btn-link text-danger p-0 ms-1"
+                                    style="line-height: 1;">
                                 &times;
                             </button>
-                            <input th:if="${session.user!=null}"  type="hidden" name="username" th:value="${session.user.getUsername()}">
+                            <input th:if="${session.user!=null}" type="hidden" name="username"
+                                   th:value="${session.user.getUsername()}">
                         </form>
                     </li>
                 </ul>
             </div>
-            <div th:if="${!project.getTopics().isEmpty()}">
-                <h4>Topics:</h4>
-                <div class="list-group">
-                    <div class="list-group-item" th:each="topic : ${project.getTopics()}">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h5 class="mb-1">
-                                <a th:href="@{/topic/{name} (name=${topic.getTitle()})}"
-                                   th:text="${topic.getTitle()}" class="text-decoration-none"></a>
-                            </h5>
-                            <!--                <small th:text="${thread.getFormattedDate()}">Date</small>-->
+            <div class="d-flex flex-row justify-content-between">
+                <div th:if="${!project.getTopics().isEmpty()}" class="w-75 d-flex flex-column align-items-center">
+                    <h4>Topics:</h4>
+                    <div class="list-group w-75">
+                        <div class="list-group-item w-100" th:each="topic : ${project.getTopics()}">
+                            <div class="d-flex">
+                                <h5 class="mb-1">
+                                    <a th:href="@{/topic/{name} (name=${topic.getTitle()})}"
+                                       th:text="${topic.getTitle()}" class="text-decoration-none"></a>
+                                </h5>
+                                <!--                <small th:text="${thread.getFormattedDate()}">Date</small>-->
+                            </div>
+                            <!--            <p class="mb-1 text-muted" th:text="${thread.getDescription()}">Thread description here...</p>-->
+                            <!--            <small th:text="${thread.getAuthor()}">Posted by Author</small>-->
                         </div>
-                        <!--            <p class="mb-1 text-muted" th:text="${thread.getDescription()}">Thread description here...</p>-->
-                        <!--            <small th:text="${thread.getAuthor()}">Posted by Author</small>-->
                     </div>
                 </div>
+
+                <div th:if="${!project.getTopics().isEmpty()}" class="w-75 d-flex flex-column align-items-center">
+                    <h4>Channels git :</h4>
+                    <div class="list-group w-75">
+                        <div class="list-group-item w-100" th:each="topic : ${project.getTopics()}">
+                            <div class="d-flex">
+                                <h5 class="mb-1">
+                                    <a th:href="@{/topic/{name} (name=${topic.getTitle()})}"
+                                       th:text="${topic.getTitle()}" class="text-decoration-none"></a>
+                                </h5>
+                                <!--                <small th:text="${thread.getFormattedDate()}">Date</small>-->
+                            </div>
+                            <!--            <p class="mb-1 text-muted" th:text="${thread.getDescription()}">Thread description here...</p>-->
+                            <!--            <small th:text="${thread.getAuthor()}">Posted by Author</small>-->
+                        </div>
+                    </div>
+                </div>
+
             </div>
             <div class="d-flex justify-content-between align-items-center mt-3 pt-3">
                 <div class="d-flex flex-row">
@@ -95,7 +119,8 @@
                   style="display:inline;">
                 <input type="hidden" name="id" th:value="${project.getId()}"/>
                 <button type="submit" class="btn btn-danger btn-sm">Delete Project</button>
-                <input th:if="${session.user!=null}" type="hidden" name="username" th:value="${session.user.getUsername()}">
+                <input th:if="${session.user!=null}" type="hidden" name="username"
+                       th:value="${session.user.getUsername()}">
             </form>
         </div>
     </div>
@@ -117,14 +142,16 @@
                         <label for="existingTags" class="form-label">Tag Name</label>
                         <select id="existingTags" class="form-select mb-3" name="tagName">
                             <option value="" selected disabled>Select an existing tag</option>
-                            <option th:each="tag : ${tags}" th:if="${!project.getTags().contains(tag)}"  th:value="${tag.getName()}" th:text="${tag.getName()}">
+                            <option th:each="tag : ${tags}" th:if="${!project.getTags().contains(tag)}"
+                                    th:value="${tag.getName()}" th:text="${tag.getName()}">
                                 Example Tag
                             </option>
                             <option value="custom">Enter a custom tag...</option>
                         </select>
                         <input type="text" id="customTag" class="form-control d-none"
                                placeholder="Enter custom tag name"/>
-                        <input th:if="${session.user!=null}" type="hidden" name="username" th:value="${session.user.getUsername()}">
+                        <input th:if="${session.user!=null}" type="hidden" name="username"
+                               th:value="${session.user.getUsername()}">
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Add Tag</button>
                 </form>

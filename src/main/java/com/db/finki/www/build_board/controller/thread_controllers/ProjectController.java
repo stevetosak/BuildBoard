@@ -89,7 +89,7 @@ public class ProjectController {
             @RequestParam String description,
             @RequestParam String username
     ){
-        projectService.addToProjecNewTopic(project, topicsTitle,description,username);
+        projectService.addToProjecNewTopic(project,topicsTitle,description,username);
         return "redirect:/project/" + project.getTitle();
     }
 

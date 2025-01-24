@@ -25,7 +25,8 @@ public class TagServiceImpl implements TagService {
     public List<Tag> findAll() {
         return tagRepository.findAll();
     }
-    public Tag create(String tagName){
+
+    public Tag create(String tagName) {
         return tagRepository.save(new Tag(tagName));
     }
 

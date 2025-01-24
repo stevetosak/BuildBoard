@@ -34,6 +34,7 @@ public class BBThread {
             inverseJoinColumns = @JoinColumn(name = "tag_name")
     )
     protected Set<Tag> tags = new HashSet<>();
+
     @ManyToMany
     @JoinTable(
             name = "likes",

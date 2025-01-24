@@ -20,6 +20,8 @@
 <body>
 <div th:replace="/home_pages/home :: navigation"></div>
 
+<a href="#32/user1">Test</a>
+
 <main class="container mt-5">
     <!-- Topic Title and Description -->
     <div class="card shadow-sm mb-4">
@@ -27,7 +29,8 @@
             <h3 th:text="${topic.getTitle()}">Topic Title</h3>
             <!-- Add Tag Button -->
             <button th:if="${session.user!=null && session.user.equals(topic.getUser())}"
-                    class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#addTagModal">Add Tag</button>
+                    class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#addTagModal">Add Tag
+            </button>
         </div>
         <div class="card-body">
             <p th:text="${topic.getContent()}">Description of the topic goes here.</p>
@@ -38,18 +41,20 @@
                     <li th:each="tag : ${topic.getTags()}" class="list-inline-item">
             <span class="badge bg-info text-dark d-inline-flex align-items-center">
                 <span th:text="${tag.getName()}">Tag Name</span>
-                <form th:if="${session.user!=null && session.user.equals(topic.getUser())}" th:action="@{/topic/delete-tag/{topicId}/{tagName} (topicId=${topic.getId()}, tagName=${tag.getName()})}"
+                <form th:if="${session.user!=null && session.user.equals(topic.getUser())}"
+                      th:action="@{/topic/delete-tag/{topicId}/{tagName} (topicId=${topic.getId()}, tagName=${tag.getName()})}"
                       method="post" style="margin-left: 5px;">
                     <button type="submit" class="btn btn-sm btn-link text-danger p-0 ms-1" style="line-height: 1;">
                         &times;
                     </button>
-                    <input th:if="${session.user!=null}" type="hidden" name="username" th:value="${session.user.username}"/>
+                    <input th:if="${session.user!=null}" type="hidden" name="username"
+                           th:value="${session.user.username}"/>
                 </form>
             </span>
                     </li>
                 </ul>
                 <div class="d-flex justify-content-end">
-                    <button th:if="${authenticated}"
+                    <button th:if="${session.user != null}"
                             class="btn btn-info btn-sm m-2 reply-button"
                             th:attr="data-reply-id=${topic.getId()}">Reply
                     </button>
@@ -70,7 +75,8 @@
                                 </button>
                             </div>
                         </div>
-                        <input type="hidden" th:if="${session.user!=null}" name="username" th:value="${session.user.username}">
+                        <input type="hidden" th:if="${session.user!=null}" name="username"
+                               th:value="${session.user.username}">
                     </form>
                 </div>
             </div>
@@ -107,7 +113,8 @@
                 <form th:action="@{/topic/delete/{id} (id=${topic.getId()})}" method="post" style="display:inline;">
                     <input type="hidden" name="id" th:value="${topic.getId()}"/>
                     <button type="submit" class="btn btn-danger btn-sm">Delete Topic</button>
-                    <input th:if="${session.user!=null}" type="hidden" name="username" th:value="${session.user.username}"/>
+                    <input th:if="${session.user!=null}" type="hidden" name="username"
+                           th:value="${session.user.username}"/>
                 </form>
             </div>
         </div>
@@ -117,7 +124,7 @@
     <!-- Replies Section -->
     <div th:each="reply : ${replies}" class="card shadow-sm mt-4 d-flex"
          th:style="'margin-left: ' + (${reply.depth + 1} * 5) + '%'">
-        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center" th:id="${reply.getId() + '/' + reply.getUser().getUsername()}">
             <div class="d-flex align-items-center w-100">
                 <img th:src="${reply.getAvatarUrl()}" alt="Profile Picture" id="profileImage"
                      class="rounded-circle border border-1 border-info me-3"
@@ -130,17 +137,25 @@
 
             </div>
             <div th:if="${session.user != null && session.user.getId() == reply.getUser().getId()}"
-                 class="ms-5 d-flex align-items-center justify-content-end p-none">
-                <button class="btn btn-warning btn-sm edit-reply-btn"
-                        th:attr="data-reply-id=${reply.getDiscussion().getId()}">Edit
-                </button>
-                <form th:action="'/topic/' + ${topic.getTitle()} + '/discussion/delete'" method="post">
-                    <input type="hidden" name="threadId" th:value="${reply.getDiscussion().getId()}">
-                    <button class="btn btn-danger btn-sm edit-reply-btn ms-2"
-                            th:attr="data-reply-id=${reply.getDiscussion().getId()}">Delete
+                 class="ms-5 d-flex align-items-center justify-content-between">
+
+                <div>
+                    <button class="btn btn-warning btn-sm edit-reply-btn"
+                            th:attr="data-reply-id=${reply.getDiscussion().getId()}">Edit
                     </button>
-                    <input th:if="${session.user!=null}" type="hidden" name="username" th:value="${session.user.username}"/>
-                </form>
+
+                </div>
+
+                <div>
+                    <form th:action="'/topic/' + ${topic.getTitle()} + '/discussion/delete'" method="post">
+                        <input type="hidden" name="threadId" th:value="${reply.getDiscussion().getId()}" class="w-0">
+                        <button class="btn btn-danger btn-sm edit-reply-btn ms-2"
+                                th:attr="data-reply-id=${reply.getDiscussion().getId()}">Delete
+                        </button>
+                        <input th:if="${session.user!=null}" type="hidden" name="username"
+                               th:value="${session.user.username}"/>
+                    </form>
+                </div>
             </div>
         </div>
 
@@ -160,7 +175,8 @@
                     <button type="button" class="btn btn-sm btn-danger mt-2"
                             th:onclick="'hideEditReplyBox(' + ${reply.getDiscussion().getId()} + ')'">Cancel
                     </button>
-                    <input th:if="${session.user!=null}"  type="hidden" name="username" th:value="${session.user.username}"/>
+                    <input th:if="${session.user!=null}" type="hidden" name="username"
+                           th:value="${session.user.username}"/>
                 </form>
 
             </div>
@@ -242,8 +258,9 @@
                         <input type="text" id="customTag" class="form-control d-none"
                                placeholder="Enter custom tag name"/>
                     </div>
-                    <button  type="submit" class="btn btn-primary w-100">Add Tag</button>
-                    <input th:if="${session.user!=null}" type="hidden" name="username" th:value="${session.user.username}"/>
+                    <button type="submit" class="btn btn-primary w-100">Add Tag</button>
+                    <input th:if="${session.user!=null}" type="hidden" name="username"
+                           th:value="${session.user.username}"/>
                 </form>
             </div>
         </div>
@@ -271,7 +288,8 @@
                                   th:text="${topic.getContent()}" required></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Save Changes</button>
-                    <input th:if="${session.user!=null}" type="hidden" name="username" th:value="${session.user.username}"/>
+                    <input th:if="${session.user!=null}" type="hidden" name="username"
+                           th:value="${session.user.username}"/>
                 </form>
             </div>
         </div>
@@ -324,8 +342,8 @@
         console.log("HIDE EDIT REPLY")
         const editBox = document.querySelector(`.edit-reply[data-reply-id="${id}"]`)
         const contentBox = document.querySelector(`.reply-content[data-reply-id="${id}"]`)
-        editClasses(editBox,'d-block','d-none')
-        editClasses(contentBox,'d-none','d-block')
+        editClasses(editBox, 'd-block', 'd-none')
+        editClasses(contentBox, 'd-none', 'd-block')
         // editBox.classList.remove("d-block");
         // editBox.classList.add("d-none");
         // contentBox.classList.remove("d-none")
@@ -337,11 +355,11 @@
 
     }
 
-    function editClasses(element,rmCls,addCls){
-        if(rmCls!=='') {
+    function editClasses(element, rmCls, addCls) {
+        if (rmCls !== '') {
             element.classList.remove(rmCls);
         }
-        if(addCls!=='')
+        if (addCls !== '')
             element.classList.add(addCls);
     }
 
@@ -353,8 +371,8 @@
         if (target.classList.contains("reply-button")) {
             const id = target.dataset.replyId
             const dialog = document.querySelector(`.reply-body[data-reply-id="${id}"]`)
-            editClasses(dialog,'d-none','d-block')
-            editClasses(target,'','d-none')
+            editClasses(dialog, 'd-none', 'd-block')
+            editClasses(target, '', 'd-none')
             // dialog.classList.remove("d-none")
             // dialog.classList.add("d-block")
             // target.classList.add('d-none');
@@ -362,17 +380,17 @@
             const id = target.dataset.replyId
             const dialog = document.querySelector(`.reply-body[data-reply-id="${id}"]`)
             const replyBtn = document.querySelector(`.reply-button[data-reply-id="${id}"]`)
-            editClasses(dialog,'d-block','d-none')
+            editClasses(dialog, 'd-block', 'd-none')
             // dialog.classList.add("d-none")
             // dialog.classList.remove("d-block")
-            editClasses(replyBtn,'d-none','d-block')
+            editClasses(replyBtn, 'd-none', 'd-block')
             // replyBtn.classList.remove('d-none');
             // replyBtn.classList.add('d-block');
         } else if (target.classList.contains("edit-reply-btn")) {
             const id = target.dataset.replyId;
             const editBox = document.querySelector(`.edit-reply[data-reply-id="${id}"]`)
             const contentBox = document.querySelector(`.reply-content[data-reply-id="${id}"]`)
-            editClasses(editBox,'d-none','d-block')
+            editClasses(editBox, 'd-none', 'd-block')
             // editBox.classList.remove("d-none");
             // editBox.classList.add("d-block");
             contentBox.classList.add("d-none")
