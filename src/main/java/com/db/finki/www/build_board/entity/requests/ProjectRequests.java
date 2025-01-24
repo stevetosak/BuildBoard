@@ -1,5 +1,6 @@
 package com.db.finki.www.build_board.entity.requests;
 
+import com.db.finki.www.build_board.entity.Status;
 import com.db.finki.www.build_board.entity.threads.Project;
 import com.db.finki.www.build_board.entity.user_types.BBUser;
 import jakarta.persistence.*;
@@ -26,4 +27,7 @@ public class ProjectRequests {
     @ManyToOne
     @JoinColumn(name = "user_id")
     BBUser creator;
+
+    @Enumerated(EnumType.STRING)
+    private Status status;
 }

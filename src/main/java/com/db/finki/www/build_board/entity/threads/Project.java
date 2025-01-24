@@ -1,5 +1,6 @@
 package com.db.finki.www.build_board.entity.threads;
 
+import com.db.finki.www.build_board.entity.requests.ProjectRequests;
 import com.db.finki.www.build_board.entity.channels.Channel;
 import com.db.finki.www.build_board.entity.requests.ProjectRequests;
 import com.db.finki.www.build_board.entity.user_types.BBUser;
