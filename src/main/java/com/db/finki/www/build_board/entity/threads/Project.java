@@ -1,16 +1,21 @@
 package com.db.finki.www.build_board.entity.threads;
 
+import com.db.finki.www.build_board.entity.requests.ProjectRequests;
 import com.db.finki.www.build_board.entity.user_types.BBUser;
 import com.db.finki.www.build_board.entity.threads.interfaces.NamedThread;
+import com.db.finki.www.build_board.entity.user_types.Developer;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 //TODO: project request
 //TODO: crud na kanali
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Entity
@@ -31,6 +36,17 @@ public class Project extends BBThread implements NamedThread {
 
     @OneToMany(cascade = {CascadeType.PERSIST,CascadeType.MERGE}, mappedBy = "parent")
     private List<Topic> topics = new ArrayList<>();
+
+    @ManyToMany
+    @JoinTable(
+            name ="developer_associated_with_project",
+            joinColumns = @JoinColumn(name = "project_id"),
+            inverseJoinColumns = @JoinColumn(name = "developer_id")
+    )
+    private Set<Developer> developers = new HashSet<>();
+
+    @OneToMany(mappedBy = "project")
+    private Set<ProjectRequests> requests = new HashSet<>();
 
     @Override
     public String getTypeName() {

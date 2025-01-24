@@ -58,6 +58,16 @@ public class ProjectController {
         return "project_pages/project-create";
     }
 
+    @GetMapping("/{pr_title}/members")
+    public String getProjectMembersPage(
+            Model model,
+            @PathVariable(name = "pr_title") Project project
+    )
+    {
+        model.addAttribute("project", project);
+        return "project_pages/members";
+    }
+
     @PreAuthorize("project.getUser().username.equals(username)")
     @PostMapping("/{title}/modify")
     public String modifyProject(
@@ -102,5 +112,6 @@ public class ProjectController {
         projectService.delete(project);
         return "redirect:/" ;
     }
+
 }
 ///projects/topics/add
