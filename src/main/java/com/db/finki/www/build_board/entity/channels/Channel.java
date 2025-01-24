@@ -1,0 +1,29 @@
+package com.db.finki.www.build_board.entity.channels;
+
+import com.db.finki.www.build_board.entity.compositeId.ChannelId;
+import com.db.finki.www.build_board.entity.threads.Project;
+import com.db.finki.www.build_board.entity.user_types.Developer;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
+@Table(name = "channel")
+@Entity
+@Getter
+@Setter
+@IdClass(ChannelId.class)
+public class Channel {
+
+    @Id
+    private String name;
+    @Id
+    @ManyToOne
+    @JoinColumn(name = "project_id",referencedColumnName = "id",nullable = false)
+    private Project project;
+
+    private String description;
+
+    @ManyToOne
+    @JoinColumn(name = "developer_id",referencedColumnName = "id",nullable = false)
+    private Developer developer;
+}
