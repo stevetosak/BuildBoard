@@ -19,14 +19,14 @@ public class ProjectRequestController {
         return "project_pages/requests/show-requests";
     }
 
-    @PostMapping("/{req-id}")
+    @PostMapping("/{req-id}/accept")
     public RedirectView acceptRequest(@PathVariable(name = "req-id") Integer reqId, @PathVariable(name = "pr-title") String projectTitle){
         return new RedirectView(
                 String.format("/project/%s/requests", projectTitle)
         );
     }
 
-    @PostMapping("/{req-id}")
+    @PostMapping("/{req-id}/deny")
     public RedirectView denyRequest(@PathVariable(name = "req-id") Integer reqId, @PathVariable(name = "pr-title") String projectTitle){
         return new RedirectView(
                 String.format("/project/%s/requests", projectTitle)

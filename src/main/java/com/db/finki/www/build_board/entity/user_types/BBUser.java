@@ -2,9 +2,7 @@ package com.db.finki.www.build_board.entity.user_types;
 
 import com.db.finki.www.build_board.entity.threads.BBThread;
 import com.db.finki.www.build_board.service.threads.impl.FileUploadService;
-import jakarta.annotation.PostConstruct;
 import jakarta.persistence.*;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -20,7 +18,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-//TODO: user regsitration
 
 @Getter
 @Setter

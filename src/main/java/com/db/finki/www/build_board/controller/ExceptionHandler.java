@@ -8,7 +8,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-@ControllerAdvice
+//@ControllerAdvice
 public class ExceptionHandler {
 
     private ModelAndView mavBuilder(Exception exception,String message,int status) {

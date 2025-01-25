@@ -15,6 +15,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.io.IOException;
 
 // todo ovaj page e private samo za userot, uste eden mozit da napreme so ke e samo javno info za userot
+// todo: java scriptot za tag 
+
 @Controller
 @RequestMapping("{username}")
 public class UserProfileController {
@@ -25,9 +27,9 @@ public class UserProfileController {
         this.userService = userService;
         this.fileUploadService = fileUploadService;
     }
-   @PreAuthorize("#user.getUsername().equals(#username)")
+   
     @GetMapping("/profile")
-    public String getProfilePage(@PathVariable @P("username") String username, @SessionAttribute @P("user") BBUser user, Model model) {
+    public String getProfilePage(@PathVariable String username, @SessionAttribute BBUser user, Model model) {
         try {
             model.addAttribute("user", userService.loadUserByUsername(username));
             model.addAttribute("canEdit", user.getUsername().equals(username));
@@ -51,7 +53,6 @@ public class UserProfileController {
             redirectAttributes.addFlashAttribute("message", "Avatar uploaded successfully");
         } catch (IOException e) {
             redirectAttributes.addFlashAttribute("message", "Cant upload avatar");
-            System.out.println(e.getMessage());
         }
 
         return "redirect:/" + username + "/profile";
