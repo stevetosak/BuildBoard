@@ -105,7 +105,7 @@ VALUES
 
 INSERT INTO channel (name, description, project_id, developer_id)
 VALUES
-    ('General', 'General discussion channel', 5, 1),
+    ('General', 'General discussion channel', 5, 3),
     ('Updates', 'Project updates channel', 5, 3);
 
 INSERT INTO messages (sent_at, content, sent_by, project_id, channel_name)

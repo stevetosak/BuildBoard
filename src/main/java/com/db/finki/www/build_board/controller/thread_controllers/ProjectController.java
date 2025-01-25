@@ -11,23 +11,29 @@ import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/project")
 public class ProjectController {
 
     private final ProjectService projectService;
-    private final TagService topicService;
+    private final TagService tagService;
 
     public ProjectController(ProjectService projectService, TagServiceImpl topicService) {
         this.projectService = projectService;
-        this.topicService = topicService;
+        this.tagService = topicService;
     }
 
     @GetMapping("/{title}")
-    public String getProjectPage(@PathVariable(name = "title") Project project, Model model) {
+    public String getProjectPage(@PathVariable(name = "title") Project project, Model model, RedirectAttributes redirectAttributes) {
         model.addAttribute("project", project);
-        model.addAttribute("tags", topicService.findAll());
+        model.addAttribute("tags", tagService.findAll());
+        String error = (String) redirectAttributes.getAttribute("error");
+        if(error != null){
+            model.addAttribute("error", error);
+        }
+        
         Hibernate.initialize(project.getTags());
 
         return "project_pages/show-project";
@@ -36,7 +42,7 @@ public class ProjectController {
     @GetMapping("/create")
     public String getCreateProjectPage(Model model) {
         model.addAttribute("project", new Project());
-        model.addAttribute("isCreatingProject", topicService.findAll());
+        model.addAttribute("isCreatingProject", tagService.findAll());
         return "project_pages/project-create";
     }
 

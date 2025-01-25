@@ -30,6 +30,6 @@ Ko ke udris search bez filtri da ti gi davat grupirani. -> Edna grupa topics, dr
 - erot menvenje !!!!
 
 ---------------
-
+- timestamp da sa prikazvit za discussion threads, koga sa postaveni
 
 

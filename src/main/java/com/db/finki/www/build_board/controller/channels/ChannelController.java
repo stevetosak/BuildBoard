@@ -23,14 +23,18 @@ public class ChannelController {
     }
 
     @GetMapping()
-    public String getChannels(@PathVariable("title") Project project,Model model) {
+    public String getChannels(@PathVariable("title") Project project, Model model) {
         List<Channel> channels = channelService.getAllChannelsForProject(project);
         model.addAttribute("channels", channels);
         return "channels/list-channels";
     }
 
+    @PreAuthorize("#project.getDevelopers().contains(#user)")
     @GetMapping("/{channelName}")
-    public String getChannel(@PathVariable String channelName, @PathVariable("title") Project project, Model model, RedirectAttributes redirectAttributes) {
+    public String getChannel(@PathVariable String channelName, @PathVariable("title") @P("project") Project project,
+                             Model model,
+                             RedirectAttributes redirectAttributes,
+                             @SessionAttribute @P("user") BBUser user) {
         Channel c = (Channel) redirectAttributes.getAttribute("channel");
         if (c == null) {
             c = channelService.getByNameAndProject(channelName, project);
@@ -41,20 +45,26 @@ public class ChannelController {
 
         return "channels/view-channel";
     }
+
     @PreAuthorize("@channelService.getByNameAndProject(#channelName,#project).getDeveloper().equals(#user)")
     @PostMapping("/{channelName}/delete")
     public String deleteChannel(@PathVariable @P("channelName") String channelName, @PathVariable("title") @P("project") Project project,
                                 @SessionAttribute @P("user") BBUser user, RedirectAttributes redirectAttributes) {
         channelService.deleteChannel(channelName, project);
-        return "redirect:/project/"+project.getTitle()+"/channels";
+        return "redirect:/project/" + project.getTitle();
     }
 
     @PreAuthorize("#project.getDevelopers().contains(#user)")
     @PostMapping("/add")
     public String add(@PathVariable("title") @P("project") Project project, String channelName, String description, @SessionAttribute @P("user") BBUser user, RedirectAttributes redirectAttributes) {
-        Channel channel = channelService.create(project, channelName, description, user);
-        redirectAttributes.addFlashAttribute("channel", channel);
-        return "redirect:/project/" + project.getTitle() + "/channels/" + channel.getName();
+        try {
+            Channel channel = channelService.create(project, channelName, description, user);
+            redirectAttributes.addFlashAttribute("channel", channel);
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+
+        return "redirect:/project/" + project.getTitle();
     }
 
 }

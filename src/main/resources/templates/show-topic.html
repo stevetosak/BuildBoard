@@ -20,8 +20,6 @@
 <body>
 <div th:replace="/home_pages/home :: navigation"></div>
 
-<a href="#32/user1">Test</a>
-
 <main class="container mt-5">
     <!-- Topic Title and Description -->
     <div class="card shadow-sm mb-4">
@@ -130,6 +128,7 @@
                      class="rounded-circle border border-1 border-info me-3"
                      style="width: 3rem; height: 3rem; object-fit: cover; vertical-align: middle;">
                 <span th:text="${reply.getUser().getUsername()}">Reply Author</span>
+<!--                <span th:text="${reply.}">Reply Time</span>-->
                 <span class="ms-auto text-muted d-flex align-items-center">
                     <i class="bi bi-arrow-return-right me-2"></i>
                      <strong th:text="'Replying to:  ' + ${reply.getDiscussion().getParent().getUser().getUsername()}"></strong>
@@ -158,7 +157,6 @@
                 </div>
             </div>
         </div>
-
 
         <!-- Reply content -->
         <div class="card-body">

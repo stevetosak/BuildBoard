@@ -93,21 +93,26 @@
                     </div>
                 </div>
 
-                <div th:if="${!project.getChannels().isEmpty()}" class="w-75 d-flex flex-column align-items-center">
+                <div th:if="${project.getDevelopers().contains(session.user)}" class="w-75 d-flex flex-column align-items-center">
                     <h4>Channels:</h4>
                     <div class="list-group w-75">
                         <div class="list-group-item w-100" th:each="channel : ${project.getChannels()}">
-                            <div class="d-flex">
-                                <h5 class="mb-1">
-                                    <a th:href="@{/channel/{name} (name=${channel.getName()})}"
-                                       th:text="${channel.getName()}" class="text-decoration-none"></a>
-                                </h5>
-                                <!--                <small th:text="${thread.getFormattedDate()}">Date</small>-->
-                            </div>
-                            <!--            <p class="mb-1 text-muted" th:text="${thread.getDescription()}">Thread description here...</p>-->
-                            <!--            <small th:text="${thread.getAuthor()}">Posted by Author</small>-->
+                            <form method="post" th:action="@{/project/{projectName}/channels/{channelName}/delete (projectName=${project.getTitle()},channelName=${channel.getName()})}">
+                                <div class="d-flex justify-content-between">
+                                    <h5 class="mb-1">
+                                        <a th:href="@{/project/{projectName}/channels/{name} (name=${channel.getName()},projectName=${project.getTitle()})}"
+                                           th:text="${channel.getName()}" class="text-decoration-none"></a>
+                                    </h5>
+                                    <div th:if="${channel.getDeveloper().getId() == session.user.getId() || project.getUser() == session.user}">
+                                        <button class="btn btn-sm btn-outline-danger">Delete</button>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
-                        <button class="btn btn-success mt-3"> Add Channel </button>
+                        <button class="btn btn-success btn-sm w-25 mt-2 mx-auto" data-bs-toggle="modal"
+                                data-bs-target="#addChannelModal">
+                            Add Channel
+                        </button>
                     </div>
                 </div>
 
@@ -146,6 +151,10 @@
 
 </main>
 
+<section id="errors" class="container bg bg-danger border border-dark w-50" th:if="${error != null}">
+    <p class="fw-bold fs-6" th:text="'Error: ' + ${error}"></p>
+</section>
+
 <!-- Add Tag Modal -->
 <div class="modal fade" id="addTagModal" tabindex="-1" aria-labelledby="addTagModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -173,6 +182,30 @@
                                th:value="${session.user.getUsername()}">
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Add Tag</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addChannelModal" tabindex="-1" aria-labelledby="addChannelModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addChannelModalLabel">Create a channel</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form th:action="@{/project/{title}/channels/add(title=${project.getTitle()})}" method="post"
+                      id="addChannelForm">
+
+                    <div class="mb-3 d-flex flex-column justify-content-center">
+                        <input class="form-control" type="text" id="channelName" name="channelName"
+                               placeholder="Enter channel name"/>
+                        <textarea class="form-control mt-2" id="channelDescription" name="channelDescription" cols="30"
+                                  rows="10" placeholder="What is this channel about.."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Create Channel</button>
                 </form>
             </div>
         </div>
