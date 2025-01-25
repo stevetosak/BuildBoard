@@ -56,9 +56,9 @@ public class ChannelController {
 
     @PreAuthorize("#project.getDevelopers().contains(#user)")
     @PostMapping("/add")
-    public String add(@PathVariable("title") @P("project") Project project, String channelName, String description, @SessionAttribute @P("user") BBUser user, RedirectAttributes redirectAttributes) {
+    public String add(@PathVariable("title") @P("project") Project project, @RequestParam String channelName, @RequestParam String channelDescription, @SessionAttribute @P("user") BBUser user, RedirectAttributes redirectAttributes) {
         try {
-            Channel channel = channelService.create(project, channelName, description, user);
+            Channel channel = channelService.create(project, channelName, channelDescription, user);
             redirectAttributes.addFlashAttribute("channel", channel);
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());

@@ -31,5 +31,11 @@ Ko ke udris search bez filtri da ti gi davat grupirani. -> Edna grupa topics, dr
 
 ---------------
 - timestamp da sa prikazvit za discussion threads, koga sa postaveni
+- poraka impl crud
+- vo kanal page da sa prikazvat avatarite na users, koga bila pustena poraka
+- levo da ti gi prikazvit site kanali
+- link do proektot nazad
+- to so referenciranje da go napreme
+- view channels page da sa napret, imas ideja toska ke ti teknit to so chatojte ko preview da sa. (ova samo za mene e viktor uzivaj)
 
 
