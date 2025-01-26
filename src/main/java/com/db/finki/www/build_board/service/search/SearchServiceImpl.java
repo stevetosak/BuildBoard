@@ -1,12 +1,11 @@
 package com.db.finki.www.build_board.service.search;
 
-import com.db.finki.www.build_board.entity.threads.BBThread;
 import com.db.finki.www.build_board.entity.threads.Project;
 import com.db.finki.www.build_board.entity.threads.Topic;
 import com.db.finki.www.build_board.entity.threads.interfaces.NamedThread;
-import com.db.finki.www.build_board.repository.threads.ProjectRepository;
-import com.db.finki.www.build_board.repository.threads.TopicRepository;
-import com.db.finki.www.build_board.service.threads.impl.NamedThreadService;
+import com.db.finki.www.build_board.repository.thread.ProjectRepository;
+import com.db.finki.www.build_board.repository.thread.TopicRepository;
+import com.db.finki.www.build_board.service.util.NamedThreadService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;

@@ -1,16 +1,13 @@
-package com.db.finki.www.build_board.service.threads.impl;
+package com.db.finki.www.build_board.service.util;
 
 
 import jakarta.annotation.PostConstruct;
 import org.apache.tomcat.util.http.fileupload.FileUploadException;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 @Service
 public class FileUploadService {

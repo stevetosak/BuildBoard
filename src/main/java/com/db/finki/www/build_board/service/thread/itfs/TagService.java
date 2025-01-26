@@ -1,8 +1,7 @@
-package com.db.finki.www.build_board.service.threads.itfs;
+package com.db.finki.www.build_board.service.thread.itfs;
 
 import com.db.finki.www.build_board.entity.threads.Tag;
 import com.db.finki.www.build_board.entity.threads.Topic;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 

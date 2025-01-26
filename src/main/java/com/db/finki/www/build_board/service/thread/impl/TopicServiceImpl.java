@@ -1,11 +1,11 @@
-package com.db.finki.www.build_board.service.threads.impl;
+package com.db.finki.www.build_board.service.thread.impl;
 
 import com.db.finki.www.build_board.entity.user_types.BBUser;
 import com.db.finki.www.build_board.entity.threads.Tag;
 import com.db.finki.www.build_board.entity.threads.Topic;
-import com.db.finki.www.build_board.repository.threads.TagRepository;
-import com.db.finki.www.build_board.repository.threads.TopicRepository;
-import com.db.finki.www.build_board.service.threads.itfs.TopicService;
+import com.db.finki.www.build_board.repository.thread.TagRepository;
+import com.db.finki.www.build_board.repository.thread.TopicRepository;
+import com.db.finki.www.build_board.service.thread.itfs.TopicService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 

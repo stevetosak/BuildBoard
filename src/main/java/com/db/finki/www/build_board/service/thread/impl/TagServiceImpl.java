@@ -2,8 +2,8 @@ package com.db.finki.www.build_board.service.threads.impl;
 
 import com.db.finki.www.build_board.entity.threads.Tag;
 import com.db.finki.www.build_board.entity.threads.Topic;
-import com.db.finki.www.build_board.repository.threads.TagRepository;
-import com.db.finki.www.build_board.service.threads.itfs.TagService;
+import com.db.finki.www.build_board.repository.thread.TagRepository;
+import com.db.finki.www.build_board.service.thread.itfs.TagService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

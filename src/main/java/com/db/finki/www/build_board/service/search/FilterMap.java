@@ -34,7 +34,6 @@ public class FilterMap<T extends NamedThread> {
             Specification<T> spec = (root, query, cb) -> null;
             return spec.or(filterMap.get("title").apply(param)).or(filterMap.get("content").apply(param));
         });
-
     }
 
     public Function<String, Specification<T>> getFilter(String filter) {

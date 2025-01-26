@@ -1,7 +1,7 @@
 package com.db.finki.www.build_board.controller.utils;
 
 import com.db.finki.www.build_board.entity.user_types.BBUser;
-import com.db.finki.www.build_board.service.threads.impl.ThreadService;
+import com.db.finki.www.build_board.service.util.ThreadService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;

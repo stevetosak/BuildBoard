@@ -2,9 +2,9 @@ package com.db.finki.www.build_board.controller.thread_controllers;
 
 import com.db.finki.www.build_board.entity.threads.Project;
 import com.db.finki.www.build_board.entity.user_types.BBUser;
-import com.db.finki.www.build_board.service.threads.impl.ProjectService;
-import com.db.finki.www.build_board.service.threads.impl.TagServiceImpl;
-import com.db.finki.www.build_board.service.threads.itfs.TagService;
+import com.db.finki.www.build_board.service.thread.impl.ProjectService;
+import com.db.finki.www.build_board.service.thread.impl.TagServiceImpl;
+import com.db.finki.www.build_board.service.thread.itfs.TagService;
 import org.hibernate.Hibernate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.parameters.P;

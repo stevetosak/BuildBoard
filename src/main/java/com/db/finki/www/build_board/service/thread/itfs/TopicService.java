@@ -1,4 +1,4 @@
-package com.db.finki.www.build_board.service.threads.itfs;
+package com.db.finki.www.build_board.service.thread.itfs;
 
 import com.db.finki.www.build_board.entity.user_types.BBUser;
 import com.db.finki.www.build_board.entity.threads.Topic;

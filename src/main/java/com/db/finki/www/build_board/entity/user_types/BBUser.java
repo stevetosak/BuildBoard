@@ -1,7 +1,7 @@
 package com.db.finki.www.build_board.entity.user_types;
 
 import com.db.finki.www.build_board.entity.threads.BBThread;
-import com.db.finki.www.build_board.service.threads.impl.FileUploadService;
+import com.db.finki.www.build_board.service.util.FileUploadService;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

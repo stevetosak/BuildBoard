@@ -1,16 +1,15 @@
-package com.db.finki.www.build_board.service.threads.impl;
+package com.db.finki.www.build_board.service.thread.impl;
 
 import java.util.List;
 
-import com.db.finki.www.build_board.entity.threads.BBThread;
 import com.db.finki.www.build_board.entity.threads.Tag;
 import com.db.finki.www.build_board.entity.threads.Topic;
 import com.db.finki.www.build_board.entity.user_types.BBUser;
 import com.db.finki.www.build_board.entity.threads.Project;
-import com.db.finki.www.build_board.repository.threads.ProjectRepository;
+import com.db.finki.www.build_board.repository.thread.ProjectRepository;
 import com.db.finki.www.build_board.service.BBUserDetailsService;
-import com.db.finki.www.build_board.service.threads.itfs.TagService;
-import com.db.finki.www.build_board.service.threads.itfs.TopicService;
+import com.db.finki.www.build_board.service.thread.itfs.TagService;
+import com.db.finki.www.build_board.service.thread.itfs.TopicService;
 import org.springframework.stereotype.Service;
 
 @Service

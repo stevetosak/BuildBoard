@@ -1,12 +1,11 @@
-package com.db.finki.www.build_board.service.threads.impl;
+package com.db.finki.www.build_board.service.util;
 
 import com.db.finki.www.build_board.entity.threads.BBThread;
 import com.db.finki.www.build_board.entity.user_types.BBUser;
 import com.db.finki.www.build_board.repository.UserRepository;
-import com.db.finki.www.build_board.repository.threads.BBThreadRepository;
+import com.db.finki.www.build_board.repository.thread.BBThreadRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Set;
 
 @Service

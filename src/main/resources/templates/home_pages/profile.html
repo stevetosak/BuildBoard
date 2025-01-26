@@ -39,7 +39,7 @@
                 </div>
                 <!-- User Details -->
                 <div
-                    th:replace="fragments/user_fields :: user_fields(url=@{/{username}/profile/change(username=${user.getUsername()})})">
+                    th:replace="fragments/user_fields :: user_fields(username=${user.getUsername()})">
                 </div>
                 <!--            <form method="post"-->
                 <!--                  class="d-flex gap-2 flex-grow-1 flex-column gap-2 list-group-flush "-->

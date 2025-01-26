@@ -179,27 +179,25 @@ create table submission(
     id serial primary key
 );
 
-CREATE TYPE status AS ENUM ('ACCEPTED', 'DENIED', 'PENDING');
+-- CREATE TYPE status AS ENUM ('ACCEPTED', 'DENIED', 'PENDING');
 CREATE TABLE project_request
 (
     id          SERIAL PRIMARY KEY,
     description VARCHAR(200),
-    status      status                     NOT NULL,
+    status      varchar(32)                NOT NULL DEFAULT 'PENDING',
     user_id     INT REFERENCES users (id)  ON DELETE CASCADE NOT NULL ,
     project_id  INT REFERENCES thread (id) ON DELETE CASCADE NOT NULL,
     created_at timestamp default now(),
-    submission_id int references submission(id)
+    submission_id int references submission(id) ON DELETE CASCADE
 );
 
--- todo trigger pred kreiranje project request ili report ke kreirat submission
 
 create table feedback (
     description TEXT,
     submission_type varchar(1),
     created_by int references users(id),
     created_at timestamp default now(),
-    submission_id int references submission(id)
-
+    submission_id int PRIMARY KEY references submission(id) on delete cascade
 );
 
 CREATE TABLE report
@@ -207,11 +205,11 @@ CREATE TABLE report
     id          SERIAL,
     created_at  TIMESTAMP default now(),
     description VARCHAR(200) NOT NULL,
-    status      status,
+    status      varchar(32) default 'PENDING',
     thread_id   INT REFERENCES thread (id) on delete cascade,
     for_user_id INT REFERENCES users (id) on delete cascade,
     by_user_id  INT REFERENCES users (id) on delete cascade,
-    submission_id int references submission(id),
+    submission_id int references submission(id) on delete cascade,
     PRIMARY KEY (id, thread_id, for_user_id, by_user_id)
 );
 CREATE TABLE channel
@@ -435,6 +433,42 @@ begin
 end
 $$;
 
+
+create or replace function fn_add_sub_pr_request()
+    returns trigger
+    language plpgsql
+as
+$$
+BEGIN
+    insert into submission default values returning id into NEW.submission_id;
+    return new;
+END;
+$$
+;
+create or replace function fn_add_report()
+    returns trigger
+    language plpgsql
+as
+$$
+BEGIN
+    insert into submission default values returning id into NEW.id;
+    return new;
+END;
+$$
+;
+
+create or replace function fn_add_dev_if_not_exist()
+returns trigger
+language plpgsql
+as $$
+    BEGIN
+        IF NOT check_if_user_exists_in('developer','id',new.developer_id::text) THEN
+            INSERT INTO developer values (NEW.developer_id);
+        end if;
+        RETURN new;
+    end;
+    $$;
+
 -------------------------- TRIGGERS ----------------------
 CREATE OR REPLACE TRIGGER tr_check_topic_name
     BEFORE INSERT OR UPDATE
@@ -469,4 +503,20 @@ create trigger tr_remove_not_active_developer
     on developer_associated_with_project
     for each row
 execute function fn_remove_not_active_developer();
+
+create or replace trigger tr_add_sub_pr_request
+    before insert
+    on project_request
+    for each row
+execute FUNCTION fn_add_sub_pr_request();
+
+create or replace trigger tr_add_report
+    before insert on report
+    for each row
+execute function fn_add_report();
+
+create or replace trigger tr_add_dev_if_not_exist
+before insert on developer_associated_with_project
+    for each row
+    execute function fn_add_dev_if_not_exist();
 

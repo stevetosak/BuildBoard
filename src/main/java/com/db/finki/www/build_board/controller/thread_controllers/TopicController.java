@@ -2,10 +2,10 @@ package com.db.finki.www.build_board.controller.thread_controllers;
 
 import com.db.finki.www.build_board.entity.user_types.BBUser;
 import com.db.finki.www.build_board.entity.threads.Topic;
-import com.db.finki.www.build_board.service.threads.impl.DiscussionService;
-import com.db.finki.www.build_board.service.threads.impl.ThreadService;
-import com.db.finki.www.build_board.service.threads.itfs.TagService;
-import com.db.finki.www.build_board.service.threads.itfs.TopicService;
+import com.db.finki.www.build_board.service.thread.impl.DiscussionService;
+import com.db.finki.www.build_board.service.util.ThreadService;
+import com.db.finki.www.build_board.service.thread.itfs.TagService;
+import com.db.finki.www.build_board.service.thread.itfs.TopicService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.parameters.P;

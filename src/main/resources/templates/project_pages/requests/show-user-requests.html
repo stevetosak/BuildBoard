@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Requests</title>
+    <title>Users Requests</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
@@ -10,7 +10,7 @@
     <div th:replace="/home_pages/home :: navigation"></div>
 </header>
 <section class="d-flex mt-3 flex-column w-100 align-items-center mt-5">
-    <form method="get" th:action="@{/project/{pr-title}/request(pr-title=${project.getTitle()})}"
+    <form method="get" th:action="@{/{username}/requests(pr-title=${user.getUsername()})}"
           class="d-flex flex-row gap-2 align-items-center"
           style="width:fit-content">
         <label for="status-query">Filter by status:</label>
@@ -45,23 +45,6 @@
                 <p th:text="${req.getDescription()}">Description of the project goes here.</p>
             </div>
         </div>
-        <div th:if="${req.getStatus().name().equals('PENDING') && session.user != null && session.user.getId() == project.getUser().getId()}"
-             class="card-footer d-flex flex-row gap-3">
-            <button type="button" class="btn btn-success accept-btn footer-btn"
-                    th:attr="data-pr-title=${project.getTitle()}, data-req-id=${req.getId()}"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modal"
-            >
-                Accept
-            </button>
-            <button type="button" class="btn btn-secondary deny-btn footer-btn"
-                    th:attr="data-pr-title=${project.getTitle()}, data-req-id=${req.getId()}"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modal"
-            >
-                Deny
-            </button>
-        </div>
         <div class="card-footer" th:if="${!req.getStatus().name().equals('PENDING')}">
             <button type="button"
                     class="btn-feedback-open btn btn-success">View feedback
@@ -79,32 +62,6 @@
             </div>
         </div>
     </div>
-    <div class="modal fade"
-         id="modal"
-         data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel"
-         aria-hidden="true"
-    >
-        <form method="post" id="modal-form">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="staticBackdropLabel2">Feedback</h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body d-flex flex-column gap-2">
-                        <label>Description</label>
-                        <textarea id="feedback-desc2"
-                                  style="height: 20vh"
-                                  class="w-100 border border-rounded"
-                                  name="feedback-desc"></textarea>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-success">Submit</button>
-                    </div>
-                </div>
-            </div>
-        </form>
-    </div>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/js/modal_utils.js"></script>
@@ -114,16 +71,7 @@
     document.addEventListener("click", ev => {
         console.log(ev.target.type)
         if (ev.target == null || ev.target.type !== 'button') return;
-        if (ev.target.classList.contains("footer-btn")) {
-            const btn = ev.target
-            const projectTitle = btn.dataset.prTitle
-            const reqId = btn.dataset.reqId
-            if (btn.classList.contains("accept-btn")) {
-                formModal.action = `/project/${projectTitle}/request/${reqId}/accept`
-            } else {
-                formModal.action = `/project/${projectTitle}/request/${reqId}/deny`
-            }
-        } else if (ev.target.classList.contains("btn-feedback-open")) {
+        if (ev.target.classList.contains("btn-feedback-open")) {
             const btn = ev.target
             const feedbackCont = btn.nextElementSibling
 

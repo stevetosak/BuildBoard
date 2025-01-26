@@ -1,7 +1,6 @@
 package com.db.finki.www.build_board.service;
 
 import com.db.finki.www.build_board.entity.user_types.BBUser;
-import com.db.finki.www.build_board.service.threads.impl.FileUploadService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

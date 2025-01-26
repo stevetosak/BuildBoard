@@ -39,13 +39,13 @@ public class Project extends BBThread implements NamedThread {
     @OneToMany(cascade = {CascadeType.PERSIST,CascadeType.MERGE}, mappedBy = "parent")
     private List<Topic> topics = new ArrayList<>();
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.MERGE})
     @JoinTable(
             name ="developer_associated_with_project",
             joinColumns = @JoinColumn(name = "project_id"),
             inverseJoinColumns = @JoinColumn(name = "developer_id")
     )
-    private Set<Developer> developers = new HashSet<>();
+    private Set<BBUser> developers = new HashSet<>();
 
     @OneToMany(mappedBy = "project")
     private Set<ProjectRequests> requests = new HashSet<>();

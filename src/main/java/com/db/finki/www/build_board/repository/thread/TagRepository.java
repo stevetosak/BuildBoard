@@ -1,4 +1,4 @@
-package com.db.finki.www.build_board.repository.threads;
+package com.db.finki.www.build_board.repository.thread;
 
 import com.db.finki.www.build_board.entity.threads.Tag;
 import org.springframework.data.jpa.repository.JpaRepository;

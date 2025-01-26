@@ -1,6 +1,6 @@
 <form th:with="borderStyle=${canEdit ? 'border-secondary rounded' : 'border-0 pe-none'}" method="post"
-       class="d-flex gap-2 flex-grow-1 flex-column gap-2 list-group-flush " th:action="${url}"
-       th:fragment="user_fields(url)">
+       class="d-flex gap-2 flex-grow-1 flex-column gap-2 list-group-flush " th:action="@{/{username}/profile/change(username=${username})}"
+       th:fragment="user_fields(username)">
        <h5>Personal Details</h5>
        <label class="fw-bold ">Username:
               <input th:readonly="${!canEdit}" th:disabled="${!canEdit}" th:classappend="${borderStyle}" name="username"
@@ -26,6 +26,7 @@
        </label>
        <input type="hidden" name="cur_user_username"
               th:value="${session.user == null} ? '' : ${session.user.getUsername()}">
+       <a th:href="@{/{username}/project-requests(username=${username})}">View project requests</a>
        <button th:if="${canEdit}" class="btn btn-success btn-sm w-50 align-self-center">Save changes
        </button>
 </form>

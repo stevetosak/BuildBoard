@@ -1,8 +1,10 @@
 package com.db.finki.www.build_board.controller.home_pages;
 
+import com.db.finki.www.build_board.entity.enums.Status;
 import com.db.finki.www.build_board.entity.user_types.BBUser;
 import com.db.finki.www.build_board.service.BBUserDetailsService;
-import com.db.finki.www.build_board.service.threads.impl.FileUploadService;
+import com.db.finki.www.build_board.service.request.ProjectRequestService;
+import com.db.finki.www.build_board.service.util.FileUploadService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.parameters.P;
@@ -22,10 +24,12 @@ import java.io.IOException;
 public class UserProfileController {
     private final BBUserDetailsService userService;
     private final FileUploadService fileUploadService;
+    private final ProjectRequestService projectRequestService;
 
-    public UserProfileController(BBUserDetailsService userService, FileUploadService fileUploadService) {
+    public UserProfileController(BBUserDetailsService userService, FileUploadService fileUploadService, ProjectRequestService projectRequestService) {
         this.userService = userService;
         this.fileUploadService = fileUploadService;
+        this.projectRequestService = projectRequestService;
     }
    
     @GetMapping("/profile")
@@ -37,6 +41,19 @@ public class UserProfileController {
         }catch(Exception ignore){
             return "redirect:/";
         }
+    }
+
+    @GetMapping("/project-requests")
+    public String getProjectRequestsPage(
+            @PathVariable String username,
+            Model model,
+            @RequestParam(required = false) Status status
+    ) {
+        BBUser forUser = (BBUser) userService.loadUserByUsername(username);
+        model.addAttribute("user", forUser);
+        model.addAttribute("requests", projectRequestService.getByStatusAndUser(status,forUser));
+        model.addAttribute("status", Status.values());
+        return "project_pages/requests/show-user-requests";
     }
 
     @PreAuthorize("#requestedByUsername==#username")
