@@ -16,8 +16,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 
-// todo ovaj page e private samo za userot, uste eden mozit da napreme so ke e samo javno info za userot
-// todo: java scriptot za tag 
 
 @Controller
 @RequestMapping("{username}")

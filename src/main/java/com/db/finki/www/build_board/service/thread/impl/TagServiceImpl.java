@@ -1,4 +1,4 @@
-package com.db.finki.www.build_board.service.threads.impl;
+package com.db.finki.www.build_board.service.thread.impl;
 
 import com.db.finki.www.build_board.entity.threads.Tag;
 import com.db.finki.www.build_board.entity.threads.Topic;

@@ -14,35 +14,29 @@
     <div class="card shadow-sm mb-4">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
             <h3 th:text="${project.getTitle()}">Project Title</h3>
-            <div class="d-flex flex-row gap-2">
-                <th:object th:if="${isManager}">
+            <div class="d-flex flex-row gap-2 align-items-center">
+                <div th:if="${isManager}">
                     <button
                             class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addTagModal">Add Tag
                     </button>
-                    <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addTagModal">
-                        <a class="text-decoration-none text-reset"
-                           th:href="@{/project/{pr_title}/topic/add(pr_title=${project.getTitle()})}">Add Topic</a>
-                    </button>
-                    <button class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#addTagModal">
-                        <a class="text-decoration-none text-reset"
-                           th:href="@{/project/{pr_title}/modify(pr_title=${project.getTitle()})}">Modify project</a>
-                    </button>
-                    <button class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#addTagModal">
-                        <a class="text-decoration-none text-reset"
-                           th:href="@{/project/{pr_title}/requests(pr_title=${project.getTitle()})}">View project requests</a>
-                    </button>
-                </th:object>
-                <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addTagModal">
-                    <a class="text-decoration-none text-reset"
-                       th:href="@{/project/{pr_title}/members(pr_title=${project.getTitle()})}">Show members</a>
-                </button>
+                    <a class="text-decoration-none text-reset p-2 border-success border rounded bg-success"
+                       th:href="@{/project/{pr_title}/topic/add(pr_title=${project.getTitle()})}">Add Topic</a>
+                    <a class="text-decoration-none text-reset p-2 border-success border rounded bg-secondary"
+                       th:href="@{/project/{pr_title}/modify(pr_title=${project.getTitle()})}">Modify project</a>
+                    <a class="text-decoration-none text-reset p-2 border border-success rounded bg-success"
+                       th:href="@{/project/{pr_title}/request(pr_title=${project.getTitle()})}">View project
+                        requests</a>
+                </div>
+                <a class="text-decoration-none text-reset p-2 border border-success rounded bg-secondary"
+                   th:href="@{/project/{pr_title}/members(pr_title=${project.getTitle()})}">Show members</a>
                 <button th:if="${session.user != null && !project.getUser().equals(session.user)
                  && !project.getDevelopers().contains(session.user)}"
-                        class="btn btn-success btn-sm"
+                        class="text-decoration-none text-reset p-2 border border-success rounded bg-success"
+                        th:attr="data-pr-title=${project.getTitle()}"
                         data-bs-toggle="modal"
-                        data-bs-target="#addTagModal">
-                    <a class="text-decoration-none text-reset"
-                       th:href="@{/project/{pr_title}/requests/add(pr_title=${project.getTitle()})}">Send request</a>
+                        data-bs-target="#modal"
+                >
+                    Send request
                 </button>
             </div>
         </div>
@@ -155,6 +149,32 @@
     <p class="fw-bold fs-6" th:text="'Error: ' + ${error}"></p>
 </section>
 
+<div class="modal fade"
+     id="modal"
+     data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel"
+     aria-hidden="true"
+>
+    <form method="post" id="modal-form" th:action="@{/project/{pr-tittle}/request/create(pr-tittle=${project.getTitle()})}">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel2">Request</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body d-flex flex-column gap-2">
+                    <label>Reason</label>
+                    <textarea id="reason-desc"
+                              style="height: 20vh"
+                              class="w-100 border border-rounded"
+                              name="reason-desc"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success">Submit</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
 <!-- Add Tag Modal -->
 <div class="modal fade" id="addTagModal" tabindex="-1" aria-labelledby="addTagModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -187,6 +207,8 @@
         </div>
     </div>
 </div>
+<script src="/js/modal_utils.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <div class="modal fade" id="addChannelModal" tabindex="-1" aria-labelledby="addChannelModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -232,7 +254,7 @@
             }
         });
     });
-
+    modalConts.push(document.querySelector(".modal"))
 </script>
 
 
