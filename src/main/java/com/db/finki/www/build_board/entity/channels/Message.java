@@ -4,6 +4,7 @@ import com.db.finki.www.build_board.entity.compositeId.MessageId;
 import com.db.finki.www.build_board.entity.threads.Project;
 import com.db.finki.www.build_board.entity.user_types.Developer;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @IdClass(MessageId.class)
+@AllArgsConstructor
 public class Message {
     @Id
     @Column(name = "channel_name")

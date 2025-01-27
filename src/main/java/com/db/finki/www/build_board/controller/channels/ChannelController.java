@@ -3,7 +3,9 @@ package com.db.finki.www.build_board.controller.channels;
 import com.db.finki.www.build_board.entity.channels.Channel;
 import com.db.finki.www.build_board.entity.threads.Project;
 import com.db.finki.www.build_board.entity.user_types.BBUser;
+import com.db.finki.www.build_board.mappers.MessageMapper;
 import com.db.finki.www.build_board.service.channel.ChannelService;
+import com.db.finki.www.build_board.service.channel.MessageService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
@@ -17,9 +19,13 @@ import java.util.List;
 @RequestMapping("/project/{title}/channels")
 public class ChannelController {
     private final ChannelService channelService;
+    private final MessageMapper messageMapper;
+    private final MessageService messageService;
 
-    public ChannelController(ChannelService channelService) {
+    public ChannelController(ChannelService channelService, MessageMapper messageMapper, MessageService messageService) {
         this.channelService = channelService;
+        this.messageMapper = messageMapper;
+        this.messageService = messageService;
     }
 
     @GetMapping()
@@ -39,6 +45,7 @@ public class ChannelController {
         if (c == null) {
             c = channelService.getByNameAndProject(channelName, project);
             model.addAttribute("channel", c);
+            model.addAttribute("messages",messageMapper.toDTO(messageService.getAllMessagesForProjectChannel(project.getId(),channelName)));
         } else {
             model.addAttribute("channel", c);
         }

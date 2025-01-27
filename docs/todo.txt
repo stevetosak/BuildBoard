@@ -38,4 +38,23 @@ Ko ke udris search bez filtri da ti gi davat grupirani. -> Edna grupa topics, dr
 - to so referenciranje da go napreme
 - view channels page da sa napret, imas ideja toska ke ti teknit to so chatojte ko preview da sa. (ova samo za mene e viktor uzivaj)
 
+------------
+
+PRAVILA ZA SINTAKSA
+- packages ednina
+- url mnozina
+- edinecen resurs ko ke pristapvis od nekoj resurs so e vo mnozina primer nekoj kanal go pristapvis so channels/kanalot
+- kebap case url
+- metodi vo services
+    - prefix get vo service,vo repo find -> za metodi so zemas nesto od baza
+    - create za kreiranje novi obj
+    - Najcesti zborcinja za koristenje: get, create,update,delete
+
+- Optionals vo repo ponatamu
+
+- Controllers
+    - get mapping so vrakjat page -> get<Ime na html page>Page
+
+
+
 

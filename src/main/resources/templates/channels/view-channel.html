@@ -3,141 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modern Channel Chat</title>
+    <title>Channel</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #f8f9fa;
-            margin: 0;
-            padding: 0;
-        }
-        .chat-container {
-            width: 80%; /* Chat takes 80% of the screen width */
-            height: 85vh; /* Chat box height takes up 85% of the viewport */
-            max-width: 1200px; /* Max-width for large screens */
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            margin-right: 250px; /* Make space for user list */
-        }
-        .chat-header {
-            background-color: #007bff;
-            color: white;
-            padding: 25px;
-            text-align: center;
-        }
-        .chat-messages {
-            background-color: #ffffff;
-            height: calc(100% - 160px); /* Adjust the height based on header and input section */
-            overflow-y: auto;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        .message-bubble {
-            max-width: 70%;
-            word-wrap: break-word;
-            padding: 12px 20px;
-            border-radius: 20px;
-        }
-        .message-bubble.outgoing {
-            background-color: #007bff;
-            color: white;
-            align-self: flex-end;
-        }
-        .message-bubble.incoming {
-            background-color: #e9ecef;
-            color: black;
-            align-self: flex-start;
-        }
-        .input-container {
-            background-color: #f1f3f5;
-            padding: 15px;
-            display: flex;
-            gap: 10px;
-        }
-        .user-list {
-            background-color: #f1f3f5;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        .user-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 8px;
-            border-radius: 8px;
-        }
-        .user-item:hover {
-            background-color: #e9ecef;
-        }
-        .avatar {
-            width: 50px;
-            height: 50px;
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 50%;
-            color: white;
-        }
-    </style>
+    <link href="/static/css/icon.css" rel="stylesheet">
+    <link href="/css/chat.css" rel="stylesheet">
 </head>
-<body class="d-flex justify-content-center align-items-center vh-100">
+<body>
 
-<div class="container chat-container bg-white">
-    <!-- Header -->
-    <div class="chat-header">
-        <h3 class="mb-0" th:text="${channel.getName()}">Channel Name</h3>
-    </div>
+<div th:replace="~{/home_pages/home ::navigation}"></div>
 
-    <!-- Main Content (Messages Section) -->
-    <div class="chat-messages">
-        <!-- Example Messages -->
-        <div class="message-bubble incoming">
-            Zdravo tokmaci
+<main class="d-flex justify-content-between align-items-start vh-90 mt-5">
+
+    <div class="d-flex gap-1 flex-grow-1 h-100">
+        <!-- Channel List -->
+        <div class="channel-list border border-outline">
+            <h5 th:text="${channel.getProject().getTitle()}"></h5>
+            <hr>
+            <h6>Channels</h6>
+            <div th:each="channel : ${channel.getProject().getChannels()}" class="channel-item">
+                <a th:href="@{/project/{projectName}/channels/{channelName} (projectName=${channel.getProject().getTitle()}, channelName=${channel.getName()})}"
+                   th:text="${channel.getName()}"
+                   class="nav-link"
+                >Channel Name</a>
+            </div>
         </div>
-        <div class="message-bubble outgoing">
-            Majka ti e tokmak
+
+        <div class="container chat-container">
+            <!-- Header -->
+            <div class="chat-header">
+                <h3 class="mb-0" th:text="${channel.getName()}">Channel Name</h3>
+            </div>
+
+            <!-- Main Content (Messages Section) -->
+            <div class="chat-messages">
+                <!-- Example Messages -->
+                <div class="message-bubble incoming" th:each="message : ${messages}">
+                    <div id="user-info">
+                        <img th:src="${message.getAvatarUrl()}" class="rounded-circle icon-small" alt="user-logo"
+                        style="width: 3rem;height: 3rem;">
+                    </div>
+                    <div id="message-info" class="message-info">
+                        <small class="text-secondary fst-italic">
+                            <span th:text="${message.getSenderUsername()}">Username</span>
+                            <span th:text="${#temporals.format(message.getSentAt(), 'dd/MM/yyyy &bull; HH:mm')}">&nbsp;datum • vreme</span>
+                        </small>
+                        <p th:text="${message.getContent()}" class="lead text-break">Message Content</p>
+                    </div>
+
+                </div>
+<!--                Tuka pocvat messages-->
+
+            </div>
+
+            <!-- Input Section -->
+            <div class="input-container">
+                <textarea class="form-control h-fit-content" name="chatMessage" placeholder="Type your message..."></textarea>
+                <button class="btn btn-primary">Send</button>
+            </div>
         </div>
-        <div class="message-bubble incoming">
-           Ajde da ne sa karame drugari sme plus majka ti super zenicka e
+
+    </div>
+
+    <!-- User List -->
+    <div class="user-list me-3 border border-outline shadow">
+        <h5 style="text-align: center">Users</h5>
+        <hr>
+        <div th:each="developer : ${channel.getProject().getDevelopers()}" class="user-item">
+            <img th:src="${developer.getAvatarUrl()}" class="rounded-circle icon-small" alt="user-logo"
+                 style="width: 3rem;height: 3rem;">
+            <span class="text-break" th:text="${developer.getUsername()}"></span>
         </div>
     </div>
 
-    <!-- Input Section -->
-    <div class="input-container">
-        <input type="text" class="form-control" placeholder="Type your message..." />
-        <button class="btn btn-primary">Send</button>
-    </div>
-</div>
+</main>
 
-<!-- User List -->
-<div class="user-list me-3 border border-outline shadow">
-    <h5>Users</h5>
-    <div class="user-item">
-        <div class="avatar bg-primary">A</div>
-        <span>Alex</span>
-    </div>
-    <div class="user-item">
-        <div class="avatar bg-success">B</div>
-        <span>Brenda</span>
-    </div>
-    <div class="user-item">
-        <div class="avatar bg-warning">C</div>
-        <span>Charlie</span>
-    </div>
-    <div class="user-item">
-        <div class="avatar bg-warning">C</div>
-        <span>Mike</span>
-    </div>
-</div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>

@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface DeveloperRepository extends JpaRepository<Developer, Integer> {
     Developer findById(int id);
+    Developer findByUsername(String username);
 }

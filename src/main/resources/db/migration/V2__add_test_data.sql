@@ -93,10 +93,6 @@ VALUES
     ('Create Thread', 'Admin', 5),
     ('Delete Thread', 'Admin', 5);
 
-INSERT INTO project_request (description, status, user_id, project_id)
-VALUES
-    ('Request to join Project 1', 'PENDING', 2, 5),
-    ('Request to join Project 1', 'ACCEPTED', 4, 5);
 
 INSERT INTO report (created_at, description, status, thread_id, for_user_id, by_user_id)
 VALUES
