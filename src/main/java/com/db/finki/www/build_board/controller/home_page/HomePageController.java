@@ -4,6 +4,8 @@ import com.db.finki.www.build_board.entity.user_type.BBUser;
 import com.db.finki.www.build_board.service.BBUserDetailsService;
 import com.db.finki.www.build_board.service.search.SearchService;
 import com.db.finki.www.build_board.service.thread.itf.TagService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.Authentication;
@@ -69,13 +71,17 @@ public class HomePageController {
             @RequestParam String description,
             @RequestParam String sex,
             RedirectAttributes redirectAttributes,
-            HttpSession session
+            HttpSession session,
+            HttpServletRequest request,
+            HttpServletResponse response
     ) {
         try {
             Authentication authentication = bbUserDetailsService.registerUser(username, email, name, password,description, sex);
 
             SecurityContext context = SecurityContextHolder.getContext();
             context.setAuthentication(authentication);
+
+            securityContextRepository.saveContext(context,request,response);
 
             session.setAttribute("user", authentication.getPrincipal());
             return "redirect:/";
