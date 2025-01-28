@@ -33,6 +33,64 @@ body {
     flex-direction: column;
     gap: 20px;
 }
+
+.input-container {
+    background-color: #ffffff; /* Light background for the input area */
+    padding: 15px;
+    display: flex;
+    gap: 10px;
+    align-items: center; /* Align items vertically */
+    border-top: 1px solid #e9ecef; /* Add a subtle border at the top */
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1); /* Add a shadow to separate from messages */
+}
+
+#chat-message {
+    flex: 1; /* Allow the textarea to take up remaining space */
+    padding: 12px 16px; /* Add padding for better text alignment */
+    border: 1px solid #ced4da; /* Add a border */
+    border-radius: 8px; /* Rounded corners */
+    font-size: 14px; /* Adjust font size */
+    resize: none; /* Disable resizing */
+    outline: none; /* Remove default outline */
+    transition: border-color 0.3s ease; /* Smooth transition for focus */
+}
+
+#chat-message:focus {
+    border-color: #007bff; /* Highlight border on focus */
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25); /* Add a subtle glow */
+}
+
+#send-message-button {
+    background-color: #2DA1E1FF; /* Primary button color */
+    color: white; /* Text color */
+    border: none; /* Remove default border */
+    padding: 10px 16px; /* Smaller padding for a compact look */
+    border-radius: 20px; /* More rounded corners for a pill-like shape */
+    font-size: 14px; /* Adjust font size */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease; /* Smooth transitions */
+    display: flex; /* Use flexbox for alignment */
+    align-items: center; /* Center content vertically */
+    justify-content: center; /* Center content horizontally */
+    width: auto; /* Let the button size adjust to its content */
+    min-width: 80px; /* Set a minimum width to avoid being too narrow */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+/*2DA1E1FF*/
+#send-message-button:hover {
+    background-color: #007dc2; /* Darker shade on hover */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Slightly larger shadow on hover */
+}
+
+#send-message-button:active {
+    transform: scale(0.95); /* Slight scale-down effect on click */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Reset shadow on click */
+}
+
+#send-message-button:focus {
+    outline: none; /* Remove default outline */
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.3); /* Add a focus ring */
+}
 .message-bubble {
     width: 100%;
     word-wrap: break-word;
@@ -60,6 +118,9 @@ body {
     padding: 15px;
     display: flex;
     gap: 10px;
+}
+.button{
+
 }
 .user-list {
     background-color: #f1f3f5;
