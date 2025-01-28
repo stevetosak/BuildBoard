@@ -6,10 +6,12 @@ import com.db.finki.www.build_board.entity.threads.Tag;
 import com.db.finki.www.build_board.entity.threads.Topic;
 import com.db.finki.www.build_board.entity.user_types.BBUser;
 import com.db.finki.www.build_board.entity.threads.Project;
+import com.db.finki.www.build_board.entity.user_types.Developer;
 import com.db.finki.www.build_board.repository.thread.ProjectRepository;
 import com.db.finki.www.build_board.service.BBUserDetailsService;
 import com.db.finki.www.build_board.service.thread.itfs.TagService;
 import com.db.finki.www.build_board.service.thread.itfs.TopicService;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -46,6 +48,13 @@ public class ProjectService {
         topic.setParent(project);
         project.getTopics().add(topic);
         projectRepository.save(project);
+    }
+
+    @Transactional
+    public void removeMember(Project project, int memberId) {
+        BBUser user = userDetailsService.loadUserById(memberId);
+        boolean removed = project.getDevelopers().remove(user);
+        System.out.println("REMOVED: " + removed);
     }
 
     public void addTagToProject(Project project, String tagName) {

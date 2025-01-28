@@ -55,4 +55,8 @@ public class BBUserDetailsService implements UserDetailsService {
                 )
         );
     }
+
+    public BBUser loadUserById(int id){
+        return userRepository.findById(id);
+    }
 }

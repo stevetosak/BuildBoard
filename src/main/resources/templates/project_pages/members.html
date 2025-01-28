@@ -4,58 +4,36 @@
     <meta charset="UTF-8">
     <title>Members</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="/css/icon.css">
     <style>
         body {
             background-color: #f8f9fa; /* Light background for the whole page */
         }
 
-        .card {
-            background-color: #ffffff; /* White background for the cards */
-            border: 1px solid #dde2e6; /* Light grey border */
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            height: 350px; /* Fixed height for larger cards */
+        .icon-small {
+            opacity: 0.5; /* Default opacity (lower) */
+            transition: opacity 0.3s ease; /* Smooth transition */
         }
 
-        .card:hover {
-            transform: translateY(-5px); /* Slight lift on hover */
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2); /* Stronger shadow on hover */
-        }
-
-        .card-header {
-            background-color: #007bff; /* Blue header color */
-            color: #ffffff; /* White text */
-            font-weight: bold;
-        }
-
-        .card-body {
-            background-color: #f1f3f5; /* Light grey background */
-            color: #495057; /* Dark text */
-            height: 200px; /* Larger height for the card body */
-            overflow-y: auto; /* Allow scrolling if content exceeds height */
-        }
-
-        .card-footer {
-            background-color: #f8f9fa;
-            color: #495057;
-        }
-
-        .card-title {
-            color: #000000; /* Dark text color for card title */
-        }
-
-        .card-text {
-            color: #6c757d; /* Grey text for descriptions */
-        }
-
-        .btn-link {
-            color: #007bff; /* Blue accent for buttons */
+        div:hover .icon-small {
+            opacity: 1; /* Higher opacity on hover */
         }
 
         .container-header {
             margin-top: 50px;
             text-align: center;
         }
+        #kick-user-button{
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
     </style>
 </head>
 <body>
@@ -80,11 +58,23 @@
                 </h5>
             </div>
             <h5 th:if="${member.getId() != project.getUser().getId()}" class="fw-lighter fst-italic">Developer</h5>
-            <h5 th:if="${member.getId() == project.getUser().getId()}" class="fw-lighter fst-italic">Creator</h5>
+            <h5 th:if="${member.getId() == project.getUser().getId()}" class="fw-lighter fst-italic">Owner</h5>
+            <div style="position: relative; display: inline-block;" th:if="${session.user.getId() == project.getUser().getId() && member.getId() != project.getUser().getId()}">
+                <img src="/project_imgs/im-kick-user.svg" alt="kick user image" class="icon-small" style="transition: opacity 0.3s ease;">
+                <form method="post" th:action="@{/project/{projectName}/members/kick (projectName=${project.getTitle()})}" style="display: inline;">
+                    <input type="hidden" name="memberId" th:value="${member.getId()}">
+                    <button id="kick-user-button" type="submit"></button>
+                </form>
+            </div>
+
+
         </div>
     </div>
-    </div>
 </main>
+
+<script>
+
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

@@ -74,6 +74,12 @@ public class ProjectController {
         model.addAttribute("project", project);
         return "project_pages/members";
     }
+    @PreAuthorize("#project.getUser().equals(#user)")
+    @PostMapping("/{pr_title}/members/kick")
+    public String kickMember(@PathVariable(name = "pr_title") @P("project") Project project,@RequestParam int memberId,@SessionAttribute @P("user") BBUser user){
+        projectService.removeMember(project, memberId);
+        return "redirect:/project/" + project.getTitle() + "/members";
+    }
 
     @PreAuthorize("#project.getUser().getUsername().equals(#username)")
     @PostMapping("/{title}/modify")
