@@ -8,13 +8,13 @@
 </head>
 <body>
 <div th:replace="/home_pages/home :: navigation"></div>
-<main th:with="prefix=${project_title==null ? '' : '/project'}" class="container mt-5">
+<main th:with="prefix=${project_title==null ? '' : '/projects'}" class="container mt-5">
   <div class="card shadow-sm">
     <div class="card-header bg-primary text-white">
       <h4 class="mb-0">Add a New Topic</h4>
     </div>
     <div class="card-body">
-      <form th:action="@{{prfx}/topic/add(prfx=${prefix})}" method="post">
+      <form th:action="@{{prfx}/topics/add(prfx=${prefix})}" method="post">
         <div class="mb-3">
           <label for="title" class="form-label">Title</label>
           <input type="text" id="title" name="title" class="form-control" placeholder="Enter the topic title" required>

@@ -1,10 +1,10 @@
 package com.db.finki.www.build_board.service.channel;
 
-import com.db.finki.www.build_board.entity.channels.Channel;
+import com.db.finki.www.build_board.entity.channel.Channel;
 import com.db.finki.www.build_board.entity.compositeId.ChannelId;
-import com.db.finki.www.build_board.entity.threads.Project;
-import com.db.finki.www.build_board.entity.user_types.BBUser;
-import com.db.finki.www.build_board.entity.user_types.Developer;
+import com.db.finki.www.build_board.entity.thread.Project;
+import com.db.finki.www.build_board.entity.user_type.BBUser;
+import com.db.finki.www.build_board.entity.user_type.Developer;
 import com.db.finki.www.build_board.repository.DeveloperRepository;
 import com.db.finki.www.build_board.repository.channel.ChannelRepository;
 import org.springframework.stereotype.Service;
@@ -28,7 +28,7 @@ public class ChannelService {
     }
 
     public List<Channel> getAllChannelsForProject(Project project) {
-        return channelRepository.findAllByProjectId(project.getId());
+        return channelRepository.findAllByProjectIdOrderByNameAsc(project.getId());
     }
 
     public Channel create(Project project, String channelName, String description, BBUser user){

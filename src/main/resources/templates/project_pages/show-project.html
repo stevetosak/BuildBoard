@@ -20,15 +20,15 @@
                             class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addTagModal">Add Tag
                     </button>
                     <a class="text-decoration-none text-reset p-2 border-success border rounded bg-success"
-                       th:href="@{/project/{pr_title}/topic/add(pr_title=${project.getTitle()})}">Add Topic</a>
+                       th:href="@{/projects/{pr_title}/topics/add(pr_title=${project.getTitle()})}">Add Topic</a>
                     <a class="text-decoration-none text-reset p-2 border-success border rounded bg-secondary"
-                       th:href="@{/project/{pr_title}/modify(pr_title=${project.getTitle()})}">Modify project</a>
+                       th:href="@{/projects/{pr_title}/edit(pr_title=${project.getTitle()})}">Modify project</a>
                     <a class="text-decoration-none text-reset p-2 border border-success rounded bg-success"
-                       th:href="@{/project/{pr_title}/request(pr_title=${project.getTitle()})}">View project
+                       th:href="@{/projects/{pr_title}/requests(pr_title=${project.getTitle()})}">View project
                         requests</a>
                 </div>
                 <a class="text-decoration-none text-reset p-2 border border-success rounded bg-secondary"
-                   th:href="@{/project/{pr_title}/members(pr_title=${project.getTitle()})}">Show members</a>
+                   th:href="@{/projects/{pr_title}/members(pr_title=${project.getTitle()})}">Show members</a>
                 <button th:if="${session.user != null && !project.getUser().equals(session.user)
                  && !project.getDevelopers().contains(session.user)}"
                         class="text-decoration-none text-reset p-2 border border-success rounded bg-success"
@@ -57,7 +57,7 @@
                         class="list-inline-item badge bg-info text-dark d-inline-flex align-items-center">
                         <span th:text="${tag.getName()}">Tag Name</span>
                         <form th:if="${session.user!=null && session.user.equals(project.getUser())}"
-                              th:action="@{/project/delete-tag/{projectTitle}/{tagName} (projectTitle=${project.getTitle()}, tagName=${tag.getName()})}"
+                              th:action="@{/projects/{projectTitle}/tags/{tagName}/delete (projectTitle=${project.getTitle()}, tagName=${tag.getName()})}"
                               method="post" style="margin-left: 5px;">
                             <button type="submit" class="btn btn-sm btn-link text-danger p-0 ms-1"
                                     style="line-height: 1;">
@@ -76,7 +76,7 @@
                         <div class="list-group-item w-100" th:each="topic : ${project.getTopics()}">
                             <div class="d-flex">
                                 <h5 class="mb-1">
-                                    <a th:href="@{/topic/{name} (name=${topic.getTitle()})}"
+                                    <a th:href="@{/topics/{name} (name=${topic.getTitle()})}"
                                        th:text="${topic.getTitle()}" class="text-decoration-none"></a>
                                 </h5>
                                 <!--                <small th:text="${thread.getFormattedDate()}">Date</small>-->
@@ -91,10 +91,10 @@
                     <h4>Channels:</h4>
                     <div class="list-group w-75">
                         <div class="list-group-item w-100" th:each="channel : ${project.getChannels()}">
-                            <form method="post" th:action="@{/project/{projectName}/channels/{channelName}/delete (projectName=${project.getTitle()},channelName=${channel.getName()})}">
+                            <form method="post" th:action="@{/projects/{projectName}/channels/{channelName}/delete (projectName=${project.getTitle()},channelName=${channel.getName()})}">
                                 <div class="d-flex justify-content-between">
                                     <h5 class="mb-1">
-                                        <a th:href="@{/project/{projectName}/channels/{name} (name=${channel.getName()},projectName=${project.getTitle()})}"
+                                        <a th:href="@{/projects/{projectName}/channels/{name} (name=${channel.getName()},projectName=${project.getTitle()})}"
                                            th:text="${channel.getName()}" class="text-decoration-none"></a>
                                     </h5>
                                     <div th:if="${channel.getDeveloper().getId() == session.user.getId() || project.getUser() == session.user}">
@@ -113,7 +113,7 @@
             </div>
             <div class="d-flex justify-content-between align-items-center mt-3 pt-3">
                 <div class="d-flex flex-row">
-                    <form th:action="'/project/' + ${project.getTitle()} + '/discussion/like'" method="post">
+                    <form th:action="'/threads/' + ${project.getId()} + '/like'" method="post">
                         <input type="hidden" name="threadId" th:value="${project.getId()}">
                         <button th:if="${session.user!=null}"
                                 type="submit" class="btn btn-outline-success btn-sm me-2 like-button">
@@ -121,7 +121,7 @@
                             👍 Like (<span th:text="${project.getNumLikes()}">0</span>)
                         </button>
                     </form>
-                    <form th:action="'/project/' + ${project.getTitle()} + '/discussion/dislike'" method="post">
+                    <form th:action="'/threads/' + ${project.getId()} + '/dislike'" method="post">
                         <input type="hidden" name="threadId" th:value="${project.getId()}">
                         <button th:if="${session.user!=null}"
                                 class="btn btn-outline-danger btn-sm dislike-button">
@@ -133,9 +133,8 @@
             </div>
         </div>
         <div th:if="${isManager}" class="card-footer d-flex justify-content-between">
-            <form th:action="@{/project/delete/{title} (title=${project.getTitle()})}" method="post"
+            <form th:action="@{/projects/{title}/delete (title=${project.getTitle()})}" method="post"
                   style="display:inline;">
-                <input type="hidden" name="id" th:value="${project.getId()}"/>
                 <button type="submit" class="btn btn-danger btn-sm">Delete Project</button>
                 <input th:if="${session.user!=null}" type="hidden" name="username"
                        th:value="${session.user.getUsername()}">
@@ -184,7 +183,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form th:action="@{/project/{title}/add-tag(title=${project.getTitle()})}" method="post"
+                <form th:action="@{/projects/{title}/tags/add(title=${project.getTitle()})}" method="post"
                       id="addTagForm">
                     <div class="mb-3">
                         <label for="existingTags" class="form-label">Tag Name</label>
@@ -218,7 +217,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form th:action="@{/project/{title}/channels/add(title=${project.getTitle()})}" method="post"
+                <form th:action="@{/projects/{title}/channels/add(title=${project.getTitle()})}" method="post"
                       id="addChannelForm">
 
                     <div class="mb-3 d-flex flex-column justify-content-center">

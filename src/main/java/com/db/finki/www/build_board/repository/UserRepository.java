@@ -1,6 +1,6 @@
 package com.db.finki.www.build_board.repository;
 
-import com.db.finki.www.build_board.entity.user_types.BBUser;
+import com.db.finki.www.build_board.entity.user_type.BBUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

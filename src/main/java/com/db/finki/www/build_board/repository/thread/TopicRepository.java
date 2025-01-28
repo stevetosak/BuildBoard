@@ -1,6 +1,6 @@
 package com.db.finki.www.build_board.repository.thread;
 
-import com.db.finki.www.build_board.entity.threads.Topic;
+import com.db.finki.www.build_board.entity.thread.Topic;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;

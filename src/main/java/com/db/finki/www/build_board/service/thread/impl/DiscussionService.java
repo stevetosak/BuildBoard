@@ -1,9 +1,9 @@
 package com.db.finki.www.build_board.service.thread.impl;
 
-import com.db.finki.www.build_board.entity.threads.BBThread;
-import com.db.finki.www.build_board.entity.threads.discussion_threads.Discussion;
-import com.db.finki.www.build_board.entity.threads.discussion_threads.VDiscussion;
-import com.db.finki.www.build_board.entity.user_types.BBUser;
+import com.db.finki.www.build_board.entity.thread.BBThread;
+import com.db.finki.www.build_board.entity.thread.discussion_thread.Discussion;
+import com.db.finki.www.build_board.entity.thread.discussion_thread.VDiscussion;
+import com.db.finki.www.build_board.entity.user_type.BBUser;
 import com.db.finki.www.build_board.repository.thread.BBThreadRepository;
 import com.db.finki.www.build_board.repository.thread.DiscussionRepository;
 import com.db.finki.www.build_board.repository.thread.VDiscussRepo;
@@ -23,18 +23,18 @@ public class DiscussionService {
         this.threadRepository = threadRepository;
     }
 
-    public List<VDiscussion> findByTopic(int topicId){
-        return vDiscussRepo.findVDiscussionByParentTopicId(topicId);
+    public List<VDiscussion> getByTopic(int topicId){
+        return vDiscussRepo.findVDiscussionByParentTopicIdOrderByCreatedAtDesc(topicId);
     }
 
-    public VDiscussion findVDiscussionById(int discussionId){
+    public VDiscussion getVDiscussionById(int discussionId){
         return vDiscussRepo.findVDiscussionByDiscussionId(discussionId);
     }
-    public Discussion findDiscussionById(int discussionId){
+    public Discussion getDiscussionById(int discussionId){
         return discussionRepository.findDiscussionById(discussionId);
     }
 
-    public List<VDiscussion> findAll(){
+    public List<VDiscussion> getAll(){
         return vDiscussRepo.findAll();
     }
 

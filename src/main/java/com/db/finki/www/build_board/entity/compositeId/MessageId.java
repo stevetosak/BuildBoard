@@ -1,11 +1,5 @@
 package com.db.finki.www.build_board.entity.compositeId;
 
-import com.db.finki.www.build_board.entity.threads.Project;
-import com.db.finki.www.build_board.entity.user_types.Developer;
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
 

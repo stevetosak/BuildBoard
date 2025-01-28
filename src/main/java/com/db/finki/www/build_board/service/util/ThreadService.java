@@ -1,7 +1,7 @@
 package com.db.finki.www.build_board.service.util;
 
-import com.db.finki.www.build_board.entity.threads.BBThread;
-import com.db.finki.www.build_board.entity.user_types.BBUser;
+import com.db.finki.www.build_board.entity.thread.BBThread;
+import com.db.finki.www.build_board.entity.user_type.BBUser;
 import com.db.finki.www.build_board.repository.UserRepository;
 import com.db.finki.www.build_board.repository.thread.BBThreadRepository;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,7 @@ public class ThreadService {
         this.userRepository = userRepository;
     }
 
-    public void rate(int threadId, int userId,boolean like){
+    public BBThread rate(int threadId, int userId,boolean like){
         BBThread thread = bbThreadRepository.findById(threadId);
         BBUser user = userRepository.findById(userId);
         if(like){
@@ -30,6 +30,6 @@ public class ThreadService {
         } else {
             thread.getLikes().remove(user);
         }
-        bbThreadRepository.save(thread);
+        return bbThreadRepository.save(thread);
     }
 }

@@ -101,11 +101,10 @@ VALUES
 
 INSERT INTO channel (name, description, project_id, developer_id)
 VALUES
-    ('General', 'General discussion channel', 5, 3),
     ('Updates', 'Project updates channel', 5, 3);
 
 INSERT INTO messages (sent_at, content, sent_by, project_id, channel_name)
 VALUES
-    (NOW(), 'Hello, team!', 2, 5, 'General'),
+    (NOW(), 'Hello, team!', 3, 5, 'General'),
     (NOW(), 'We need to push the deadline.', 3, 5, 'Updates');
 

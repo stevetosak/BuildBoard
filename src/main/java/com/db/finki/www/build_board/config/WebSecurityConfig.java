@@ -15,6 +15,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.context.DelegatingSecurityContextRepository;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.util.matcher.AndRequestMatcher;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
@@ -33,7 +36,6 @@ public class WebSecurityConfig {
         this.userDetailsService = userDetailsService;
         this.successHandler = successHandler;
     }
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -47,7 +49,9 @@ public class WebSecurityConfig {
                                 "*.ico",
                                 "*.jpg",
                                 "*.png",
-                                "/register"
+                                "/register",
+                                        "/css/**",
+                                        "/js/**"
                                 ).permitAll()
                                 .requestMatchers(
                                         new AntPathRequestMatcher("/topic/*", HttpMethod.GET.name()),
@@ -63,7 +67,11 @@ public class WebSecurityConfig {
                                 .successHandler(successHandler)
                 )
                 .logout(logout ->
-                        logout.logoutSuccessUrl("/"));
+                        logout.logoutSuccessUrl("/")
+                                .clearAuthentication(true)
+                                .invalidateHttpSession(true)
+                                .deleteCookies("JSESSIONID")
+                );
 
         return http.build();
 
@@ -80,5 +88,10 @@ public class WebSecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
+    }
+
+    @Bean
+    public SecurityContextRepository securityContextRepository() {
+        return new DelegatingSecurityContextRepository(new HttpSessionSecurityContextRepository());
     }
 }

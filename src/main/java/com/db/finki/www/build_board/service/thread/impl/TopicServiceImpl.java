@@ -1,11 +1,11 @@
 package com.db.finki.www.build_board.service.thread.impl;
 
-import com.db.finki.www.build_board.entity.user_types.BBUser;
-import com.db.finki.www.build_board.entity.threads.Tag;
-import com.db.finki.www.build_board.entity.threads.Topic;
+import com.db.finki.www.build_board.entity.user_type.BBUser;
+import com.db.finki.www.build_board.entity.thread.Tag;
+import com.db.finki.www.build_board.entity.thread.Topic;
 import com.db.finki.www.build_board.repository.thread.TagRepository;
 import com.db.finki.www.build_board.repository.thread.TopicRepository;
-import com.db.finki.www.build_board.service.thread.itfs.TopicService;
+import com.db.finki.www.build_board.service.thread.itf.TopicService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -74,7 +74,7 @@ public class TopicServiceImpl implements TopicService {
     }
 
     @Override
-    public Topic save(long id, String title, String description) {
+    public Topic create(long id, String title, String description) {
         Topic t = getById(id);
         t.setTitle(title);
         t.setContent(description);

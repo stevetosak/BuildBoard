@@ -1,5 +1,6 @@
 package com.db.finki.www.build_board.controller;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
@@ -39,6 +40,4 @@ public class ExceptionHandler {
     public ModelAndView handleNotFound(Exception exception) {
         return mavBuilder(exception,"Unknown exception",-1);
     }
-
-
 }

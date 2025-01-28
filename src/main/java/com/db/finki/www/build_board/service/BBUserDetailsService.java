@@ -1,11 +1,14 @@
 package com.db.finki.www.build_board.service;
 
-import com.db.finki.www.build_board.entity.user_types.BBUser;
+import com.db.finki.www.build_board.entity.user_type.BBUser;
 import com.db.finki.www.build_board.repository.UserRepository;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +24,9 @@ public class BBUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+        return userRepository.findByUsername(username)
+                             .orElseThrow(
+                                     () -> new UsernameNotFoundException("User not found with username: " + username));
     }
 
     public BBUser changeInfoForUserWithUsername(String oldUsername, String newUsername, String email, String name, String description, String password) {
@@ -56,7 +61,12 @@ public class BBUserDetailsService implements UserDetailsService {
         );
     }
 
-    public BBUser loadUserById(int id){
+    public Authentication registerUser(String username, String email, String name, String password, String description, String sex) {
+        BBUser user = createUser(username, email, name, password, description, sex);
+        return new UsernamePasswordAuthenticationToken(user,user.getPassword(),user.getAuthorities());
+    }
+
+    public BBUser loadUserById(int id) {
         return userRepository.findById(id);
     }
 }

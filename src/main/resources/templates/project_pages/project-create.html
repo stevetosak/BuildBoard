@@ -17,7 +17,7 @@
                     class="mb-0">Create new project</h4>
         </div>
         <div class="card-body">
-            <form th:action="${isCreatingProject==null} ? '/project/' + ${project.getTitle()} + '/modify' : '/project/add'" method="post">
+            <form th:action="${isCreatingProject==null} ? '/projects/' + ${project.getTitle()} + '/edit' : '/projects/create'" method="post">
                 <div class="mb-3">
                     <label for="title" class="form-label">Title</label>
                     <input type="text" id="title" name="title" th:value="${project.getTitle()}" class="form-control" placeholder="Enter projects title" required>

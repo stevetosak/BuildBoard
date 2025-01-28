@@ -70,7 +70,8 @@ CREATE TABLE thread
 (
     id      SERIAL PRIMARY KEY,
     content TEXT,
-    user_id INT REFERENCES users (id) NOT NULL
+    user_id INT REFERENCES users (id) NOT NULL,
+    created_at timestamp DEFAULT NOW()
 );
 CREATE TABLE topic_thread
 (
@@ -294,7 +295,7 @@ with recursive
     tmp as (select id, max(depth) as depth
             from depth_table
             group by id)
-select d.id as id, t.user_id as user_id, d.depth as depth, d1.parent_id as parent_id
+select d.id as id, t.user_id as user_id, d.depth as depth, d1.parent_id as parent_id, t.created_at as "created_at"
 from tmp d
          join depth_table d1
               on d.id = d1.id and d1.depth = d.depth
@@ -469,6 +470,25 @@ as $$
     end;
     $$;
 
+create or replace function fn_insert_general_for_project()
+    returns trigger
+    language plpgsql
+as $$
+DECLARE
+    developer_id INT;
+BEGIN
+    select user_id
+    into developer_id
+    from thread t
+    where t.id=NEW.id;
+
+    insert into channel(name,description,project_id,developer_id)
+    values ('General','General',NEW.id,developer_id);
+
+    return new;
+end;
+$$;
+
 -------------------------- TRIGGERS ----------------------
 CREATE OR REPLACE TRIGGER tr_check_topic_name
     BEFORE INSERT OR UPDATE
@@ -519,4 +539,10 @@ create or replace trigger tr_add_dev_if_not_exist
 before insert on developer_associated_with_project
     for each row
     execute function fn_add_dev_if_not_exist();
+
+create or replace trigger tr_insert_general_for_project
+    after insert on project_thread
+    for each row
+execute function fn_insert_general_for_project();
+
 

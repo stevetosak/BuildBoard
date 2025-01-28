@@ -1,9 +1,9 @@
 package com.db.finki.www.build_board.service.thread.impl;
 
-import com.db.finki.www.build_board.entity.threads.Tag;
-import com.db.finki.www.build_board.entity.threads.Topic;
+import com.db.finki.www.build_board.entity.thread.Tag;
+import com.db.finki.www.build_board.entity.thread.Topic;
 import com.db.finki.www.build_board.repository.thread.TagRepository;
-import com.db.finki.www.build_board.service.thread.itfs.TagService;
+import com.db.finki.www.build_board.service.thread.itf.TagService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,12 +17,12 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public Tag findByName(String name) {
+    public Tag getByName(String name) {
         return tagRepository.findByName(name).orElseThrow(() -> new IllegalArgumentException("Tag not found"));
     }
 
     @Override
-    public List<Tag> findAll() {
+    public List<Tag> getAll() {
         return tagRepository.findAll();
     }
 
@@ -31,7 +31,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public List<Tag> findAllNotUsed(Topic t) {
+    public List<Tag> getAllNotUsed(Topic t) {
         return tagRepository.findAll().stream().filter(tag -> !t.getTags().contains(tag)).toList();
     }
 }

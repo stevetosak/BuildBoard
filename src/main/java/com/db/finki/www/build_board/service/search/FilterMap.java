@@ -1,8 +1,6 @@
 package com.db.finki.www.build_board.service.search;
 
-import com.db.finki.www.build_board.entity.threads.BBThread;
-import com.db.finki.www.build_board.entity.threads.interfaces.NamedThread;
-import org.springframework.context.annotation.Scope;
+import com.db.finki.www.build_board.entity.thread.itf.NamedThread;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 

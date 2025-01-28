@@ -37,7 +37,7 @@ Ko ke udris search bez filtri da ti gi davat grupirani. -> Edna grupa topics, dr
 - link do proektot nazad
 - to so referenciranje da go napreme
 - view channels page da sa napret, imas ideja toska ke ti teknit to so chatojte ko preview da sa. (ova samo za mene e viktor uzivaj)
-
+- edit na chat messages
 ------------
 
 PRAVILA ZA SINTAKSA
@@ -49,7 +49,7 @@ PRAVILA ZA SINTAKSA
     - prefix get vo service,vo repo find -> za metodi so zemas nesto od baza
     - create za kreiranje novi obj
     - Najcesti zborcinja za koristenje: get, create,update,delete
-
+    - html pagese tie sho prikazhvat neshto da se vikat show
 - Optionals vo repo ponatamu
 
 - Controllers

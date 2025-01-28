@@ -1,10 +1,10 @@
 package com.db.finki.www.build_board.service.request;
 
-import com.db.finki.www.build_board.entity.enums.FeedbackFor;
-import com.db.finki.www.build_board.entity.enums.Status;
-import com.db.finki.www.build_board.entity.requests.ProjectRequests;
-import com.db.finki.www.build_board.entity.threads.Project;
-import com.db.finki.www.build_board.entity.user_types.BBUser;
+import com.db.finki.www.build_board.entity.entity_enum.FeedbackFor;
+import com.db.finki.www.build_board.entity.entity_enum.Status;
+import com.db.finki.www.build_board.entity.request.ProjectRequests;
+import com.db.finki.www.build_board.entity.thread.Project;
+import com.db.finki.www.build_board.entity.user_type.BBUser;
 import com.db.finki.www.build_board.repository.request.ProjectRequestRepo;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -40,16 +40,16 @@ public class ProjectRequestService {
 
     public List<ProjectRequests> getByStatusAndProject(Status status,Project project) {
         if(status == null){
-            return prReqRepo.findByProject(project);
+            return prReqRepo.findByProjectOrderByCreatedAtDesc(project);
         }
-        return prReqRepo.findByStatusAndProject(status,project);
+        return prReqRepo.findByStatusAndProjectOrderByCreatedAtDesc(status,project);
     }
 
     public List<ProjectRequests> getByStatusAndUser(Status status, BBUser forUser) {
         if(status == null){
-            return prReqRepo.findByCreator(forUser);
+            return prReqRepo.findByCreatorOrderByCreatedAtDesc(forUser);
         }
-        return prReqRepo.findByStatusAndCreator(status,forUser);
+        return prReqRepo.findByStatusAndCreatorOrderByCreatedAtDesc(status,forUser);
     }
 
     public ProjectRequests createRequestFor(Project project, String reason, BBUser creator) {

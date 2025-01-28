@@ -1,9 +1,9 @@
 package com.db.finki.www.build_board.service.util;
 
-import com.db.finki.www.build_board.entity.threads.interfaces.NamedThread;
+import com.db.finki.www.build_board.entity.thread.itf.NamedThread;
 import com.db.finki.www.build_board.service.thread.impl.ProjectService;
 import com.db.finki.www.build_board.service.thread.impl.TopicServiceImpl;
-import com.db.finki.www.build_board.service.thread.itfs.TopicService;
+import com.db.finki.www.build_board.service.thread.itf.TopicService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,7 +18,7 @@ public class NamedThreadService {
         this.projectService = projectService;
     }
 
-    public List<NamedThread> findAll(){
+    public List<NamedThread> getAll(){
         List<NamedThread> results = (List<NamedThread>) (List<?>) topicService.getAll();
         results.addAll((List<NamedThread>)(List<?>) projectService.getAll());
         return results;

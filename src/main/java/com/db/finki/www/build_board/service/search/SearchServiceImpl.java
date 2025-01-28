@@ -1,8 +1,8 @@
 package com.db.finki.www.build_board.service.search;
 
-import com.db.finki.www.build_board.entity.threads.Project;
-import com.db.finki.www.build_board.entity.threads.Topic;
-import com.db.finki.www.build_board.entity.threads.interfaces.NamedThread;
+import com.db.finki.www.build_board.entity.thread.Project;
+import com.db.finki.www.build_board.entity.thread.Topic;
+import com.db.finki.www.build_board.entity.thread.itf.NamedThread;
 import com.db.finki.www.build_board.repository.thread.ProjectRepository;
 import com.db.finki.www.build_board.repository.thread.TopicRepository;
 import com.db.finki.www.build_board.service.util.NamedThreadService;
@@ -32,7 +32,6 @@ public class SearchServiceImpl implements SearchService {
     }
 
 
-    //todo strictmode so and spec
 
     private List<Topic> searchTopics(String query, List<String> filters) {
         Specification<Topic> spec = Specification.where(null);
