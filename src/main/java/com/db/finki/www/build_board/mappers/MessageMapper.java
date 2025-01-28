@@ -8,6 +8,7 @@ import com.db.finki.www.build_board.repository.DeveloperRepository;
 import com.db.finki.www.build_board.repository.UserRepository;
 import com.db.finki.www.build_board.repository.thread.ProjectRepository;
 import com.db.finki.www.build_board.service.thread.impl.ProjectService;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

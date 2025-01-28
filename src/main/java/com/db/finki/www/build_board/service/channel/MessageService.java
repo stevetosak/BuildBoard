@@ -11,12 +11,18 @@ import java.util.List;
 @Service
 public class MessageService {
     private final MessageRepository messageRepository;
-    public MessageService(MessageRepository messageRepository) {
+    private final MessageMapper messageMapper;
+    public MessageService(MessageRepository messageRepository, MessageMapper messageMapper) {
         this.messageRepository = messageRepository;
+        this.messageMapper = messageMapper;
     }
 
     public List<Message> getAllMessagesForProjectChannel(Integer projectId,String channelName) {
-        return messageRepository.findAllByNameAndProjectIdOrderBySentAtDesc(channelName,projectId);
+        return messageRepository.findAllByNameAndProjectIdOrderBySentAtAsc(channelName,projectId);
+    }
+    public Message saveMessage(MessageDTO messageDTO) {
+        Message message = messageMapper.fromDTO(messageDTO);
+        return messageRepository.save(message);
     }
 
 }

@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface MessageRepository extends JpaRepository<Message, MessageId> {
-    List<Message> findAllByNameAndProjectIdOrderBySentAtDesc(String channelName, Integer projectId);
+    List<Message> findAllByNameAndProjectIdOrderBySentAtAsc(String channelName, Integer projectId);
 }
