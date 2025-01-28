@@ -95,7 +95,7 @@ public class BBUser implements UserDetails, Serializable {
         this.isEnabled=true;
     }
 
-    public Collection<GrantedAuthority> getAuthority(){
-        return Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"));
+    public List<GrantedAuthority> getAuthority(){
+        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
     }
 }

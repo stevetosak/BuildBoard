@@ -188,7 +188,7 @@ CREATE TABLE project_request
     status      varchar(32)                NOT NULL DEFAULT 'PENDING',
     user_id     INT REFERENCES users (id)  ON DELETE CASCADE NOT NULL ,
     project_id  INT REFERENCES thread (id) ON DELETE CASCADE NOT NULL,
-    created_at timestamp default now(),
+    created_at timestamp default now() not null,
     submission_id int references submission(id) ON DELETE CASCADE
 );
 
@@ -197,14 +197,14 @@ create table feedback (
     description TEXT,
     submission_type varchar(1),
     created_by int references users(id),
-    created_at timestamp default now(),
+    created_at timestamp default now() not null,
     submission_id int PRIMARY KEY references submission(id) on delete cascade
 );
 
 CREATE TABLE report
 (
     id          SERIAL,
-    created_at  TIMESTAMP default now(),
+    created_at  TIMESTAMP default now() not null,
     description VARCHAR(200) NOT NULL,
     status      varchar(32) default 'PENDING',
     thread_id   INT REFERENCES thread (id) on delete cascade,
@@ -396,45 +396,6 @@ BEGIN
     return old;
 end;
 $$;
-create or replace function fn_remove_not_active_project_manager()
-    returns trigger
-    language plpgsql
-as
-$$
-DECLARE
-    creator_id int;
-begin
-    select user_id
-    into creator_id
-    from thread t
-    where t.id = old.id;
-
-    IF NOT EXISTS(select 1
-                  from thread t
-                  where t.id in (select id from project_thread)
-                    and t.user_id = creator_id) THEN
-        delete from project_manager where id = creator_id;
-    end if;
-    return new;
-end
-$$;
-
-create or replace function fn_remove_not_active_developer()
-    returns trigger
-    language plpgsql
-as
-$$
-begin
-    IF not check_if_user_exists_in('developer_associated_with_project','developer_id',old.developer_id::text)
-    THEN
-        delete from developer d
-        where d.id=old.developer_id;
-    end if;
-    return new;
-end
-$$;
-
-
 create or replace function fn_add_sub_pr_request()
     returns trigger
     language plpgsql
@@ -452,7 +413,7 @@ create or replace function fn_add_report()
 as
 $$
 BEGIN
-    insert into submission default values returning id into NEW.id;
+    insert into submission default values returning id into NEW.submission_id;
     return new;
 END;
 $$
@@ -488,6 +449,25 @@ BEGIN
     return new;
 end;
 $$;
+create or replace function fn_replace_id_with_submission_id()
+    returns trigger
+    language plpgsql
+as $$
+BEGIN
+    IF NEW.submission_type = 'P' THEN
+        select submission_id
+        into NEW.submission_id
+        from project_request
+        where id=NEW.submission_id;
+    ELSE
+        select submission_id
+        into NEW.submission_id
+        from report
+        where id=NEW.submission_id;
+    end if;
+    return new;
+end;
+$$;
 
 -------------------------- TRIGGERS ----------------------
 CREATE OR REPLACE TRIGGER tr_check_topic_name
@@ -512,18 +492,6 @@ create or replace trigger tr_remove_unused_tags
     for each row
 execute function fn_remove_unused_tags();
 
-create trigger tr_remove_not_project_managers
-    after delete
-    on project_thread
-    for each row
-execute function fn_remove_not_active_project_manager();
-
-create trigger tr_remove_not_active_developer
-    after delete
-    on developer_associated_with_project
-    for each row
-execute function fn_remove_not_active_developer();
-
 create or replace trigger tr_add_sub_pr_request
     before insert
     on project_request
@@ -545,4 +513,8 @@ create or replace trigger tr_insert_general_for_project
     for each row
 execute function fn_insert_general_for_project();
 
+create or replace trigger tr_replace_id_with_submission_id
+    before insert on feedback
+    for each row
+execute function fn_replace_id_with_submission_id();
 

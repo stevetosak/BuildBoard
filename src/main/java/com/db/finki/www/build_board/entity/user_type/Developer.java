@@ -10,6 +10,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 @Entity
 @Table(name = "developer")
@@ -18,7 +19,7 @@ import java.util.Collections;
 @NoArgsConstructor
 public class Developer extends BBUser{
     @Override
-    public Collection<GrantedAuthority> getAuthority(){
-        return Collections.singleton(new SimpleGrantedAuthority("ROLE_DEVELOPER"));
+    public List<GrantedAuthority> getAuthority(){
+        return List.of(new SimpleGrantedAuthority("ROLE_DEVELOPER"));
     }
 }

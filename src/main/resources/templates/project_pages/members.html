@@ -36,7 +36,7 @@
 
     </style>
 </head>
-<body>
+<body th:attr="data-project-name=${project.getTitle()}">
 <div th:replace="/home_pages/home :: navigation"></div>
 
 <header class="container container-header mb-5">
@@ -57,22 +57,58 @@
                     ></a>
                 </h5>
             </div>
-            <h5 th:if="${member.getId() != project.getUser().getId()}" class="fw-lighter fst-italic">Developer</h5>
-            <h5 th:if="${member.getId() == project.getUser().getId()}" class="fw-lighter fst-italic">Owner</h5>
-            <div style="position: relative; display: inline-block;" th:if="${session.user.getId() == project.getUser().getId() && member.getId() != project.getUser().getId()}">
-                <img src="/project_imgs/im-kick-user.svg" alt="kick user image" class="icon-small" style="transition: opacity 0.3s ease;">
-                <form method="post" th:action="@{/project/{projectName}/members/kick (projectName=${project.getTitle()})}" style="display: inline;">
-                    <input type="hidden" name="memberId" th:value="${member.getId()}">
-                    <button id="kick-user-button" type="submit"></button>
-                </form>
+            <div style="position: relative; display: inline-block;" th:if="${session.user.getId() == project.getUser().getId() && member.getId() != project.getUser().getId()}"
+            class="d-flex flex-row gap-1 align-items-center">
+                <h5 th:if="${member.getId() != project.getUser().getId()}" class="fw-lighter mb-0 fst-italic">Developer</h5>
+                <h5 th:if="${member.getId() == project.getUser().getId()}" class="fw-lighter mb-0 fst-italic">Owner</h5>
+<!--                <img src="/project_imgs/im-kick-user.svg" alt="kick user image" class="icon-small " style="transition: opacity 0.3s ease;"-->
+
+<!--                >-->
+                <button
+                        th:attr="data-mem-id=${member.getId()}"
+                        type="button" class="btn rounded open-kick-dialog"
+                        style="background-image: url('/project_imgs/im-kick-user.svg'); width: 3rem; height: 3rem; background-color: transparent"
+                        data-bs-toggle="modal"
+                        data-bs-target="#confirm"
+                >
+                </button>
             </div>
-
-
         </div>
     </div>
 </main>
-
+<div class="modal fade "
+     id="confirm"
+     data-bs-backdrop="static"
+     data-bs-keyboard="false" tabindex="-1" aria-labelledby="confirm" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="staticBackdropLabel">Are you sure</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post"
+                      class="confirm-form d-flex justify-content-end"
+                      th:action="@{/project/{projectName}/members/{member-id}/kick(projectName=${project.getTitle()})}" >
+                    <button class="btn btn-danger rounded"  type="submit">Confirm</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/js/modal_utils.js"></script>
 <script>
+modalConts.push(document.querySelector("#confirm"))
+
+const projectTitle = document.body.dataset.projectName
+const form=document.querySelector(".confirm-form")
+
+document.addEventListener("click", ev => {
+    if(ev.target.classList.contains("open-kick-dialog")){
+        const memberId = ev.target.dataset.memId
+        form.action=`/projects/${projectTitle}/members/${memberId}/kick`
+    }
+})
 
 </script>
 

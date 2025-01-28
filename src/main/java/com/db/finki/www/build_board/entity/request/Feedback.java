@@ -29,10 +29,18 @@ public class Feedback {
 
     private LocalDateTime createdAt;
 
-    public Feedback(FeedbackFor submissionType, BBUser creator, String description, Integer reqId) {
+    public Feedback(FeedbackFor submissionType, BBUser creator, String description, Integer subId) {
         setDescription(description);
         setSubmissionType(submissionType);
         setCreator(creator);
-        setId(reqId);
+        setId(subId);
+        setCreatedAt(LocalDateTime.now());
+    }
+
+    public Feedback(FeedbackFor feedbackFor, BBUser creator, Integer subId) {
+        setSubmissionType(feedbackFor);
+        setCreator(creator);
+        setId(subId);
+        setCreatedAt(LocalDateTime.now());
     }
 }

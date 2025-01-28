@@ -10,6 +10,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 @Getter
 @Setter
@@ -18,7 +19,7 @@ import java.util.Collections;
 @Table(name = "project_manager")
 public class ProjectOwner extends Developer{
     @Override
-    public Collection<GrantedAuthority> getAuthority(){
-        return Collections.singleton(new SimpleGrantedAuthority("ROLE_PROJECT_OWNER"));
+    public List<GrantedAuthority> getAuthority(){
+        return List.of(new SimpleGrantedAuthority("ROLE_PROJECT_OWNER"));
     }
 }

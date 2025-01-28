@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home Page</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 
     <style>
         .search-container {
@@ -67,7 +68,9 @@
                              style="width: 50px; height: 50px; object-fit: cover; vertical-align: middle;">
                     </div>
                     <div class="nav-item d-flex align-items-center" th:if="${session.user != null}">
-                        <span class="nav-link mb-0" th:text="${session.user.getUsername()}">Username</span>
+                        <span class="nav-link mb-0 me-1" th:text="${session.user.getUsername()}" >Username</span>
+                        <span class="nav-link mb-0" th:text="| (${session.user!=null ? #strings.capitalize(
+                        session.user.getAuthority().get(0).getAuthority().substring(5).replace('_',' ').toLowerCase()) : ''})|"></span>
                     </div>
                 </div>
                 <div class="nav-item d-flex align-items-center ms-xs-5 ms-0  mt-xs-5" th:if="${session.user != null}">
@@ -85,7 +88,6 @@
     </div>
 </nav>
 
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 <div class="container mb-5">
     <div class="row justify-content-center align-items-center pt-3">
         <div class="col-md-8 pt-5">

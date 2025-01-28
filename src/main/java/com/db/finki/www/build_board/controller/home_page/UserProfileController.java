@@ -16,7 +16,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 
-//TODO: napraj poseben za edit i poseben samo za geldanje
 
 @Controller
 @RequestMapping("{username}")

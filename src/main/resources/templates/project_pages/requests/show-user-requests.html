@@ -43,18 +43,19 @@
             <div>
                 <h4>Description</h4>
                 <p th:text="${req.getDescription()}">Description of the project goes here.</p>
+                <p th:text="|Submitted on: ${#temporals.format(req.getCreatedAt(), 'dd/MM/yyyy  HH:mm')}|"></p>
             </div>
         </div>
-        <div class="card-footer" th:if="${!req.getStatus().name().equals('PENDING')}">
+        <div class="card-footer" th:if="${req.getStatus().name().equals('DENIED')}">
             <button type="button"
                     class="btn-feedback-open btn btn-success">View feedback
             </button>
             <div th:with="feed=${req.getFeedback()}"
                  class="feedback d-flex flex-column gap-2 invisible" style="height: 0">
                 <h5>Feedback</h5>
-                <p th:text="${feed!=null ? feed.getDescription() : ''}"></p>
+                <p th:text="${feed==null ? '' : (feed.getDescription()!=null ? feed.getDescription() : '')}"></p>
                 <p>
-                    <span>Submitted at</span>
+                    <span>Submitted at:</span>
                     <span th:text="${feed != null ?  feed.getCreatedAt() : ''}"></span>
                 <div class="w-100 d-flex justify-content-end">
                     <button type="button" class="btn-feedback-close btn-danger btn">Close</button>

@@ -13,7 +13,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-//TODO: confirm pred kick
 
 @Controller
 @RequestMapping("/projects")
@@ -77,8 +76,8 @@ public class ProjectController {
         return "project_pages/members";
     }
     @PreAuthorize("#project.getUser().equals(#user)")
-    @PostMapping("/{pr-title}/members/kick")
-    public String kickMember(@PathVariable(name = "pr-title") @P("project") Project project,@RequestParam int memberId,@SessionAttribute @P("user") BBUser user){
+    @PostMapping("/{pr-title}/members/{mem-id}/kick")
+    public String kickMember(@PathVariable(name = "pr-title") @P("project") Project project,@PathVariable(name = "mem-id") int memberId,@SessionAttribute @P("user") BBUser user){
         projectService.deleteMember(project, memberId);
         return "redirect:/projects/" + project.getTitle() + "/members";
     }

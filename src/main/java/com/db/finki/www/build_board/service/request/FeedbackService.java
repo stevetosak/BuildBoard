@@ -15,4 +15,7 @@ public class FeedbackService {
     public Feedback create(String description, BBUser creator, FeedbackFor feedbackFor, Integer reqId){
         return feedbackRepo.save(new Feedback(feedbackFor, creator, description,reqId));
     }
+    public Feedback create(BBUser creator, FeedbackFor feedbackFor, Integer reqId){
+        return feedbackRepo.save(new Feedback(feedbackFor, creator,reqId));
+    }
 }

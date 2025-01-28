@@ -12,7 +12,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-//TODO: trgni go toj trigerot da developer sho brishit
 
 @Controller
 @RequestMapping("/topics")

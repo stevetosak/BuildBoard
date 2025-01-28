@@ -39,10 +39,12 @@ public class ProjectRequests {
     @JoinColumn(name = "submission_id")
     private Feedback feedback;
 
+
     public ProjectRequests(Project project, BBUser creator, String description) {
         setDescription(description);
         setCreator(creator);
         setProject(project);
         setStatus(Status.PENDING);
+        setCreatedAt(LocalDateTime.now());
     }
 }

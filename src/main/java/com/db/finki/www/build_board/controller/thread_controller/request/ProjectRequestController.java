@@ -11,8 +11,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
-//TODO: filter za najnov request spored user i po mozhnost po user da se searchvit
-//TODO: da se prikazvit date na requestot
 
 @Controller
 @RequestMapping("/projects/{pr-title}/requests")
@@ -28,11 +26,13 @@ public class ProjectRequestController {
     public String getRequestPage(
             Model model,
             @PathVariable(name = "pr-title") Project project,
-            @RequestParam(required = false) Status status
+            @RequestParam(required = false) Status status,
+            @RequestParam(required = false, name = "checkSearchLatest") String isSearForLatestActive
     ) {
         model.addAttribute("project", project);
-        model.addAttribute("requests", projectRequestService.getByStatusAndProject(status,project));
+        model.addAttribute("requests", projectRequestService.getByStatusAndProjectAndLatest(status,project,isSearForLatestActive));
         model.addAttribute("status", Status.values());
+        model.addAttribute("isSearForLatestActive", isSearForLatestActive);
         return "project_pages/requests/show-requests";
     }
 
@@ -40,10 +40,9 @@ public class ProjectRequestController {
     @PreAuthorize("#project.getUser().getId()==#user.getId()")
     public RedirectView acceptRequest(@PathVariable(name = "req-id") Integer reqId,
                                       @PathVariable(name = "pr-title") @P("project") Project project,
-                                      @RequestParam(name = "feedback-desc") String feedbackDesc,
                                       @SessionAttribute @P("user") BBUser user
     ) {
-        projectRequestService.accept(feedbackDesc,user,reqId);
+        projectRequestService.accept(user,reqId);
         return new RedirectView(
                 String.format("/projects/%s/requests", project.getTitle())
         );
