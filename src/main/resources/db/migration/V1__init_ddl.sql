@@ -195,7 +195,7 @@ CREATE TABLE project_request
 
 create table feedback (
     description TEXT,
-    submission_type varchar(1),
+    submission_type varchar(1) CHECK(submission_type IN ('P','R')),
     created_by int references users(id),
     created_at timestamp default now() not null,
     submission_id int PRIMARY KEY references submission(id) on delete cascade
@@ -206,7 +206,7 @@ CREATE TABLE report
     id          SERIAL,
     created_at  TIMESTAMP default now() not null,
     description VARCHAR(200) NOT NULL,
-    status      varchar(32) default 'PENDING',
+    status      varchar(32) default 'PENDING' CHECK(status IN ( 'ACCEPTED', 'DENIED', 'PENDING')),
     thread_id   INT REFERENCES thread (id) on delete cascade,
     for_user_id INT REFERENCES users (id) on delete cascade,
     by_user_id  INT REFERENCES users (id) on delete cascade,

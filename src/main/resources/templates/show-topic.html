@@ -66,7 +66,7 @@
                 <div th:attr="data-reply-id=${topic.getId()}" class="card-body d-none reply-body">
                     <form th:action="@{/topics/{topic-name}/discussions/add(topic-name=${topic.getTitle()})}" method="post">
                         <div class="mb-3">
-                            <label for="reply" class="form-label">Your Reply</label>
+                            <label  class="form-label">Your Reply</label>
                             <textarea name="content" class="form-control" rows="3" placeholder="Write your reply here"
                                       required></textarea>
                         </div>
@@ -220,7 +220,7 @@
         <div th:attr="data-reply-id=${reply.getDiscussion().getId()}" class="card-body d-none reply-body">
             <form th:action="@{/topics/{topic-name}/discussions/add(topic-name=${topic.getTitle()})}" method="post">
                 <div class="mb-3">
-                    <label for="reply" class="form-label">Your Reply</label>
+                    <label  class="form-label">Your Reply</label>
                     <textarea name="content" class="form-control" rows="3" placeholder="Write your reply here"
                               required></textarea>
                 </div>
@@ -252,7 +252,7 @@
             <div class="modal-body">
                 <form th:action="@{/topics/{id}/tags/add (id=${topic.getId()})}" method="post" id="addTagForm">
                     <div class="mb-3">
-                        <label for="tagName" class="form-label">Tag Name</label>
+                        <label  class="form-label">Tag Name</label>
                         <select id="existingTags" class="form-select mb-3" name="tagName">
                             <option value="" selected disabled>Select an existing tag</option>
                             <option th:each="tag : ${tags}" th:value="${tag.getName()}" th:text="${tag.getName()}">
