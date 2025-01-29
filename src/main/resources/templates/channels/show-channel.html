@@ -185,6 +185,9 @@
     let sendButton = document.getElementById("send-message-button");
 
     sendButton.addEventListener("click", () => {
+        let message = document.getElementById("chat-message").value;
+        let msgRegex = /^\s*$/;
+        if(message == null || message === '' || msgRegex.test(message)) return
         messageJson.content = document.getElementById("chat-message").value;
         client.publish({
             destination: `/projects/${projectName}/channels/${channelName}`,

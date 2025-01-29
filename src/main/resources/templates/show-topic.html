@@ -158,7 +158,7 @@
                         <button class="btn btn-danger btn-sm edit-delete-btn ms-2"
                                 th:attr="data-reply-id=${reply.getDiscussion().getId()}">Delete
                         </button>
-                        <input th:if="${secssion.user!=null}" type="hidden" name="username"
+                        <input th:if="${session.user!=null}" type="hidden" name="username"
                                th:value="${session.user.username}"/>
                     </form>
                 </div>

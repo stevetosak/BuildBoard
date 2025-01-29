@@ -57,13 +57,10 @@
                     ></a>
                 </h5>
             </div>
+            <h5 th:if="${member.getId() != project.getUser().getId()}" class="fw-lighter mb-0 fst-italic">Developer</h5>
+            <h5 th:if="${member.getId() == project.getUser().getId()}" class="fw-lighter mb-0 fst-italic">Owner</h5>
             <div style="position: relative; display: inline-block;" th:if="${session.user.getId() == project.getUser().getId() && member.getId() != project.getUser().getId()}"
             class="d-flex flex-row gap-1 align-items-center">
-                <h5 th:if="${member.getId() != project.getUser().getId()}" class="fw-lighter mb-0 fst-italic">Developer</h5>
-                <h5 th:if="${member.getId() == project.getUser().getId()}" class="fw-lighter mb-0 fst-italic">Owner</h5>
-<!--                <img src="/project_imgs/im-kick-user.svg" alt="kick user image" class="icon-small " style="transition: opacity 0.3s ease;"-->
-
-<!--                >-->
                 <button
                         th:attr="data-mem-id=${member.getId()}"
                         type="button" class="btn rounded open-kick-dialog"
