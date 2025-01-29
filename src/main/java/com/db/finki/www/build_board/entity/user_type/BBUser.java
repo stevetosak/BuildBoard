@@ -1,6 +1,7 @@
 package com.db.finki.www.build_board.entity.user_type;
 
 import com.db.finki.www.build_board.entity.thread.BBThread;
+import com.db.finki.www.build_board.entity.thread.Project;
 import com.db.finki.www.build_board.service.util.FileUploadService;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -15,10 +16,7 @@ import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 
 @Getter
@@ -51,6 +49,8 @@ public class BBUser implements UserDetails, Serializable {
     @OneToMany(mappedBy = "user")
     private List<BBThread> threads;
 
+    @ManyToMany(mappedBy = "developers")
+private List<Project> projects = new ArrayList<>();
     @Override
     public boolean isEnabled() {
         return isEnabled;

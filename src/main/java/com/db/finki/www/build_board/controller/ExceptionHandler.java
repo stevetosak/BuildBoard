@@ -38,6 +38,9 @@ public class ExceptionHandler {
 
     @org.springframework.web.bind.annotation.ExceptionHandler(value = {Exception.class })
     public ModelAndView handleNotFound(Exception exception) {
-        return mavBuilder(exception,"Unknown exception",-1);
+        System.out.println(exception.getMessage());
+        exception.printStackTrace();
+        return mavBuilder(exception,"An error occurred.",-1);
+
     }
 }

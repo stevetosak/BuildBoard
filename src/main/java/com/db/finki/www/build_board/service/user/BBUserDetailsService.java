@@ -1,11 +1,9 @@
-package com.db.finki.www.build_board.service;
+package com.db.finki.www.build_board.service.user;
 
 import com.db.finki.www.build_board.entity.user_type.BBUser;
 import com.db.finki.www.build_board.repository.UserRepository;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

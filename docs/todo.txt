@@ -38,6 +38,7 @@ Ko ke udris search bez filtri da ti gi davat grupirani. -> Edna grupa topics, dr
 - to so referenciranje da go napreme
 - view channels page da sa napret, imas ideja toska ke ti teknit to so chatojte ko preview da sa. (ova samo za mene e viktor uzivaj)
 - edit na chat messages
+- statistiki za userot vo public profile page (vo kolku proekti rabotel, kolku vreme e vo nekoj proekt ...)
 ------------
 
 PRAVILA ZA SINTAKSA
@@ -54,6 +55,19 @@ PRAVILA ZA SINTAKSA
 
 - Controllers
     - get mapping so vrakjat page -> get<Ime na html page>Page
+
+
+---- Dokumentacija
+
+najvazni scenarija:
+    - odgovara na diskusija
+    - kreira diskusija
+
+podelba:
+- viktor od kreira nov topic, do se prijavuva za ucestvo vo proekt (inclusive)
+- stefan od dodava i kreira tagovi (inclusive) do otstranuva programer od proekt
+
+
 
 
 

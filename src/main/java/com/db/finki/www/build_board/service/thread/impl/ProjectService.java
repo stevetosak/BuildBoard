@@ -6,8 +6,10 @@ import com.db.finki.www.build_board.entity.thread.Tag;
 import com.db.finki.www.build_board.entity.thread.Topic;
 import com.db.finki.www.build_board.entity.user_type.BBUser;
 import com.db.finki.www.build_board.entity.thread.Project;
+import com.db.finki.www.build_board.entity.user_type.Developer;
+import com.db.finki.www.build_board.repository.UserRepository;
 import com.db.finki.www.build_board.repository.thread.ProjectRepository;
-import com.db.finki.www.build_board.service.BBUserDetailsService;
+import com.db.finki.www.build_board.service.user.BBUserDetailsService;
 import com.db.finki.www.build_board.service.thread.itf.TagService;
 import com.db.finki.www.build_board.service.thread.itf.TopicService;
 import jakarta.transaction.Transactional;
@@ -19,12 +21,14 @@ public class ProjectService {
     private final TopicService topicService;
     private final TagService tagService;
     private final BBUserDetailsService userDetailsService;
+    private final UserRepository userRepository;
 
-    public ProjectService(ProjectRepository projectRepository, TopicServiceImpl topicService, TagServiceImpl tagService, BBUserDetailsService userDetailsService) {
+    public ProjectService(ProjectRepository projectRepository, TopicServiceImpl topicService, TagServiceImpl tagService, BBUserDetailsService userDetailsService, UserRepository userRepository) {
         this.projectRepository = projectRepository;
         this.topicService = topicService;
         this.tagService = tagService;
         this.userDetailsService = userDetailsService;
+        this.userRepository = userRepository;
     }
 
     public List<Project> getAll(){
@@ -49,11 +53,16 @@ public class ProjectService {
         projectRepository.save(project);
     }
 
+    public void addDeveloperToProject(Project project, BBUser user) {
+        projectRepository.addUserToProject(project.getId(),user.getId());
+    }
+
     @Transactional
-    public void deleteMember(Project project, int memberId) {
-        BBUser user = userDetailsService.loadUserById(memberId);
-        boolean removed = project.getDevelopers().remove(user);
-        System.out.println("REMOVED: " + removed);
+    public void kickMember(Project project, int memberId) {
+        projectRepository.removeUserFromProject(project.getId(),memberId);
+    }
+    public List<BBUser> getAllDevelopersForProject(Project project) {
+        return userRepository.findAllActiveDevelopersForProject(project.getId());
     }
 
     public void addTag(Project project, String tagName) {

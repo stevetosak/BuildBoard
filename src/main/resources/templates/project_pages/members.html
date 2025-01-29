@@ -46,7 +46,7 @@
     <div class="list-group w-75">
 
         <div class="list-group-item d-flex gap-2 justify-content-between align-items-center ps-4 pe-4"
-             th:each="member : ${project.getDevelopers()}">
+             th:each="member : ${developers}">
             <div class="d-flex flex-row align-items-center gap-3">
                 <img class="rounded-circle border border-1 border-info"
                      style="width: 5em; height: 5em" th:src="${member.getAvatarUrl()}">

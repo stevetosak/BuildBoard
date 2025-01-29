@@ -6,6 +6,7 @@ import com.db.finki.www.build_board.entity.user_type.BBUser;
 import com.db.finki.www.build_board.mapper.MessageMapper;
 import com.db.finki.www.build_board.service.channel.ChannelService;
 import com.db.finki.www.build_board.service.channel.MessageService;
+import com.db.finki.www.build_board.service.thread.impl.ProjectService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
@@ -22,11 +23,13 @@ public class ChannelController {
     private final ChannelService channelService;
     private final MessageMapper messageMapper;
     private final MessageService messageService;
+    private final ProjectService projectService;
 
-    public ChannelController(ChannelService channelService, MessageMapper messageMapper, MessageService messageService) {
+    public ChannelController(ChannelService channelService, MessageMapper messageMapper, MessageService messageService, ProjectService projectService) {
         this.channelService = channelService;
         this.messageMapper = messageMapper;
         this.messageService = messageService;
+        this.projectService = projectService;
     }
 
     @GetMapping()
@@ -36,7 +39,7 @@ public class ChannelController {
         return "channels/list-channels";
     }
 
-    @PreAuthorize("#project.getDevelopers().contains(#user)")
+    @PreAuthorize("@projectService.getAllDevelopersForProject(#project).contains(#user)")
     @GetMapping("/{channelName}")
     public String getChannel(@PathVariable String channelName,
                              @PathVariable("title") @P("project") Project project,
@@ -50,6 +53,7 @@ public class ChannelController {
             model.addAttribute("channel", c);
             model.addAttribute("messages", messageMapper.toDTO(
                     messageService.getAllMessagesForProjectChannel(project.getId(), channelName)));
+            model.addAttribute("developers",projectService.getAllDevelopersForProject(project));
         } else {
             model.addAttribute("channel", c);
         }
@@ -65,7 +69,7 @@ public class ChannelController {
         return "redirect:/projects/" + project.getTitle();
     }
 
-    @PreAuthorize("#project.getDevelopers().contains(#user)")
+    @PreAuthorize("@projectService.getAllDevelopersForProject(#project).contains(#user)")
     @PostMapping("/add")
     public String add(@PathVariable("title") @P("project") Project project, @RequestParam String channelName, @RequestParam String channelDescription, @SessionAttribute @P("user") BBUser user, RedirectAttributes redirectAttributes) {
         try {

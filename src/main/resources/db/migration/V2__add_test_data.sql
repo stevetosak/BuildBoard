@@ -105,6 +105,6 @@ VALUES
 
 INSERT INTO messages (sent_at, content, sent_by, project_id, channel_name)
 VALUES
-    (NOW(), 'Hello, team!', 3, 5, 'General'),
-    (NOW(), 'We need to push the deadline.', 3, 5, 'Updates');
+    (NOW(), 'Zdravo. Ova e real-time chat za dopisuvanje', 3, 5, 'General'),
+    (NOW(), 'Resen ladno a?', 3, 5, 'Updates');
 

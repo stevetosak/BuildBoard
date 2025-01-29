@@ -1,7 +1,7 @@
 package com.db.finki.www.build_board.controller.home_page;
 
 import com.db.finki.www.build_board.entity.user_type.BBUser;
-import com.db.finki.www.build_board.service.BBUserDetailsService;
+import com.db.finki.www.build_board.service.user.BBUserDetailsService;
 import com.db.finki.www.build_board.service.search.SearchService;
 import com.db.finki.www.build_board.service.thread.itf.TagService;
 import jakarta.servlet.http.HttpServletRequest;

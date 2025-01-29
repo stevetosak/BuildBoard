@@ -5,8 +5,10 @@ import com.db.finki.www.build_board.entity.entity_enum.Status;
 import com.db.finki.www.build_board.entity.request.ProjectRequests;
 import com.db.finki.www.build_board.entity.thread.Project;
 import com.db.finki.www.build_board.entity.user_type.BBUser;
+import com.db.finki.www.build_board.repository.UserRepository;
 import com.db.finki.www.build_board.repository.request.ProjectRequestRepo;
 import com.db.finki.www.build_board.service.thread.impl.ProjectService;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -16,15 +18,20 @@ import java.util.List;
 public class ProjectRequestService {
     private final ProjectRequestRepo prReqRepo;
     private final FeedbackService feedbackService;
+    private final UserRepository userRepo;
+    private final ProjectService projectService;
 
-    public ProjectRequestService(ProjectRequestRepo prReqRepo, FeedbackService feedbackService) {
+
+    public ProjectRequestService(ProjectRequestRepo prReqRepo, FeedbackService feedbackService, UserRepository userRepo, ProjectService projectService) {
         this.prReqRepo = prReqRepo;
         this.feedbackService = feedbackService;
+        this.userRepo = userRepo;
+        this.projectService = projectService;
     }
 
     private ProjectRequests getRequestById(Integer id) {
         return prReqRepo.findById((long) id)
-                        .get();
+                .get();
     }
 
     public void deny(Integer reqId, String desc, BBUser creator) {
@@ -34,13 +41,12 @@ public class ProjectRequestService {
         prReqRepo.save(prReq);
     }
 
+    @Transactional
     public void accept(BBUser creator, Integer reqId) {
         ProjectRequests prReq = getRequestById(reqId);
         prReq.setStatus(Status.ACCEPTED);
         prReq.setFeedback(feedbackService.create(creator, FeedbackFor.P, reqId));
-        prReq.getProject()
-             .getDevelopers()
-             .add(prReq.getCreator());
+        projectService.addDeveloperToProject(prReq.getProject(), prReq.getCreator());
         prReqRepo.save(prReq);
     }
 

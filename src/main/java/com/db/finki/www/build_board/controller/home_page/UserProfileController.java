@@ -2,7 +2,7 @@ package com.db.finki.www.build_board.controller.home_page;
 
 import com.db.finki.www.build_board.entity.entity_enum.Status;
 import com.db.finki.www.build_board.entity.user_type.BBUser;
-import com.db.finki.www.build_board.service.BBUserDetailsService;
+import com.db.finki.www.build_board.service.user.BBUserDetailsService;
 import com.db.finki.www.build_board.service.request.ProjectRequestService;
 import com.db.finki.www.build_board.service.util.FileUploadService;
 import jakarta.servlet.http.HttpSession;
@@ -29,17 +29,29 @@ public class UserProfileController {
         this.fileUploadService = fileUploadService;
         this.projectRequestService = projectRequestService;
     }
-   
-    @GetMapping("/profile")
-    public String getProfilePage(@PathVariable String username, @SessionAttribute BBUser user, Model model) {
+
+    @PreAuthorize("#user.getUsername().equals(#username)")
+    @GetMapping("/profile/edit")
+    public String getEditProfilePage(@PathVariable @P("username") String username, @SessionAttribute @P("user") BBUser user, Model model) {
         try {
             model.addAttribute("user", userService.loadUserByUsername(username));
             model.addAttribute("canEdit", user.getUsername().equals(username));
-            return "home_pages/profile";
+            return "/home_pages/private-profile";
         }catch(Exception ignore){
             return "redirect:/";
         }
     }
+
+    @GetMapping("/profile")
+    public String getProfilePage(@PathVariable String username, @SessionAttribute BBUser user, Model model) {
+        try {
+            model.addAttribute("user", userService.loadUserByUsername(username));
+            return "/home_pages/public-profile";
+        }catch(Exception ignore){
+            return "redirect:/";
+        }
+    }
+
 
     @GetMapping("/project-requests")
     public String getProjectRequestsPage(
@@ -94,6 +106,6 @@ public class UserProfileController {
                 password
         );
         session.setAttribute("user", user);
-        return "redirect:/";
+        return "redirect:/" + user.getUsername() + "/profile";
     }
 }

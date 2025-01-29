@@ -1,4 +1,4 @@
-package com.db.finki.www.build_board.service;
+package com.db.finki.www.build_board.service.user;
 
 import com.db.finki.www.build_board.entity.user_type.BBUser;
 import jakarta.servlet.ServletException;

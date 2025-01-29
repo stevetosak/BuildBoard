@@ -30,6 +30,7 @@ public class ProjectController {
     public String getProjectPage(@PathVariable(name = "title") Project project, Model model, RedirectAttributes redirectAttributes) {
         model.addAttribute("project", project);
         model.addAttribute("tags", tagService.getAll());
+        model.addAttribute("developers",projectService.getAllDevelopersForProject(project));
         String error = (String) redirectAttributes.getAttribute("error");
         if(error != null){
             model.addAttribute("error", error);
@@ -73,12 +74,13 @@ public class ProjectController {
     )
     {
         model.addAttribute("project", project);
+        model.addAttribute("developers", projectService.getAllDevelopersForProject(project));
         return "project_pages/members";
     }
     @PreAuthorize("#project.getUser().equals(#user)")
     @PostMapping("/{pr-title}/members/{mem-id}/kick")
     public String kickMember(@PathVariable(name = "pr-title") @P("project") Project project,@PathVariable(name = "mem-id") int memberId,@SessionAttribute @P("user") BBUser user){
-        projectService.deleteMember(project, memberId);
+        projectService.kickMember(project, memberId);
         return "redirect:/projects/" + project.getTitle() + "/members";
     }
 

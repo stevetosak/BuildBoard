@@ -41,7 +41,7 @@ public class Project extends BBThread implements NamedThread {
             joinColumns = @JoinColumn(name = "project_id"),
             inverseJoinColumns = @JoinColumn(name = "developer_id")
     )
-    private Set<BBUser> developers = new HashSet<>(); // vaj dis
+    private Set<BBUser> developers = new HashSet<>(); // NE GO KORISTI GETTEROT OVDE
 
     @OneToMany(mappedBy = "project")
     private Set<ProjectRequests> requests = new HashSet<>();

@@ -67,7 +67,7 @@
     <div class="user-list me-3 border border-outline shadow">
         <h5 style="text-align: center">Users</h5>
         <hr>
-        <div th:each="developer : ${channel.getProject().getDevelopers()}" class="user-item">
+        <div th:each="developer : ${developers}" class="user-item">
             <img th:src="${developer.getAvatarUrl()}" class="rounded-circle icon-small" alt="user-logo"
                  style="width: 3rem;height: 3rem;">
             <a class="text-break nav-link"
