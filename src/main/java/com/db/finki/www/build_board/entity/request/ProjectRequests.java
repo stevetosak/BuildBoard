@@ -35,10 +35,9 @@ public class ProjectRequests {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @OneToOne(cascade = { CascadeType.PERSIST })
+    @OneToOne
     @JoinColumn(name = "submission_id")
-    private Feedback feedback;
-
+    private Submission submission;
 
     public ProjectRequests(Project project, BBUser creator, String description) {
         setDescription(description);
@@ -46,5 +45,9 @@ public class ProjectRequests {
         setProject(project);
         setStatus(Status.PENDING);
         setCreatedAt(LocalDateTime.now());
+    }
+
+    public Feedback getFeedback() {
+        return submission == null ? null : submission.getFeedback();
     }
 }

@@ -37,7 +37,7 @@ public class ProjectRequestService {
     public void deny(Integer reqId, String desc, BBUser creator) {
         ProjectRequests prReq = getRequestById(reqId);
         prReq.setStatus(Status.DENIED);
-        prReq.setFeedback(feedbackService.create(desc, creator, FeedbackFor.P, reqId));
+        feedbackService.create(desc,creator,FeedbackFor.P,prReq.getSubmission());
         prReqRepo.save(prReq);
     }
 
@@ -45,7 +45,8 @@ public class ProjectRequestService {
     public void accept(BBUser creator, Integer reqId) {
         ProjectRequests prReq = getRequestById(reqId);
         prReq.setStatus(Status.ACCEPTED);
-        prReq.setFeedback(feedbackService.create(creator, FeedbackFor.P, reqId));
+
+        feedbackService.create(creator,FeedbackFor.P,prReq.getSubmission());
         projectService.addDeveloperToProject(prReq.getProject(), prReq.getCreator());
         prReqRepo.save(prReq);
     }

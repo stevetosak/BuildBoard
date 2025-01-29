@@ -402,7 +402,7 @@ create or replace function fn_add_sub_pr_request()
 as
 $$
 BEGIN
-    insert into submission default values returning id into NEW.submission_id;
+    insert into submission(id) values (nextval('submission_id_seq'))  returning id into NEW.submission_id;
     return new;
 END;
 $$
@@ -449,25 +449,7 @@ BEGIN
     return new;
 end;
 $$;
-create or replace function fn_replace_id_with_submission_id()
-    returns trigger
-    language plpgsql
-as $$
-BEGIN
-    IF NEW.submission_type = 'P' THEN
-        select submission_id
-        into NEW.submission_id
-        from project_request
-        where id=NEW.submission_id;
-    ELSE
-        select submission_id
-        into NEW.submission_id
-        from report
-        where id=NEW.submission_id;
-    end if;
-    return new;
-end;
-$$;
+
 
 -------------------------- TRIGGERS ----------------------
 CREATE OR REPLACE TRIGGER tr_check_topic_name
@@ -513,8 +495,5 @@ create or replace trigger tr_insert_general_for_project
     for each row
 execute function fn_insert_general_for_project();
 
-create or replace trigger tr_replace_id_with_submission_id
-    before insert on feedback
-    for each row
-execute function fn_replace_id_with_submission_id();
+
 

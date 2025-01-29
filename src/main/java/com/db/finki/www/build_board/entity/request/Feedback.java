@@ -16,7 +16,12 @@ import java.time.LocalDateTime;
 public class Feedback {
     @Id
     @Column(name = "submission_id")
-    Integer id;
+    private Integer id;
+
+    @OneToOne
+    @JoinColumn(name = "submission_id")
+    @MapsId
+    private Submission forSubmission;
 
     private String description;
 
@@ -29,18 +34,18 @@ public class Feedback {
 
     private LocalDateTime createdAt;
 
-    public Feedback(FeedbackFor submissionType, BBUser creator, String description, Integer subId) {
+    public Feedback(FeedbackFor submissionType, BBUser creator, String description, Submission sub) {
         setDescription(description);
         setSubmissionType(submissionType);
         setCreator(creator);
-        setId(subId);
+        setForSubmission(sub);
         setCreatedAt(LocalDateTime.now());
     }
 
-    public Feedback(FeedbackFor feedbackFor, BBUser creator, Integer subId) {
+    public Feedback(FeedbackFor feedbackFor, BBUser creator, Submission sub) {
         setSubmissionType(feedbackFor);
         setCreator(creator);
-        setId(subId);
+        setForSubmission(sub);
         setCreatedAt(LocalDateTime.now());
     }
 }
