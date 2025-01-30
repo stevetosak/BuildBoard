@@ -15,6 +15,8 @@ public interface UserRepository extends JpaRepository<BBUser, Long> {
 
     BBUser findById(long id);
 
+    // select * from user join developer_asso
+
     @Query("""
                 SELECT d.developer
                 FROM DeveloperAssociatedWithProject d

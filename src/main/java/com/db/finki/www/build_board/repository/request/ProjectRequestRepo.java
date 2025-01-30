@@ -19,7 +19,7 @@ public interface ProjectRequestRepo extends JpaRepository<ProjectRequests,Long> 
     @Query(value = """
             select *
             from project_request pr
-            where (:latest is null or (pr.user_id,pr.created_at) IN ( select user_id,max(created_at) from project_request pr group by user_id)) 
+            where (:latest is null or (pr.user_id,pr.created_at) IN ( select user_id,max(created_at) from project_request pr group by user_id))
                         and pr.project_id=:projectId
                         and (:status is null or pr.status=:status)
             """,
