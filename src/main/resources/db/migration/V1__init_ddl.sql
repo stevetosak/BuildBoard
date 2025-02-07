@@ -183,13 +183,13 @@ create table submission(
 -- CREATE TYPE status AS ENUM ('ACCEPTED', 'DENIED', 'PENDING');
 CREATE TABLE project_request
 (
-    id          SERIAL PRIMARY KEY,
     description VARCHAR(200),
     status      varchar(32)                NOT NULL DEFAULT 'PENDING',
     user_id     INT REFERENCES users (id)  ON DELETE CASCADE NOT NULL ,
     project_id  INT REFERENCES thread (id) ON DELETE CASCADE NOT NULL,
     created_at timestamp default now() not null,
-    submission_id int references submission(id) ON DELETE CASCADE
+    submission_id int references submission(id) ON DELETE CASCADE,
+    PRIMARY KEY (submission_id)
 );
 
 
@@ -203,7 +203,6 @@ create table feedback (
 
 CREATE TABLE report
 (
-    id          SERIAL,
     created_at  TIMESTAMP default now() not null,
     description VARCHAR(200) NOT NULL,
     status      varchar(32) default 'PENDING' CHECK(status IN ( 'ACCEPTED', 'DENIED', 'PENDING')),
@@ -211,7 +210,7 @@ CREATE TABLE report
     for_user_id INT REFERENCES users (id) on delete cascade,
     by_user_id  INT REFERENCES users (id) on delete cascade,
     submission_id int references submission(id) on delete cascade,
-    PRIMARY KEY (id, thread_id, for_user_id, by_user_id)
+    PRIMARY KEY (submission_id)
 );
 CREATE TABLE channel
 (
