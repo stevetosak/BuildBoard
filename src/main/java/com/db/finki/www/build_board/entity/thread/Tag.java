@@ -1,10 +1,8 @@
 package com.db.finki.www.build_board.entity.thread;
 
+import com.db.finki.www.build_board.entity.user_type.BBUser;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,13 +21,19 @@ public class Tag implements Serializable {
     @Id
     String name;
 
-    public Tag(String name) {
+    @ManyToOne
+    @JoinColumn(name = "creator_id")
+    BBUser creator;
+
+    public Tag(String name, BBUser user) {
         this.name = name;
+        this.creator = user;
     }
 
     @JsonIgnore
     @ManyToMany(mappedBy = "tags")
     private List<BBThread> threads = new ArrayList<>();
+
 
     @Override
     public boolean equals(Object o) {

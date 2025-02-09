@@ -1,7 +1,6 @@
 package com.db.finki.www.build_board.controller.util;
 
 import com.db.finki.www.build_board.service.search.SearchService;
-import com.db.finki.www.build_board.service.thread.itf.TopicService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;

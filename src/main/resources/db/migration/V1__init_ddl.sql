@@ -427,16 +427,16 @@ END;
 $function$
 ;
 
-create or replace function fn_remove_thread()
-returns trigger 
-language plpgsql
-as 
-$$ 
-BEGIN
-    delete from thread where id = OLD.id; 
-    return OLD;  
-END; 
-$$; 
+-- create or replace function fn_remove_thread()
+-- returns trigger
+-- language plpgsql
+-- as
+-- $$
+-- BEGIN
+--     delete from thread where id = OLD.id;
+--     return OLD;
+-- END;
+-- $$;
 
 
 -------------------------- TRIGGERS ----------------------
@@ -487,20 +487,20 @@ create or replace trigger tr_insert_general_for_project --RADI
     for each row
 execute function fn_insert_general_for_project();
 
-create or replace trigger tr_remove_thread_from_project
-after delete 
-on project_thread
-for each row 
-execute function fn_remove_thread(); 
-
-create or replace trigger tr_remove_thread_from_topic
-after delete 
-on topic_thread
-for each row 
-execute function fn_remove_thread();
-
-create or replace trigger tr_remove_thread_from_discussion 
-after delete 
-on discussion_thread 
-for each row 
-execute function fn_remove_thread();
+-- create or replace trigger tr_remove_thread_from_project
+-- after delete
+-- on project_thread
+-- for each row
+-- execute function fn_remove_thread();
+--
+-- create or replace trigger tr_remove_thread_from_topic
+-- after delete
+-- on topic_thread
+-- for each row
+-- execute function fn_remove_thread();
+--
+-- create or replace trigger tr_remove_thread_from_discussion
+-- after delete
+-- on discussion_thread
+-- for each row
+-- execute function fn_remove_thread();

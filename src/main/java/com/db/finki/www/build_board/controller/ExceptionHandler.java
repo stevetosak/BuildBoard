@@ -1,12 +1,9 @@
 package com.db.finki.www.build_board.controller;
 
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @ControllerAdvice
@@ -30,10 +27,10 @@ public class ExceptionHandler {
         return mavBuilder(exception,"You requested a resource that does not exist.\nCheck if you entered the url correctly.",404);
     }
 
-    @org.springframework.web.bind.annotation.ExceptionHandler(value = {HttpServerErrorException.InternalServerError.class })
-    public ModelAndView handleNotFound(HttpServerErrorException.InternalServerError exception) {
-        return mavBuilder(exception,"This is a server issue.\nNot your fault :).",500);
-    }
+//    @org.springframework.web.bind.annotation.ExceptionHandler(value = {HttpServerErrorException.InternalServerError.class })
+//    public ModelAndView handleNotFound(HttpServerErrorException.InternalServerError exception) {
+//        return mavBuilder(exception,"This is a server issue.\nNot your fault :).",500);
+//    }
 
 
     @org.springframework.web.bind.annotation.ExceptionHandler(value = {Exception.class })
@@ -41,6 +38,5 @@ public class ExceptionHandler {
         System.out.println(exception.getMessage());
         exception.printStackTrace();
         return mavBuilder(exception,"An error occurred.",-1);
-
     }
 }

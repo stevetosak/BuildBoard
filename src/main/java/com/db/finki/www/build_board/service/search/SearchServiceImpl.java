@@ -5,8 +5,6 @@ import com.db.finki.www.build_board.entity.thread.Topic;
 import com.db.finki.www.build_board.entity.thread.itf.NamedThread;
 import com.db.finki.www.build_board.repository.thread.ProjectRepository;
 import com.db.finki.www.build_board.repository.thread.TopicRepository;
-import com.db.finki.www.build_board.service.util.NamedThreadService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -20,15 +18,12 @@ public class SearchServiceImpl implements SearchService {
     private final FilterMap<Topic> topicFilterMap;
     private final FilterMap<Project> projectFilterMap;
     private final ProjectRepository projectRepository;
-    private final NamedThreadService namedThreadService;
 
-    @Autowired
-    public SearchServiceImpl(TopicRepository topicRepository, FilterMap<Topic> TopicFilterMap, FilterMap<Project> ProjectFilterMap, ProjectRepository projectRepository, NamedThreadService namedThreadService) {
+    public SearchServiceImpl(TopicRepository topicRepository, FilterMap<Topic> TopicFilterMap, FilterMap<Project> ProjectFilterMap, ProjectRepository projectRepository) {
         this.topicRepository = topicRepository;
         this.topicFilterMap = TopicFilterMap;
         this.projectFilterMap = ProjectFilterMap;
         this.projectRepository = projectRepository;
-        this.namedThreadService = namedThreadService;
     }
 
 

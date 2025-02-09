@@ -10,11 +10,9 @@ import java.util.List;
 
 @Service
 public class UserStatisticsService {
-    private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
 
     public UserStatisticsService(UserRepository userRepository, ProjectRepository projectRepository) {
-        this.userRepository = userRepository;
         this.projectRepository = projectRepository;
     }
 

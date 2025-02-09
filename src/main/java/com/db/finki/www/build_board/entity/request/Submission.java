@@ -1,5 +1,10 @@
 package com.db.finki.www.build_board.entity.request;
 
+import java.time.LocalDateTime;
+
+import com.db.finki.www.build_board.entity.entity_enum.Status;
+import com.db.finki.www.build_board.entity.user_type.BBUser;
+
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,6 +15,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+@Inheritance(strategy = InheritanceType.JOINED)
 public class Submission {
     @Id
     @GeneratedValue(generator = "sub_gen",strategy = GenerationType.SEQUENCE)
@@ -18,4 +24,14 @@ public class Submission {
 
     @OneToOne(mappedBy = "forSubmission")
     private Feedback feedback;
+
+    LocalDateTime createdAt;
+    String description; 
+    
+    @Enumerated(EnumType.STRING)
+    Status status;
+
+    @ManyToOne
+    @JoinColumn(name = "created_by")
+    BBUser creator;
 }

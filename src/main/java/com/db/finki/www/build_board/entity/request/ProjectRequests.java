@@ -15,29 +15,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Entity
 @Table(name = "project_request")
-public class ProjectRequests {
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "project_req_gen")
-    @SequenceGenerator(name = "project_req_gen", sequenceName = "project_request_id_seq", initialValue = 1, allocationSize = 1)
-    private int id;
-    private String description;
-
-    private LocalDateTime createdAt;
-
+public class ProjectRequests extends Submission {
     @ManyToOne
     @JoinColumn(name = "project_id")
     private Project project;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private BBUser creator;
-
-    @Enumerated(EnumType.STRING)
-    private Status status;
-
-    @OneToOne
-    @JoinColumn(name = "submission_id")
-    private Submission submission;
 
     public ProjectRequests(Project project, BBUser creator, String description) {
         setDescription(description);
@@ -48,6 +29,7 @@ public class ProjectRequests {
     }
 
     public Feedback getFeedback() {
-        return submission == null ? null : submission.getFeedback();
+        Feedback feedback = getFeedback(); 
+        return feedback == null ? null : feedback;
     }
 }

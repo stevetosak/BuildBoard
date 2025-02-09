@@ -2,6 +2,7 @@ package com.db.finki.www.build_board.controller.thread_controller;
 
 import com.db.finki.www.build_board.entity.thread.Project;
 import com.db.finki.www.build_board.entity.thread.Topic;
+import com.db.finki.www.build_board.entity.user_type.BBUser;
 import com.db.finki.www.build_board.service.thread.impl.ProjectService;
 import com.db.finki.www.build_board.service.thread.itf.TagService;
 import com.db.finki.www.build_board.service.thread.itf.TopicService;
@@ -12,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.SessionAttribute;
 
 
 @Controller
@@ -55,9 +57,10 @@ public class TagController {
     public String addTagToProject(
             @PathVariable(name = "title") @P("project") Project project,
             @RequestParam(name = "tagName") String tagName,
-            @RequestParam @P("username") String username
+            @RequestParam @P("username") String username,
+            @SessionAttribute("user") BBUser user
     ) {
-        projectService.addTag(project, tagName);
+        projectService.addTag(project, tagName,user);
         return "redirect:/projects/" + project.getTitle();
     }
 
