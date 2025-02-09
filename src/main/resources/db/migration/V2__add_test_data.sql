@@ -1,3 +1,4 @@
+
 INSERT INTO users (username, is_activate, password, description, registered_at, sex,name,email)
 VALUES
     ('user1', true, '$2a$12$0f.x7aBM2wFBZBXoLPj0BObVsk.J1kXFYo5nb4niAWkI4hk5tHvDy', 'First user', NOW(), 'M','viki', 'viki@gmail.com'),
@@ -31,6 +32,7 @@ VALUES
     ('Project-specific thread content', 3),
     ('Reply to topic 1', 4),
     ('Further discussion on topic 2', 5);
+
 
 INSERT INTO topic_thread (id, title, parent_id)
 VALUES
@@ -67,10 +69,11 @@ VALUES
     (4, 6),
     (5, 7);
 
+
 INSERT INTO blacklisted_user (topic_id, user_id, moderator_id, start_date, end_date, reason)
 VALUES
     (1, 2, 1, NOW(), NOW() + INTERVAL '7 days', 'Spamming'),
-    (2, 3, 4, NOW(), NOW() + INTERVAL '3 days', 'Offensive language');
+    (2, 3, 2, NOW(), NOW() + INTERVAL '3 days', 'Offensive language');
 
 INSERT INTO permissions (name)
 VALUES
@@ -82,22 +85,27 @@ VALUES
     ('Admin', 5, 'Admin role for the project'),
     ('Developer', 5, 'Developer role for the project');
 
+
 INSERT INTO users_project_roles (user_id, project_id, role_name)
 VALUES
     (3, 5, 'Admin'),
-    (2, 5, 'Developer'),
-    (4, 5, 'Developer');
+    (5, 5, 'Developer'),
+    (1, 5, 'Developer');
 
 INSERT INTO project_roles_permissions (permission_name, role_name, project_id)
 VALUES
     ('Create Thread', 'Admin', 5),
     ('Delete Thread', 'Admin', 5);
 
+insert into submission(created_by,status,description) 
+values 
+(1,'PENDING','Inappropriate content'),
+(3,'DENIED','Spam content');
 
-INSERT INTO report (created_at, description, status, thread_id, for_user_id, by_user_id)
+INSERT INTO report (id,thread_id, for_user_id)
 VALUES
-    (NOW(), 'Inappropriate content', 'PENDING', 3, 2, 1),
-    (NOW(), 'Spam content', 'DENIED', 6, 4, 3);
+    (1, 2, 1),
+    (2, 1, 3);
 
 INSERT INTO channel (name, description, project_id, developer_id)
 VALUES

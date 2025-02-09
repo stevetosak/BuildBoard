@@ -2,6 +2,7 @@ package com.db.finki.www.build_board.service.thread.impl;
 
 import com.db.finki.www.build_board.entity.thread.Tag;
 import com.db.finki.www.build_board.entity.thread.Topic;
+import com.db.finki.www.build_board.entity.user_type.BBUser;
 import com.db.finki.www.build_board.repository.thread.TagRepository;
 import com.db.finki.www.build_board.service.thread.itf.TagService;
 import org.springframework.stereotype.Service;
@@ -26,8 +27,8 @@ public class TagServiceImpl implements TagService {
         return tagRepository.findAll();
     }
 
-    public Tag create(String tagName) {
-        return tagRepository.save(new Tag(tagName));
+    public Tag create(String tagName, BBUser user) {
+        return tagRepository.save(new Tag(tagName, user));
     }
 
     @Override

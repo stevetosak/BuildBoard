@@ -2,7 +2,6 @@ package com.db.finki.www.build_board.repository.request;
 
 import com.db.finki.www.build_board.entity.entity_enum.Status;
 import com.db.finki.www.build_board.entity.request.ProjectRequests;
-import com.db.finki.www.build_board.entity.thread.Project;
 import com.db.finki.www.build_board.entity.user_type.BBUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -19,9 +18,11 @@ public interface ProjectRequestRepo extends JpaRepository<ProjectRequests,Long> 
     @Query(value = """
             select *
             from project_request pr
-            where (:latest is null or (pr.user_id,pr.created_at) IN ( select user_id,max(created_at) from project_request pr group by user_id))
+            join submission s 
+            on s.id = pr.id
+            where (:latest is null or (s.created_by,s.created_at) IN ( select created_by,max(created_at) from submission pr group by created_by)) 
                         and pr.project_id=:projectId
-                        and (:status is null or pr.status=:status)
+                        and (:status is null or s.status=:status)
             """,
             nativeQuery = true
     )

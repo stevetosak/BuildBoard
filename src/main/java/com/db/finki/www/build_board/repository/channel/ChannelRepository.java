@@ -11,5 +11,5 @@ import java.util.List;
 public interface ChannelRepository extends JpaRepository<Channel, ChannelId> {
     List<Channel> findAllByProjectIdOrderByNameAsc(Integer projectId);
     List<Channel> findAllByDeveloperIdOrderByNameAsc(Integer developerId);
-    Channel findByProjectTitleAndName(String title, String name);
+    Channel findByProjectTitleAndNameOrderByNameAsc(String title, String name);
 }

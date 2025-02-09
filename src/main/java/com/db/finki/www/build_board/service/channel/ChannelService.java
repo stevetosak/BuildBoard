@@ -32,7 +32,7 @@ public class ChannelService {
     }
 
     public Channel create(Project project, String channelName, String description, BBUser user){
-        if(channelRepository.findByProjectTitleAndName(project.getTitle(), channelName) != null) {
+        if(channelRepository.findByProjectTitleAndNameOrderByNameAsc(project.getTitle(), channelName) != null) {
             throw new IllegalArgumentException("Channel with title '" + channelName + "' already exists");
         }
 
@@ -45,7 +45,7 @@ public class ChannelService {
         return channelRepository.save(channel);
     }
     public Channel getByNameAndProject(String channelName, Project project){
-        return channelRepository.findByProjectTitleAndName(project.getTitle(), channelName);
+        return channelRepository.findByProjectTitleAndNameOrderByNameAsc(project.getTitle(), channelName);
     }
     public void deleteChannel(String channelName,Project project){
         ChannelId cid = new ChannelId(project.getId(), channelName);

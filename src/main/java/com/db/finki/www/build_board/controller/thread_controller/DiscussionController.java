@@ -2,8 +2,6 @@ package com.db.finki.www.build_board.controller.thread_controller;
 
 import com.db.finki.www.build_board.entity.user_type.BBUser;
 import com.db.finki.www.build_board.service.thread.impl.DiscussionService;
-import com.db.finki.www.build_board.service.thread.impl.TopicServiceImpl;
-import com.db.finki.www.build_board.service.thread.itf.TopicService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.data.repository.query.Param;
 import org.springframework.security.access.prepost.PreAuthorize;

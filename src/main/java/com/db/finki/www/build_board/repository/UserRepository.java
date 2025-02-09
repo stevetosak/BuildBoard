@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends JpaRepository<BBUser, Long> {
+public interface UserRepository extends JpaRepository<BBUser, Integer> {
     Optional<BBUser> findByUsername(String username);
 
     BBUser findById(long id);

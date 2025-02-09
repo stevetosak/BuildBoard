@@ -6,7 +6,6 @@ import com.db.finki.www.build_board.entity.thread.Tag;
 import com.db.finki.www.build_board.entity.thread.Topic;
 import com.db.finki.www.build_board.entity.user_type.BBUser;
 import com.db.finki.www.build_board.entity.thread.Project;
-import com.db.finki.www.build_board.entity.user_type.Developer;
 import com.db.finki.www.build_board.repository.UserRepository;
 import com.db.finki.www.build_board.repository.thread.ProjectRepository;
 import com.db.finki.www.build_board.service.user.BBUserDetailsService;
@@ -65,12 +64,12 @@ public class ProjectService {
         return userRepository.findAllActiveDevelopersForProject(project.getId());
     }
 
-    public void addTag(Project project, String tagName) {
+    public void addTag(Project project, String tagName, BBUser user) {
         Tag tag = null ;
         try{
             tag=tagService.getByName(tagName);
         }catch (IllegalArgumentException ignore){
-             tag=tagService.create(tagName);
+             tag=tagService.create(tagName,user);
         }
         project.getTags().add(tag);
         projectRepository.save(project);

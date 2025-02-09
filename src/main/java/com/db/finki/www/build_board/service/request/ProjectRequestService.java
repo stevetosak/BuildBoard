@@ -5,11 +5,9 @@ import com.db.finki.www.build_board.entity.entity_enum.Status;
 import com.db.finki.www.build_board.entity.request.ProjectRequests;
 import com.db.finki.www.build_board.entity.thread.Project;
 import com.db.finki.www.build_board.entity.user_type.BBUser;
-import com.db.finki.www.build_board.repository.UserRepository;
 import com.db.finki.www.build_board.repository.request.ProjectRequestRepo;
 import com.db.finki.www.build_board.service.thread.impl.ProjectService;
 import jakarta.transaction.Transactional;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,14 +16,12 @@ import java.util.List;
 public class ProjectRequestService {
     private final ProjectRequestRepo prReqRepo;
     private final FeedbackService feedbackService;
-    private final UserRepository userRepo;
     private final ProjectService projectService;
 
 
-    public ProjectRequestService(ProjectRequestRepo prReqRepo, FeedbackService feedbackService, UserRepository userRepo, ProjectService projectService) {
+    public ProjectRequestService(ProjectRequestRepo prReqRepo, FeedbackService feedbackService,ProjectService projectService) {
         this.prReqRepo = prReqRepo;
         this.feedbackService = feedbackService;
-        this.userRepo = userRepo;
         this.projectService = projectService;
     }
 
@@ -37,7 +33,7 @@ public class ProjectRequestService {
     public void deny(Integer reqId, String desc, BBUser creator) {
         ProjectRequests prReq = getRequestById(reqId);
         prReq.setStatus(Status.DENIED);
-        feedbackService.create(desc,creator,FeedbackFor.P,prReq.getSubmission());
+        feedbackService.create(desc,creator,FeedbackFor.P,prReq);
         prReqRepo.save(prReq);
     }
 
@@ -46,7 +42,7 @@ public class ProjectRequestService {
         ProjectRequests prReq = getRequestById(reqId);
         prReq.setStatus(Status.ACCEPTED);
 
-        feedbackService.create(creator,FeedbackFor.P,prReq.getSubmission());
+        feedbackService.create(creator,FeedbackFor.P,prReq);
         projectService.addDeveloperToProject(prReq.getProject(), prReq.getCreator());
         prReqRepo.save(prReq);
     }
