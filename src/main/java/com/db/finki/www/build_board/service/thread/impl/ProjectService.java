@@ -14,6 +14,7 @@ import com.db.finki.www.build_board.service.thread.itf.TopicService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+//TODO: trgni gi comopose.yml i env
 @Service
 public class ProjectService {
     private final ProjectRepository projectRepository;

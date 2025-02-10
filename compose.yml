@@ -1,8 +1,0 @@
-services:
-  db:
-    ports:
-      - '5432:5432'
-    image: postgres
-    env_file:
-      - ./env
-    container_name: build_board_db
