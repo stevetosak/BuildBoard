@@ -19,13 +19,25 @@
             height: auto;
             line-height: 1.2;
         }
+        .error-bubble {
+        display: inline-block;
+        background-color: #dc3545; /* Bootstrap danger color */
+        color: white;
+        padding: 10px 15px;
+        border-radius: 20px;
+        font-weight: bold;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    }
     </style>
-
-
 </head>
 <body>
 <div th:replace="/home_pages/home :: navigation"></div>
-
+<div class="mt-3 w-100 d-flex justify-content-center align-items-center">
+    <div th:if="${errMsg!=null}" class="error-bubble">
+        <h5 class="text-center">Error</h5>
+        <p th:text="${errMsg}" class="mb-0"></p>
+    </div>
+</div>
 <main class="container mt-5">
     <!-- Topic Title and Description -->
     <div class="card shadow-sm mb-4">

@@ -1,0 +1,39 @@
+<div th:fragment="discussion(reply)" class="card-header bg-light d-flex justify-content-between align-items-center"
+    th:id="${reply.getId() + '/' + reply.getUser().getUsername()}">
+    <div class="d-flex align-items-center w-100">
+        <img th:src="${reply.getAvatarUrl()}" alt="Profile Picture" id="profileImage"
+            class="rounded-circle border border-1 border-info me-3"
+            style="width: 3rem; height: 3rem; object-fit: cover; vertical-align: middle;">
+        <span th:text="${reply.getUser().getUsername()}">Reply Author</span>
+        <span class="ms-auto text-muted d-flex align-items-center">
+            <i class="bi bi-arrow-return-right me-2"></i>
+            <strong th:text="'Replying to:  ' + ${reply.getDiscussion().getParent().getUser().getUsername()}"></strong>
+        </span>
+
+    </div>
+    <div th:if="${session.user != null && session.user.getId() == reply.getUser().getId()}"
+        class="ms-5 d-flex align-items-center justify-content-between">
+
+        <div>
+            <button class="btn btn-warning btn-sm edit-reply-btn"
+                th:attr="data-reply-id=${reply.getDiscussion().getId()}">Edit
+            </button>
+
+        </div>
+
+        <div>
+            <form th:action="@{/topics/{topic-name}/discussions/{discussionId}/delete(topic-name=${topic.getTitle()
+           },discussionId=${reply.getId()})}" method="post">
+                <input type="hidden" name="threadId" th:value="${reply.getDiscussion().getId()}" class="w-0">
+                <button class="btn btn-danger btn-sm edit-delete-btn ms-2"
+                    th:attr="data-reply-id=${reply.getDiscussion().getId()}">Delete
+                </button>
+                <input th:if="${session.user!=null}" type="hidden" name="username"
+                    th:value="${session.user.username}" />
+            </form>
+        </div>
+    </div>
+    <div th:each="child:${reply.getChildren()}">
+        <div th:reaplce="/fragments/discussion :: discussion(child)"></div>
+    </div>
+</div>

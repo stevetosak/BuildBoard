@@ -45,7 +45,9 @@ public class Project extends BBThread implements NamedThread {
 
     @OneToMany(mappedBy = "project")
     private Set<ProjectRequests> requests = new HashSet<>();
+
     @OneToMany(mappedBy = "project")
+    @OrderBy("name")
     private Set<Channel> channels;
 
     @Override

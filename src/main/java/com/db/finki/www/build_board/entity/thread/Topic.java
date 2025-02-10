@@ -26,5 +26,7 @@ public class Topic extends BBThread implements NamedThread {
     private BBThread parent;
 
     @Override
-    public String getTypeName() {return "topics";}
+    public String getTypeName() {
+        return "topics";
+    }
 }

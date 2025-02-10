@@ -20,6 +20,7 @@ public class ProjectController {
 
     private final ProjectService projectService;
     private final TagService tagService;
+    private final String DUPLICATED_TITLE_MSG="could not execute statement [ERROR: duplicate key value violates unique constraint";
 
     public ProjectController(ProjectService projectService, TagServiceImpl topicService) {
         this.projectService = projectService;
@@ -27,13 +28,18 @@ public class ProjectController {
     }
 
     @GetMapping("/{title}")
-    public String getProjectPage(@PathVariable(name = "title") Project project, Model model, RedirectAttributes redirectAttributes) {
+    public String getProjectPage(@PathVariable(name = "title") Project project, Model model, RedirectAttributes redirectAttributes,
+    @RequestParam(required = false) String duplicateTitle) {
         model.addAttribute("project", project);
         model.addAttribute("tags", tagService.getAll());
         model.addAttribute("developers",projectService.getAllDevelopersForProject(project));
         String error = (String) redirectAttributes.getAttribute("error");
+        
         if(error != null){
             model.addAttribute("error", error);
+        }
+        if(duplicateTitle!=null){
+            model.addAttribute("errMsg","There already exists a project with the provided title" );
         }
         
         Hibernate.initialize(project.getTags());
@@ -42,7 +48,10 @@ public class ProjectController {
     }
 
     @GetMapping("/create")
-    public String getCreateProjectPage(Model model) {
+    public String getCreateProjectPage(Model model, @RequestParam(required = false) String duplicateTitle) {
+        if(duplicateTitle!=null){
+            model.addAttribute("errMsg", "There already exists a project with the provided title"); 
+        }
         model.addAttribute("project", new Project());
         model.addAttribute("isCreatingProject", tagService.getAll());
         return "project_pages/project-create";
@@ -77,6 +86,7 @@ public class ProjectController {
         model.addAttribute("developers", projectService.getAllDevelopersForProject(project));
         return "project_pages/members";
     }
+
     @PreAuthorize("#project.getUser().equals(#user)")
     @PostMapping("/{pr-title}/members/{mem-id}/kick")
     public String kickMember(@PathVariable(name = "pr-title") @P("project") Project project,@PathVariable(name = "mem-id") int memberId,@SessionAttribute @P("user") BBUser user){
@@ -91,9 +101,19 @@ public class ProjectController {
             @RequestParam(name = "title") String newTitle,
             @RequestParam(name = "repo_url") String repoUrl,
             @RequestParam @P("username") String username,
-            @RequestParam String description
+            @RequestParam String description,
+            RedirectAttributes attributes
     ){
-        return "redirect:/projects/" +  projectService.update(project, repoUrl, description, newTitle).getTitle();
+        String oldTitle = project.getTitle();
+        try{
+            return "redirect:/projects/" +  projectService.update(project, repoUrl, description, newTitle).getTitle();
+        }catch(org.springframework.dao.DataIntegrityViolationException e){
+            if(e.getMessage().contains(DUPLICATED_TITLE_MSG)){
+                attributes.addAttribute("duplicateTitle", "y");
+                return "redirect:/projects/" + oldTitle; 
+            }
+            throw e ; 
+        }
     }
 
     @PostMapping("/add")
@@ -101,10 +121,19 @@ public class ProjectController {
             @RequestParam String title,
             @RequestParam(required = false, name = "repo_url") String repoUrl,
             @RequestParam(required = false) String description,
-            @SessionAttribute BBUser user
+            @SessionAttribute BBUser user,
+            RedirectAttributes redirectAttributes
     ) {
-        projectService.create(title,repoUrl,description,user);
-        return "redirect:/";
+        try{
+            projectService.create(title,repoUrl,description,user);
+            return "redirect:/";
+        }catch(org.springframework.dao.DataIntegrityViolationException e){
+            if(e.getMessage().contains(DUPLICATED_TITLE_MSG)){
+                redirectAttributes.addAttribute("duplicateTitle", "y");
+                return "redirect:/projects/create"; 
+            }
+            throw e ; 
+        }
     }
 
     @PreAuthorize("#project.getUser().getUsername().equals(#username)")
@@ -113,9 +142,10 @@ public class ProjectController {
             @RequestParam(name = "project_title") @P("project") Project project,
             @RequestParam(name = "title") String topicsTitle,
             @RequestParam String description,
-            @RequestParam @P("username") String username
+            @RequestParam @P("username") String username,
+            @SessionAttribute("user") BBUser user 
     ){
-        projectService.createTopic(project, topicsTitle, description, username);
+        projectService.createTopic(project, topicsTitle, description, user);
         return "redirect:/projects/" + project.getTitle();
     }
 

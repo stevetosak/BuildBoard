@@ -11,7 +11,6 @@ import org.hibernate.annotations.Immutable;
 
 import java.time.LocalDateTime;
 
-//TODO: napraj da izlegvat preku created_at
 @Entity
 @Immutable
 @Table(name="v_discussion_thread")

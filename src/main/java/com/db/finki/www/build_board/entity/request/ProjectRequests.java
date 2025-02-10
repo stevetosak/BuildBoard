@@ -27,9 +27,4 @@ public class ProjectRequests extends Submission {
         setStatus(Status.PENDING);
         setCreatedAt(LocalDateTime.now());
     }
-
-    public Feedback getFeedback() {
-        Feedback feedback = getFeedback(); 
-        return feedback == null ? null : feedback;
-    }
 }
