@@ -93,7 +93,7 @@
                         <div class="list-group-item w-100" th:each="topic : ${project.getTopics()}">
                             <div class="d-flex">
                                 <h5 class="mb-1">
-                                    <a th:href="@{/topics/{name} (name=${topic.getTitle()})}"
+                                    <a th:href="@{/topics/{id} (id=${topic.getId()})}"
                                        th:text="${topic.getTitle()}" class="text-decoration-none"></a>
                                 </h5>
                                 <!--                <small th:text="${thread.getFormattedDate()}">Date</small>-->
@@ -131,7 +131,6 @@
             <div class="d-flex justify-content-between align-items-center mt-3 pt-3">
                 <div class="d-flex flex-row">
                     <form th:action="'/threads/' + ${project.getId()} + '/like'" method="post">
-                        <input type="hidden" name="threadId" th:value="${project.getId()}">
                         <button th:if="${session.user!=null}"
                                 type="submit" class="btn btn-outline-success btn-sm me-2 like-button">
                             <!--                                th:attr="data-reply-id=${reply.getDiscussion().getId()}">-->
@@ -139,7 +138,6 @@
                         </button>
                     </form>
                     <form th:action="'/threads/' + ${project.getId()} + '/dislike'" method="post">
-                        <input type="hidden" name="threadId" th:value="${project.getId()}">
                         <button th:if="${session.user!=null}"
                                 class="btn btn-outline-danger btn-sm dislike-button">
                             <!--                                th:attr="data-reply-id=${reply.getDiscussion().getId()}">-->

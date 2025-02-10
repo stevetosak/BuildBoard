@@ -41,7 +41,7 @@ public class TagController {
         topicService.addTagToTopic(t, tagName,user);
         model.addAttribute("topic", t);
         model.addAttribute("tags", tagService.getAllNotUsed(t));
-        return "redirect:/topics/" + t.getTitle();
+        return "redirect:/topics/" + t.getId();
     }
 
     @PreAuthorize("@topicServiceImpl.getById(#topicId).getUser().getUsername()==#username")
@@ -50,7 +50,7 @@ public class TagController {
         Topic t = topicService.deleteTagFromTopic(topicId, tagName);
         model.addAttribute("topic", t);
         model.addAttribute("tags", tagService.getAllNotUsed(t));
-        return "redirect:/topics/" + t.getTitle();
+        return "redirect:/topics/" + t.getId();
     }
 
     @PreAuthorize("#project.getUser().getUsername()==#username")

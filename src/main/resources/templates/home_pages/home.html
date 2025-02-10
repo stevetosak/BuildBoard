@@ -157,7 +157,7 @@
         <div class="list-group-item" th:each="thread : ${threads}">
             <div class="d-flex w-100 justify-content-between">
                 <h5 class="mb-1">
-                    <a th:href="@{/{type}/{name} (type=${thread.getTypeName()},name=${thread.getTitle()})}"
+                    <a th:href="@{/{type}/{id} (type=${thread.getTypeName()},id=${thread.getId()})}"
                        th:text="${thread.getTitle()}" class="text-decoration-none"></a>
                 </h5>
                 <!--                <small th:text="${thread.getFormattedDate()}">Date</small>-->

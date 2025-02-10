@@ -40,7 +40,7 @@
         <p th:text="${errMsg}" class="mb-0"></p>
     </div>
 </div>
-<main class="container mt-5">
+<main class="mb-5 container mt-5">
     <!-- Topic Title and Description -->
     <div class="card shadow-sm mb-4">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
@@ -78,7 +78,7 @@
                     </button>
                 </div>
                 <div th:attr="data-reply-id=${topic.getId()}" class="card-body d-none reply-body">
-                    <form th:action="@{/topics/{topic-name}/discussions/add(topic-name=${topic.getTitle()})}"
+                    <form th:action="@{/topics/{topic-id}/discussions/add(topic-id=${topic.getId()})}"
                           method="post">
                         <div class="mb-3">
                             <label class="form-label">Your Reply</label>
@@ -102,7 +102,7 @@
             <div class="d-flex justify-content-between align-items-center mt-3 pt-3">
                 <div class="d-flex flex-row">
                     <form th:action="@{/threads/{thread-id}/like(thread-id=${topic.getId()})}" method="post">
-                        <input type="hidden" name="threadId" th:value="${topic.getId()}">
+                        <input type="hidden" name="topic-id" th:value="${topic.getId()}">
                         <button th:if="${session.user!=null}"
                                 type="submit" class="btn btn-outline-success btn-sm me-2 like-button">
                             <!--                                th:attr="data-reply-id=${reply.getDiscussion().getId()}">-->
@@ -110,7 +110,7 @@
                         </button>
                     </form>
                     <form th:action="@{/threads/{thread-id}/dislike(thread-id=${topic.getId()})}" method="post">
-                        <input type="hidden" name="threadId" th:value="${topic.getId()}">
+                        <input type="hidden" name="topic-id" th:value="${topic.getId()}">
                         <button th:if="${session.user!=null}"
                                 class="btn btn-outline-danger btn-sm dislike-button">
                             <!--                                th:attr="data-reply-id=${reply.getDiscussion().getId()}">-->

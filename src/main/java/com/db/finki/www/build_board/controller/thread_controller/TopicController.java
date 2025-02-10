@@ -35,13 +35,13 @@ public class TopicController {
         return "create-topic";
     }
 
-    @GetMapping("/{topic-name}")
-    public String showTopic(@PathVariable(name = "topic-name") String topicId, Model model,
+    @GetMapping("/{topic-id}")
+    public String showTopic(@PathVariable(name = "topic-id") int topicId, Model model,
             @RequestParam(required = false) Boolean duplicateTittle) {
         if (duplicateTittle != null) {
             model.addAttribute("errMsg", "There already exists a thread with the same title in that parent");
         }
-        Topic t = topicService.getByTitle(topicId);
+        Topic t = topicService.getById((long)topicId);
         model.addAttribute("topic", t);
         model.addAttribute("tags", tagService.getAllNotUsed(t));
         model.addAttribute("replies", discussionService.getByTopic(t.getId()));
@@ -80,7 +80,7 @@ public class TopicController {
             topicService.edit(t, title, content);
             model.addAttribute("topic", t);
             model.addAttribute("tags", tagService.getAllNotUsed(t));
-            return "redirect:/topics/" + t.getTitle();
+            return "redirect:/topics/" + t.getId();
         } catch (org.springframework.orm.jpa.JpaSystemException e) {
             return handleDuplicatedTitle(e, redirectAttributes, "/topics/" + oldTitle);
         }
