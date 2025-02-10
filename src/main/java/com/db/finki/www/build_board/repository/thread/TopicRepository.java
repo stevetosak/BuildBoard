@@ -17,7 +17,7 @@ public interface TopicRepository extends JpaRepository<Topic,Long>, JpaSpecifica
 
     @Modifying
     @Query(value="""
-            delete from thread where id=:id
+            delete from topic_thread where id=:id
             """,
             nativeQuery = true
     )

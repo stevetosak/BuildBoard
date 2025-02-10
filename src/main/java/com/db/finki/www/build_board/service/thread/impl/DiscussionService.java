@@ -1,11 +1,13 @@
 package com.db.finki.www.build_board.service.thread.impl;
 
 import com.db.finki.www.build_board.entity.thread.BBThread;
+import com.db.finki.www.build_board.entity.thread.EmbdedableThread;
 import com.db.finki.www.build_board.entity.thread.discussion_thread.Discussion;
 import com.db.finki.www.build_board.entity.thread.discussion_thread.VDiscussion;
 import com.db.finki.www.build_board.entity.user_type.BBUser;
 import com.db.finki.www.build_board.repository.thread.BBThreadRepository;
 import com.db.finki.www.build_board.repository.thread.DiscussionRepository;
+import com.db.finki.www.build_board.repository.thread.EmbdedableRepo;
 import com.db.finki.www.build_board.repository.thread.VDiscussRepo;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -17,12 +19,12 @@ import java.util.List;
 public class DiscussionService {
     private final VDiscussRepo vDiscussRepo;
     private final DiscussionRepository discussionRepository;
-    private final BBThreadRepository threadRepository;
+    private final EmbdedableRepo embdedableRepo;
 
-    public DiscussionService(VDiscussRepo vDiscussRepo, DiscussionRepository discussionRepository, BBThreadRepository threadRepository) {
+    public DiscussionService(VDiscussRepo vDiscussRepo, DiscussionRepository discussionRepository, EmbdedableRepo embdedableRepo) {
         this.vDiscussRepo = vDiscussRepo;
         this.discussionRepository = discussionRepository;
-        this.threadRepository = threadRepository;
+        this.embdedableRepo = embdedableRepo;
     }
 
     public List<VDiscussion> getByTopic(int topicId){
@@ -55,7 +57,7 @@ public class DiscussionService {
     @Transactional
     public Discussion create(String content, int parentId, BBUser user){
 
-        BBThread parent = threadRepository.findById(parentId);
+        EmbdedableThread parent = embdedableRepo.findById((long) parentId).get();
 
         Discussion reply = new Discussion();
         reply.setContent(content);
@@ -72,8 +74,7 @@ public class DiscussionService {
     }
 
     public void delete(int threadId) {
-        Discussion d = discussionRepository.findDiscussionById(threadId);
-        discussionRepository.delete(d);
+        discussionRepository.deleteById((long) threadId);
     }
 
 }

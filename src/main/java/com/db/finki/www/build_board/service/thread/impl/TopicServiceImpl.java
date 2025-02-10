@@ -1,5 +1,6 @@
 package com.db.finki.www.build_board.service.thread.impl;
 
+import com.db.finki.www.build_board.entity.thread.Project;
 import com.db.finki.www.build_board.entity.user_type.BBUser;
 import com.db.finki.www.build_board.entity.thread.BBThread;
 import com.db.finki.www.build_board.entity.thread.Tag;
@@ -34,7 +35,7 @@ public class TopicServiceImpl implements TopicService {
         return topicRepository.save(topic);
     }
 
-    public Topic create(String title, String description, BBUser user, BBThread parent){
+    public Topic create(String title, String description, BBUser user, Project parent){
         Topic topic = new Topic();
         
         topic.setTitle(title);

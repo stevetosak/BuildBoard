@@ -1,6 +1,7 @@
 package com.db.finki.www.build_board.entity.thread.discussion_thread;
 
 import com.db.finki.www.build_board.entity.thread.BBThread;
+import com.db.finki.www.build_board.entity.thread.EmbdedableThread;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,8 +10,8 @@ import lombok.Setter;
 @Table(name = "discussion_thread")
 @Getter
 @Setter
-public class Discussion extends BBThread {
+public class Discussion extends EmbdedableThread {
     @ManyToOne
     @JoinColumn(name = "parent_id")
-    private BBThread parent;
+    private EmbdedableThread parent;
 }

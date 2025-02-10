@@ -1,5 +1,6 @@
 package com.db.finki.www.build_board.service.thread.itf;
 
+import com.db.finki.www.build_board.entity.thread.Project;
 import com.db.finki.www.build_board.entity.user_type.BBUser;
 import com.db.finki.www.build_board.entity.thread.BBThread;
 import com.db.finki.www.build_board.entity.thread.Topic;
@@ -7,7 +8,7 @@ import com.db.finki.www.build_board.entity.thread.Topic;
 import java.util.List;
 public interface TopicService {
     Topic create(String title, String description, BBUser user);
-    Topic create(String title, String description, BBUser user, BBThread parent); 
+    Topic create(String title, String description, BBUser user, Project parent);
     List<Topic> getAll();
     Topic getByTitle(String title);
     void deleteTopicById(Long id);

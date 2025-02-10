@@ -11,7 +11,7 @@ import java.util.List;
 
 @Repository
 public interface ProjectRepository extends JpaRepository<Project, Long>, JpaSpecificationExecutor<Project> {
-    Project findByTitleStartingWith(String title);
+    Project findByTitle(String title);
     void deleteByTitle(String title);
     List<Project> findAllByUserId(int userId);
 

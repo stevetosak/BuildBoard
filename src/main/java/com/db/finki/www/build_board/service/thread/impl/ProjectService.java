@@ -43,7 +43,7 @@ public class ProjectService {
     }
 
     public Project getByTitle(String title) {
-        return projectRepository.findByTitleStartingWith(title);
+        return projectRepository.findByTitle(title);
     }
 
     public void createTopic(Project project, String title, String description, BBUser user) {
