@@ -9,6 +9,8 @@ import com.db.finki.www.build_board.repository.thread.DiscussionRepository;
 import com.db.finki.www.build_board.repository.thread.VDiscussRepo;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -24,7 +26,19 @@ public class DiscussionService {
     }
 
     public List<VDiscussion> getByTopic(int topicId){
-        return vDiscussRepo.findVDiscussionByParentTopicIdOrderByCreatedAtDesc(topicId);
+        List<VDiscussion> discussions = vDiscussRepo.findVDiscussionByParentTopicIdOrderByCreatedAtDesc(topicId);
+        List<VDiscussion> level0Discussions = new ArrayList<>(); 
+
+        for(VDiscussion dis : discussions){
+            if(dis.getDepth()==0){
+                level0Discussions.add(dis);
+            }else{
+                VDiscussion parent = vDiscussRepo.findById((long) dis.getDiscussion().getParent().getId()).get();
+                parent.getChildren().add(dis); 
+            }
+        }
+
+        return level0Discussions; 
     }
 
     public VDiscussion getVDiscussionById(int discussionId){
@@ -61,4 +75,5 @@ public class DiscussionService {
         Discussion d = discussionRepository.findDiscussionById(threadId);
         discussionRepository.delete(d);
     }
+
 }

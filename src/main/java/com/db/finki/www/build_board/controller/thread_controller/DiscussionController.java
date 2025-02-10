@@ -35,7 +35,7 @@ public class DiscussionController {
         return "redirect:/topics/" + topicName;
     }
 
-    @PreAuthorize("@discussionService.discussionById(#replyId).user.username==#username")
+    @PreAuthorize("@discussionService.getDiscussionById(#replyId).user.username==#username")
     @PostMapping("/topics/{topic-name}/discussions/{replyId}/edit")
     public String editReply(@PathVariable(name = "topic-name") String topicName, @PathVariable @P("replyId") int replyId, @RequestParam String content, Model model, HttpSession session
     , @P("username") String username) {
@@ -43,7 +43,7 @@ public class DiscussionController {
         return "redirect:/topics/" + topicName;
     }
 
-    @PreAuthorize("@discussionService.discussionById(#discussionId).getUser().getId()==#user.getId()")
+    @PreAuthorize("@discussionService.getDiscussionById(#discussionId).getUser().getId()==#user.getId()")
     @PostMapping("/topics/{topic-name}/discussions/{discussionId}/delete")
     public String deleteDiscussion(@PathVariable(name = "topic-name") String topicName, @PathVariable @P("discussionId") int discussionId, @SessionAttribute @P("user") BBUser user, @RequestParam @Param("username") String username) {
         discussionService.delete(discussionId);
