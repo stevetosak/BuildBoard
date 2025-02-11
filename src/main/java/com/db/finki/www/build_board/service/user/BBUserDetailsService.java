@@ -28,6 +28,11 @@ public class BBUserDetailsService implements UserDetailsService {
     }
 
     public BBUser changeInfoForUserWithUsername(String oldUsername, String newUsername, String email, String name, String description, String password) {
+        oldUsername=oldUsername.strip();
+        newUsername=newUsername.strip();
+        email=email.strip();
+        password=password.strip();
+
         BBUser user = (BBUser) loadUserByUsername(oldUsername);
 
         user.setUsername(newUsername);

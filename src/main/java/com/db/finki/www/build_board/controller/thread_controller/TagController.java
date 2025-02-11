@@ -34,13 +34,14 @@ public class TagController {
             @PathVariable(name = "id") @P("id") long id,
             @RequestParam String tagName,
             @P("username") String username,
-            Model model
+            Model model,
+            @SessionAttribute("user") BBUser user 
     ) {
         Topic t = topicService.getById(id);
-        topicService.addTagToTopic(t, tagName);
+        topicService.addTagToTopic(t, tagName,user);
         model.addAttribute("topic", t);
         model.addAttribute("tags", tagService.getAllNotUsed(t));
-        return "redirect:/topics/" + t.getTitle();
+        return "redirect:/topics/" + t.getId();
     }
 
     @PreAuthorize("@topicServiceImpl.getById(#topicId).getUser().getUsername()==#username")
@@ -49,7 +50,7 @@ public class TagController {
         Topic t = topicService.deleteTagFromTopic(topicId, tagName);
         model.addAttribute("topic", t);
         model.addAttribute("tags", tagService.getAllNotUsed(t));
-        return "redirect:/topics/" + t.getTitle();
+        return "redirect:/topics/" + t.getId();
     }
 
     @PreAuthorize("#project.getUser().getUsername()==#username")

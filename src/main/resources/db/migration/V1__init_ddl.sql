@@ -76,11 +76,21 @@ CREATE TABLE thread
     created_at timestamp DEFAULT NOW(),
     user_id INT REFERENCES users (id) NOT NULL --IS_CREATED_BY TOTAL
 );
+CREATE TABLE project_thread
+(
+    title    VARCHAR(256) UNIQUE NOT NULL,
+    repo_url TEXT,
+    id       INT PRIMARY KEY REFERENCES thread (id) on delete cascade --INHERITANCE
+);
+create table embdedable_thread(
+   id int primary key references thread(id) on delete cascade
+);
+
 CREATE TABLE topic_thread
 (
     title     VARCHAR(256) NOT NULL,
     id        INT PRIMARY KEY REFERENCES thread(id) on delete cascade, --INHERITANCE
-    parent_id int REFERENCES thread(id) on delete CASCADE  --PARENT
+    parent_id int REFERENCES project_thread(id) on delete CASCADE  --PARENT
 );
 create table topic_guidelines
 (
@@ -92,14 +102,9 @@ create table topic_guidelines
 CREATE TABLE discussion_thread
 (
     id  INT PRIMARY KEY REFERENCES  thread(id) on delete cascade, --INHERITANCE,
-    parent_id int REFERENCES thread(id) on delete CASCADE NOT NULL --PARENT TOTAL BIGINT
+    parent_id int REFERENCES embdedable_thread(id)  NOT NULL --on delete CASCADE ne tuku preku trigger PARENT TOTAL BIGINT
 );
-CREATE TABLE project_thread
-(
-    title    VARCHAR(256) UNIQUE NOT NULL,
-    repo_url TEXT,
-    id       INT PRIMARY KEY REFERENCES thread (id) on delete cascade --INHERITANCE
-);
+
 CREATE TABLE likes
 (
     user_id   INT REFERENCES users (id) on delete cascade ,
@@ -328,7 +333,11 @@ BEGIN
     into usrId,new_project_id
     FROM v_project_thread p
     WHERE NEW.id = p.id;
-    IF not check_if_user_exists_in('developer_associated_with_project', 'developer_id', usrId::text) THEN
+    IF not EXISTS(
+      select 1
+      from developer_associated_with_project dawp
+      where dawp.project_id=new_project_id and dawp.developer_id=usrId
+    ) THEN
         INSERT INTO developer_associated_with_project(project_id, developer_id, started_at)
             values (new_project_id, usrId, NOW());
     end if;
@@ -413,19 +422,39 @@ BEGIN
 THEN
     DELETE FROM moderator where id=OLD.user_id;
  END IF;
- IF not exists (
-    select 1
-    from topic_threads_moderators t
-    where t.thread_id = OLD.thread_id
- )
+ IF not exists ( 
+    select 1 
+    from topic_threads_moderators t 
+    where t.thread_id = OLD.thread_id 
+ ) 
 THEN
+    delete from discussion_thread where parent_id=OLD.thread_id;
     DELETE FROM topic_thread where id = OLD.thread_id;
-	delete from thread where id =  OLD.thread_id;
- END IF;
+-- 	delete from thread where id =  OLD.thread_id;
+ END IF; 
  RETURN OLD;
 END;
 $function$
 ;
+create or replace function fn_aa_rm_orphan_dics()
+    returns trigger
+    language plpgsql
+as
+$$
+BEGIN
+--     RAISE NOTICE '%',OLD.id;
+
+    delete from discussion_thread dt
+    where dt.parent_id=OLD.id;
+    delete from embdedable_thread
+    where id = OLD.id;
+    delete from thread t
+    where t.id=OLD.id;
+    RETURN OLD;
+END;
+$$;
+
+
 
 -- create or replace function fn_remove_thread()
 -- returns trigger
@@ -486,6 +515,18 @@ create or replace trigger tr_insert_general_for_project --RADI
     after insert on project_thread
     for each row
 execute function fn_insert_general_for_project();
+
+create or replace trigger tr_rm_orphan_disc
+    after delete
+    on discussion_thread
+    for each row
+execute function fn_aa_rm_orphan_dics();
+
+create or replace trigger tr_rm_orphan_disc
+    after delete
+    on topic_thread
+    for each row
+execute function fn_aa_rm_orphan_dics();
 
 -- create or replace trigger tr_remove_thread_from_project
 -- after delete

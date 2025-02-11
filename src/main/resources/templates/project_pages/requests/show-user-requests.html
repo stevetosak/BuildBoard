@@ -10,7 +10,7 @@
     <div th:replace="/home_pages/home :: navigation"></div>
 </header>
 <section class="d-flex mt-3 flex-column w-100 align-items-center mt-5">
-    <form method="get" th:action="@{/{username}/requests(pr-title=${user.getUsername()})}"
+    <form method="get" th:action="@{/{username}/project-requests(username=${user.getUsername()})}"
           class="d-flex flex-row gap-2 align-items-center"
           style="width:fit-content">
         <label for="status-query">Filter by status:</label>

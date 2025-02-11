@@ -36,20 +36,22 @@ public class ProjectService {
     }
 
     public void create(String title, String repoUrl, String description, BBUser user) {
+        title=title.strip();
         projectRepository.save(
                 new Project(title, repoUrl, description, user)
         );
     }
 
     public Project getByTitle(String title) {
-        return projectRepository.findByTitleStartingWith(title);
+        return projectRepository.findByTitle(title);
     }
 
-    public void createTopic(Project project, String title, String description, String username) {
-        BBUser user = ((BBUser) userDetailsService.loadUserByUsername(username));
-        Topic topic = topicService.create(title, description, user);
-        topic.setParent(project);
+    public void createTopic(Project project, String title, String description, BBUser user) {
+        title=title.strip();
+        Topic topic = topicService.create(title, description, user, project);
+
         project.getTopics().add(topic);
+
         projectRepository.save(project);
     }
 
@@ -77,6 +79,7 @@ public class ProjectService {
     }
 
     public Project update(Project project, String repoUrl, String description, String newTitle) {
+        newTitle=newTitle.strip();
         project.setRepoUrl(repoUrl);
         project.setDescription(description);
         project.setTitle(newTitle);

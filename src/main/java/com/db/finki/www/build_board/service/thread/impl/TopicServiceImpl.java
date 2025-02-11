@@ -1,6 +1,8 @@
 package com.db.finki.www.build_board.service.thread.impl;
 
+import com.db.finki.www.build_board.entity.thread.Project;
 import com.db.finki.www.build_board.entity.user_type.BBUser;
+import com.db.finki.www.build_board.entity.thread.BBThread;
 import com.db.finki.www.build_board.entity.thread.Tag;
 import com.db.finki.www.build_board.entity.thread.Topic;
 import com.db.finki.www.build_board.repository.thread.TagRepository;
@@ -25,9 +27,22 @@ public class TopicServiceImpl implements TopicService {
     @Override
     public Topic create(String title, String description, BBUser user) {
         Topic topic = new Topic();
+        
         topic.setTitle(title);
         topic.setContent(description);
         topic.setUser(user);
+        
+        return topicRepository.save(topic);
+    }
+
+    public Topic create(String title, String description, BBUser user, Project parent){
+        Topic topic = new Topic();
+        
+        topic.setTitle(title);
+        topic.setContent(description);
+        topic.setUser(user);
+        topic.setParent(parent);
+
         return topicRepository.save(topic);
     }
 
@@ -58,14 +73,14 @@ public class TopicServiceImpl implements TopicService {
 
     @Override
     @Transactional
-    public void addTagToTopic(Topic topic, String tagName) {
+    public void addTagToTopic(Topic topic, String tagName, BBUser user) {
         tagRepository.findByName(tagName).ifPresentOrElse(tag -> {
             topic.getTags().add(tag);
             tag.getThreads().add(topic);
             topicRepository.save(topic);
             tagRepository.save(tag);
         },() -> {
-            Tag tag = new Tag(tagName);
+            Tag tag = new Tag(tagName,user);
             tagRepository.save(tag);
             topic.getTags().add(tag);
             tag.getThreads().add(topic);
@@ -74,8 +89,7 @@ public class TopicServiceImpl implements TopicService {
     }
 
     @Override
-    public Topic create(long id, String title, String description) {
-        Topic t = getById(id);
+    public Topic edit(Topic t, String title, String description) {
         t.setTitle(title);
         t.setContent(description);
         return topicRepository.save(t);
@@ -85,7 +99,7 @@ public class TopicServiceImpl implements TopicService {
     @Transactional
     public Topic deleteTagFromTopic(long id, String tagName) {
         Topic t = getById(id);
-        boolean removed = t.getTags().remove(new Tag(tagName));
+        boolean removed = t.getTags().removeIf(tag -> tag.getName().equals(tagName));
         if(!removed) throw new IllegalArgumentException("Tag not found");
         return topicRepository.save(t);
     }

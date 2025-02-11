@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "topic_thread")
-public class Topic extends BBThread implements NamedThread {
+public class Topic extends EmbdedableThread implements NamedThread {
 
     private String title;
 
@@ -23,8 +23,10 @@ public class Topic extends BBThread implements NamedThread {
 
     @ManyToOne
     @JoinColumn(name = "parent_id")
-    private BBThread parent;
+    private Project parent;
 
     @Override
-    public String getTypeName() {return "topics";}
+    public String getTypeName() {
+        return "topics";
+    }
 }

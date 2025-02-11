@@ -42,7 +42,7 @@ public class BBThread {
     )
     protected Set<BBUser> likes = new HashSet<>();
 
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     public int getNumLikes(){
         return likes.size();

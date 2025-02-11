@@ -20,6 +20,7 @@ public class Channel {
 
     @Id
     private String name;
+    
     @Id
     @ManyToOne
     @JoinColumn(name = "project_id",referencedColumnName = "id",nullable = false)

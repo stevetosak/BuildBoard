@@ -9,4 +9,5 @@ import java.util.Optional;
 @Repository
 public interface TagRepository extends JpaRepository<Tag, String> {
     Optional<Tag> findByName(String name);
+    long deleteAllByName(String name); 
 }

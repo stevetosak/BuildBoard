@@ -18,7 +18,7 @@ public class FilterMap<T extends NamedThread> {
             if (param == null) {
                 return (root, query, cb) -> null;
             } else {
-                return (root, query, cb) -> cb.like(cb.lower(root.get("title")), "%" + param.toLowerCase() + "%");
+                return (root, query, cb) -> cb.like(cb.lower(root.get("title")),  param.toLowerCase() + "%" );
             }
         });
         filterMap.put("content", (param) -> {

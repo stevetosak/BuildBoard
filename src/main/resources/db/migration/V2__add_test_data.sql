@@ -10,38 +10,30 @@ VALUES
 
 INSERT INTO thread (content, user_id)
 VALUES
-    ('Main content for topic thread 1', 1),
-    ('Main content for topic thread 2', 2),
-    ('Discussion content for topic 1', 1),
-    ('Discussion content for topic 2', 2),
-    ('Project-specific thread content', 3),
-    ('Reply to topic 1', 4),
-    ('Further discussion on topic 2', 5),
-    ('Main content for topic thread', 1),
-    ('Main content for topic thread', 2),
-    ('Discussion content for topic 1', 1),
-    ('Discussion content for topic 2', 2),
-    ('Project-specific thread content', 3),
-    ('Reply to topic 1', 4),
-    ('Further discussion on topic 2', 5),
-    ('Further discussion on topic 2', 5),
-    ('Main content for topic thread', 1),
-    ('Main content for topic thread', 2),
-    ('Discussion content for topic 1', 1),
-    ('Discussion content for topic 2', 2),
-    ('Project-specific thread content', 3),
-    ('Reply to topic 1', 4),
-    ('Further discussion on topic 2', 5);
+    ('Main content for topic thread 1', 1), --1
+    ('Main content for topic thread 2', 2), --2
+    ('Discussion content for topic 1', 1), --3
+    ('Discussion content for topic 2', 2), --4
+    ('Project-specific thread content', 3), --5
+    ('Reply to topic 1', 4), -- 6
+    ('Further discussion on topic 2', 5), --7
+    ('Main content for topic thread', 1), --8
+    ('Project-specific thread content 2', 5); --9
 
+insert into embdedable_thread(id)
+values (1),(2),(3),(4),(6),(7),(8);
+
+
+INSERT INTO project_thread (id, title, repo_url)
+VALUES
+    (5, 'Project 1 Thread', 'http://github.com/project1'),
+    (9, 'Project 2 Thread', 'http://github.com/project1');
 
 INSERT INTO topic_thread (id, title, parent_id)
 VALUES
     (1, 'Topic 1' , 5),
-    (2, 'Topic 2', 5),
-    (8, 'Topic 7' , NULL),
-    (9, 'Topic 8', NULL),
-    (16, 'Topic 9' , NULL),
-    (17, 'Topic 10', NULL);
+    (2, 'Topic 2', NULL),
+    (8, 'Topic 7' , NULL);
 
 insert into topic_guidelines(topic_id,description)
 values
@@ -52,14 +44,9 @@ INSERT INTO discussion_thread (id, parent_id)
 VALUES
     (3, 1),
     (4, 2),
-    (6, 3),
+    (6, 1),
     (7, 4);
 
-INSERT INTO project_thread (id, title, repo_url)
-VALUES
-    (5, 'Project 1 Thread', 'http://github.com/project1'),
-    (10, 'Project 2 Thread', 'http://github.com/project1'),
-    (15, 'Project 3 Thread', 'http://github.com/project1');
 
 INSERT INTO likes (user_id, thread_id)
 VALUES
@@ -89,18 +76,17 @@ VALUES
 INSERT INTO users_project_roles (user_id, project_id, role_name)
 VALUES
     (3, 5, 'Admin'),
-    (5, 5, 'Developer'),
-    (1, 5, 'Developer');
+    (5, 5, 'Developer');
 
 INSERT INTO project_roles_permissions (permission_name, role_name, project_id)
 VALUES
     ('Create Thread', 'Admin', 5),
     ('Delete Thread', 'Admin', 5);
 
-insert into submission(created_by,status,description) 
-values 
-(1,'PENDING','Inappropriate content'),
-(3,'DENIED','Spam content');
+insert into submission(created_by,status,description)
+values
+    (1,'PENDING','Inappropriate content'),
+    (3,'DENIED','Spam content');
 
 INSERT INTO report (id,thread_id, for_user_id)
 VALUES
@@ -115,4 +101,13 @@ INSERT INTO messages (sent_at, content, sent_by, project_id, channel_name)
 VALUES
     (NOW(), 'Zdravo. Ova e real-time chat za dopisuvanje', 3, 5, 'General'),
     (NOW(), 'Resen ladno a?', 3, 5, 'Updates');
+
+
+
+
+
+
+
+
+
 

@@ -9,9 +9,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Immutable;
 
+import java.util.ArrayList;
+import java.util.List; 
 import java.time.LocalDateTime;
 
-//TODO: napraj da izlegvat preku created_at
 @Entity
 @Immutable
 @Table(name="v_discussion_thread")
@@ -42,4 +43,7 @@ public class VDiscussion {
     private Topic parentTopic;
 
     private LocalDateTime createdAt;
+
+    @Transient
+    private List<VDiscussion> children = new ArrayList<>();
 }

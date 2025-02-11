@@ -2,7 +2,6 @@ package com.db.finki.www.build_board.controller;
 
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
@@ -33,10 +32,10 @@ public class ExceptionHandler {
 //    }
 
 
-    @org.springframework.web.bind.annotation.ExceptionHandler(value = {Exception.class })
-    public ModelAndView handleNotFound(Exception exception) {
-        System.out.println(exception.getMessage());
-        exception.printStackTrace();
-        return mavBuilder(exception,"An error occurred.",-1);
-    }
+    // @org.springframework.web.bind.annotation.ExceptionHandler(value = {Exception.class })
+    // public ModelAndView handleNotFound(Exception exception) {
+    //     System.out.println(exception.getMessage());
+    //     exception.printStackTrace();
+    //     return mavBuilder(exception,"An error occurred.",-1);
+    // }
 }
