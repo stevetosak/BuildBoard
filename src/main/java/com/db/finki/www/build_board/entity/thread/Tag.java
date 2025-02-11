@@ -1,6 +1,7 @@
 package com.db.finki.www.build_board.entity.thread;
 
 import com.db.finki.www.build_board.entity.user_type.BBUser;
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -43,6 +44,10 @@ public class Tag implements Serializable {
         return Objects.equals(name, tag.name);
     }
 
+    @JsonGetter("creator")
+    public String getCreatorUsernameJackson(){
+        return creator.getUsername() == null ? "" : creator.getUsername() ;
+    }
     @Override
     public int hashCode() {
         return Objects.hashCode(name);
