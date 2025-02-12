@@ -29,4 +29,5 @@ public class Topic extends EmbdedableThread implements NamedThread {
     public String getTypeName() {
         return "topics";
     }
+
 }

@@ -50,6 +50,10 @@ public class SearchServiceImpl implements SearchService {
         if(type == null){
             type = "all";
         }
+        if(filters == null || filters.isEmpty()){
+            filters = new ArrayList<>();
+            filters.add("all");
+        }
 
         if(Objects.equals(type, "project")){
             System.out.println("PROJECT");
@@ -62,6 +66,8 @@ public class SearchServiceImpl implements SearchService {
             result.addAll(searchProjects(query, filters));
             System.out.println("ALL");
         }
+
+
 
         return result;
     }

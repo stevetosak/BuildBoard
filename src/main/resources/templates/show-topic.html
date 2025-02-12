@@ -30,6 +30,9 @@
             font-weight: bold;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
         }
+        .badge{
+            background: #00e7ff80
+        }
     </style>
 </head>
 <body>
@@ -50,62 +53,46 @@
                     class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#addTagModal">Add Tag
             </button>
         </div>
-        <div class="card-body">
-            <p th:text="${topic.getContent()}">Description of the topic goes here.</p>
-            <!-- Tags Section -->
-            <div>
-                <h6>Tags:</h6>
-                <ul class="list-inline">
-                    <li th:each="tag : ${topic.getTags()}" class="list-inline-item">
-            <span class="badge bg-info text-dark d-inline-flex align-items-center">
-                <span th:text="${tag.getName()}">Tag Name</span>
-                <form th:if="${session.user!=null && session.user.equals(topic.getUser())}"
-                      th:action="@{/topics/{topicId}/tags/{tag-name}/delete (topicId=${topic.getId()}, tag-name=${tag.getName()})}"
-                      method="post" style="margin-left: 5px;">
-                    <button type="submit" class="btn btn-sm btn-link text-danger p-0 ms-1" style="line-height: 1;">
-                        &times;
-                    </button>
-                    <input th:if="${session.user!=null}" type="hidden" name="username"
-                           th:value="${session.user.username}"/>
-                </form>
-            </span>
-                    </li>
-                </ul>
+
+        <div class="card-body d-flex flex-column justify-content-between">
+            <!-- Top Section: Description + Tags -->
+            <div class="d-flex justify-content-between">
+                <p th:text="${topic.getContent()}">Description of the topic goes here.</p>
+                <!-- Tags Section -->
+                <div>
+                    <ul class="list-inline text-end">
+                        <li th:each="tag : ${topic.getTags()}" class="list-inline-item">
+                        <span class="badge text-dark d-inline-flex align-items-center">
+                            <span th:text="${tag.getName()}">Tag Name</span>
+                            <form th:if="${session.user!=null && session.user.equals(topic.getUser())}"
+                                  th:action="@{/topics/{topicId}/tags/{tag-name}/delete (topicId=${topic.getId()}, tag-name=${tag.getName()})}"
+                                  method="post" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-link text-danger p-0 ms-1" style="line-height: 1;">
+                                    &times;
+                                </button>
+                            </form>
+                        </span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Bottom Section: Reply + Like/Dislike Buttons -->
+            <div class="d-flex justify-content-between align-items-center mt-3 pt-3">
+                <!-- Reply Button -->
                 <div class="d-flex justify-content-end">
                     <button th:if="${session.user != null}"
-                            class="btn btn-info btn-sm m-2 reply-button"
+                            class="btn btn-info btn-sm reply-button"
                             th:attr="data-reply-id=${topic.getId()}">Reply
                     </button>
                 </div>
-                <div th:attr="data-reply-id=${topic.getId()}" class="card-body d-none reply-body">
-                    <form th:action="@{/topics/{topic-id}/discussions/add(topic-id=${topic.getId()})}"
-                          method="post">
-                        <div class="mb-3">
-                            <label class="form-label">Your Reply</label>
-                            <textarea name="content" class="form-control" rows="3" placeholder="Write your reply here"
-                                      required></textarea>
-                        </div>
-                        <div class="d-flex justify-content-between">
-                            <input type="hidden" th:value="${topic.getId()}" name="parentId">
-                            <button type="submit" class="btn btn-success w-10 ms-2">Post Reply</button>
-                            <div class="d-flex justify-content-end reply-cancel">
-                                <button class="btn btn-danger btn-sm reply-cancel w-10 me-2"
-                                        th:attr="data-reply-id=${topic.getId()}">Cancel
-                                </button>
-                            </div>
-                        </div>
-                        <input type="hidden" th:if="${session.user!=null}" name="username"
-                               th:value="${session.user.username}">
-                    </form>
-                </div>
-            </div>
-            <div class="d-flex justify-content-between align-items-center mt-3 pt-3">
+
+                <!-- Like & Dislike Buttons -->
                 <div class="d-flex flex-row">
                     <form th:action="@{/threads/{thread-id}/like(thread-id=${topic.getId()})}" method="post">
                         <input type="hidden" name="topic-id" th:value="${topic.getId()}">
                         <button th:if="${session.user!=null}"
                                 type="submit" class="btn btn-outline-success btn-sm me-2 like-button">
-                            <!--                                th:attr="data-reply-id=${reply.getDiscussion().getId()}">-->
                             👍 Like (<span th:text="${topic.getNumLikes()}">0</span>)
                         </button>
                     </form>
@@ -113,16 +100,15 @@
                         <input type="hidden" name="topic-id" th:value="${topic.getId()}">
                         <button th:if="${session.user!=null}"
                                 class="btn btn-outline-danger btn-sm dislike-button">
-                            <!--                                th:attr="data-reply-id=${reply.getDiscussion().getId()}">-->
                             👎 Dislike
                         </button>
                     </form>
                 </div>
             </div>
-
-
         </div>
-        <!-- Edit and Delete Buttons for Topic -->
+    </div>
+
+    <!-- Edit and Delete Buttons for Topic -->
         <div th:if="${session.user != null && session.user.getId() == topic.getUser().getId()}"
              class="card-footer d-flex justify-content-between">
             <div>

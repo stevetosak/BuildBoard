@@ -15,6 +15,9 @@
        font-weight: bold;
        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
    }
+        .badge{
+            background: #00e7ff80;
+        }
    </style>
 </head>
 <body>
@@ -68,7 +71,6 @@
                 <span th:if="!${hasRepoUrl}">There's no provided url for this project</span>
             </div>
             <div th:if="${!project.getTags().isEmpty()}">
-                <h6>Tags:</h6>
                 <ul class="list-inline">
                     <li th:each="tag : ${project.getTags()}"
                         class="list-inline-item badge bg-info text-dark d-inline-flex align-items-center">

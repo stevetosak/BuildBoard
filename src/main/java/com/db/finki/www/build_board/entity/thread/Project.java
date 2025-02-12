@@ -54,6 +54,8 @@ public class Project extends BBThread implements NamedThread {
     public String getTypeName() {
         return "projects";
     }
+
+
     public String getDescription() {return content;}
     public void setDescription(String description) {this.content = description;}
 

@@ -1,6 +1,9 @@
 package com.db.finki.www.build_board.service.search;
 
+import com.db.finki.www.build_board.entity.thread.BBThread;
+import com.db.finki.www.build_board.entity.thread.Tag;
 import com.db.finki.www.build_board.entity.thread.itf.NamedThread;
+import jakarta.persistence.criteria.Join;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +21,7 @@ public class FilterMap<T extends NamedThread> {
             if (param == null) {
                 return (root, query, cb) -> null;
             } else {
-                return (root, query, cb) -> cb.like(cb.lower(root.get("title")),  param.toLowerCase() + "%" );
+                return (root, query, cb) -> cb.like(cb.lower(root.get("title")), param.toLowerCase() + "%");
             }
         });
         filterMap.put("content", (param) -> {
