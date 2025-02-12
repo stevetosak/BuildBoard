@@ -20,7 +20,7 @@ VALUES
     ('Main content for topic thread', 1), --8
     ('Project-specific thread content 2', 5); --9
 
-insert into embdedable_thread(id)
+insert into embeddable_thread(id)
 values (1),(2),(3),(4),(6),(7),(8);
 
 

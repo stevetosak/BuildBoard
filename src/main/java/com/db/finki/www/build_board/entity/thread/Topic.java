@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "topic_thread")
-public class Topic extends EmbdedableThread implements NamedThread {
+public class Topic extends EmbeddableThread implements NamedThread {
 
     private String title;
 

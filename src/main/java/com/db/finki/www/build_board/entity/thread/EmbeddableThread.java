@@ -13,8 +13,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Entity
-@Table(name = "embdedable_thread")
-public class EmbdedableThread extends BBThread {
+@Table(name = "embeddable_thread")
+public class EmbeddableThread extends BBThread {
     @Id
     Integer id ;
 }

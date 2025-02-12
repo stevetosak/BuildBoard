@@ -1,13 +1,11 @@
 package com.db.finki.www.build_board.service.thread.impl;
 
-import com.db.finki.www.build_board.entity.thread.BBThread;
-import com.db.finki.www.build_board.entity.thread.EmbdedableThread;
+import com.db.finki.www.build_board.entity.thread.EmbeddableThread;
 import com.db.finki.www.build_board.entity.thread.discussion_thread.Discussion;
 import com.db.finki.www.build_board.entity.thread.discussion_thread.VDiscussion;
 import com.db.finki.www.build_board.entity.user_type.BBUser;
-import com.db.finki.www.build_board.repository.thread.BBThreadRepository;
 import com.db.finki.www.build_board.repository.thread.DiscussionRepository;
-import com.db.finki.www.build_board.repository.thread.EmbdedableRepo;
+import com.db.finki.www.build_board.repository.thread.EmbeddableRepo;
 import com.db.finki.www.build_board.repository.thread.VDiscussRepo;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -19,12 +17,12 @@ import java.util.List;
 public class DiscussionService {
     private final VDiscussRepo vDiscussRepo;
     private final DiscussionRepository discussionRepository;
-    private final EmbdedableRepo embdedableRepo;
+    private final EmbeddableRepo embeddableRepo;
 
-    public DiscussionService(VDiscussRepo vDiscussRepo, DiscussionRepository discussionRepository, EmbdedableRepo embdedableRepo) {
+    public DiscussionService(VDiscussRepo vDiscussRepo, DiscussionRepository discussionRepository, EmbeddableRepo embeddableRepo) {
         this.vDiscussRepo = vDiscussRepo;
         this.discussionRepository = discussionRepository;
-        this.embdedableRepo = embdedableRepo;
+        this.embeddableRepo = embeddableRepo;
     }
 
     public List<VDiscussion> getByTopic(int topicId){
@@ -36,7 +34,7 @@ public class DiscussionService {
                 level0Discussions.add(dis);
             }else{
                 VDiscussion parent = vDiscussRepo.findById((long) dis.getDiscussion().getParent().getId()).get();
-                parent.getChildren().add(dis); 
+                parent.getChildren().add(dis);
             }
         }
 
@@ -57,7 +55,7 @@ public class DiscussionService {
     @Transactional
     public Discussion create(String content, int parentId, BBUser user){
 
-        EmbdedableThread parent = embdedableRepo.findById((long) parentId).get();
+        EmbeddableThread parent = embeddableRepo.findById((long) parentId).get();
 
         Discussion reply = new Discussion();
         reply.setContent(content);

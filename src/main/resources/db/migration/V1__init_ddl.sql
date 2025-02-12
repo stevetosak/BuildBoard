@@ -42,6 +42,7 @@ DROP TRIGGER IF EXISTS validate_same_parent ON discussion_thread CASCADE;
 drop table if exists topic_guidelines cascade;
 drop table if exists submission cascade;
 drop table if exists feedback;
+drop table if exists embeddable_thread;
 
 
 ---- DDL
@@ -54,7 +55,7 @@ CREATE TABLE users
     is_activate   bool DEFAULT true,
     password      VARCHAR(72),
     description   VARCHAR(200),
-    registered_at TIMESTAMP DEFAULT NOW(),
+    registered_at TIMESTAMP DEFAULT NOW() NOT NULL,
     sex           VARCHAR(1)
 );
 CREATE TABLE moderator
@@ -73,7 +74,7 @@ CREATE TABLE thread
 (
     id      SERIAL PRIMARY KEY,
     content TEXT,
-    created_at timestamp DEFAULT NOW(),
+    created_at timestamp DEFAULT NOW() NOT NULL,
     user_id INT REFERENCES users (id) NOT NULL --IS_CREATED_BY TOTAL
 );
 CREATE TABLE project_thread
@@ -82,14 +83,14 @@ CREATE TABLE project_thread
     repo_url TEXT,
     id       INT PRIMARY KEY REFERENCES thread (id) on delete cascade --INHERITANCE
 );
-create table embdedable_thread(
+create table embeddable_thread(
    id int primary key references thread(id) on delete cascade
 );
 
 CREATE TABLE topic_thread
 (
     title     VARCHAR(256) NOT NULL,
-    id        INT PRIMARY KEY REFERENCES thread(id) on delete cascade, --INHERITANCE
+    id        INT PRIMARY KEY REFERENCES embeddable_thread(id) on delete cascade, --INHERITANCE
     parent_id int REFERENCES project_thread(id) on delete CASCADE  --PARENT
 );
 create table topic_guidelines
@@ -101,13 +102,13 @@ create table topic_guidelines
 );
 CREATE TABLE discussion_thread
 (
-    id  INT PRIMARY KEY REFERENCES  thread(id) on delete cascade, --INHERITANCE,
-    parent_id int REFERENCES embdedable_thread(id)  NOT NULL --on delete CASCADE ne tuku preku trigger PARENT TOTAL BIGINT
+    id  INT PRIMARY KEY REFERENCES  embeddable_thread(id) on delete cascade, --INHERITANCE,
+    parent_id int REFERENCES embeddable_thread(id) NOT NULL --on delete CASCADE ne tuku preku trigger PARENT TOTAL BIGINT
 );
 
 CREATE TABLE likes
 (
-    user_id   INT REFERENCES users (id) on delete cascade ,
+    user_id   INT REFERENCES users (id) on delete cascade,
     thread_id INT REFERENCES thread (id) on delete cascade,
     PRIMARY KEY (user_id, thread_id)
 );
@@ -115,13 +116,13 @@ CREATE TABLE topic_threads_moderators
 (
     thread_id INT REFERENCES topic_thread(id) ON DELETE CASCADE,
     user_id   INT REFERENCES moderator(id) ON DELETE CASCADE,
-    started_at TIMESTAMP DEFAULT NOW(),
+    started_at TIMESTAMP DEFAULT NOW() NOT NULL,
     PRIMARY KEY (thread_id, user_id)
 );
 CREATE TABLE tag
 (
     name VARCHAR(64) PRIMARY KEY,
-    creator_id int REFERENCES moderator(id)  on delete CASCADE not null
+    creator_id int REFERENCES moderator(id) on delete CASCADE not null
 );
 CREATE TABLE tag_threads
 (
@@ -145,7 +146,7 @@ CREATE TABLE developer_associated_with_project
 (
     project_id   INT REFERENCES project_thread(id) on delete cascade,
     developer_id INT REFERENCES developer(id) on delete cascade,
-    started_at   TIMESTAMP DEFAULT NOW(),
+    started_at   TIMESTAMP DEFAULT NOW() NOT NULL,
     ended_at     TIMESTAMP,
     PRIMARY KEY (project_id, developer_id, started_at)
 );
@@ -163,7 +164,7 @@ CREATE TABLE project_roles
 );
 CREATE TABLE users_project_roles
 (
-    user_id    INT REFERENCES developer(id) on delete cascade,
+    user_id INT REFERENCES developer(id) on delete cascade,
     project_id INT,
     role_name  VARCHAR(32),
     FOREIGN KEY (role_name, project_id)
@@ -184,7 +185,7 @@ create table submission(
     id serial primary key,
     created_at  TIMESTAMP default now() not null,
     description VARCHAR(200) NOT NULL,
-    status      varchar(32) default 'PENDING' CHECK(status IN ( 'ACCEPTED', 'DENIED', 'PENDING')),
+    status varchar(32) default 'PENDING' CHECK(status IN ( 'ACCEPTED', 'DENIED', 'PENDING')) NOT NULL,
     created_by int REFERENCES users(id) not null
 );
 
@@ -446,7 +447,7 @@ BEGIN
 
     delete from discussion_thread dt
     where dt.parent_id=OLD.id;
-    delete from embdedable_thread
+    delete from embeddable_thread
     where id = OLD.id;
     delete from thread t
     where t.id=OLD.id;
