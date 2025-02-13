@@ -69,7 +69,7 @@ podelba:
 - stefan od dodava i kreira tagovi (inclusive) do otstranuva programer od proekt
 
 
-
+-BUG DEFAULT AVATAR GRESEN ZEMAT.
 
 
 
