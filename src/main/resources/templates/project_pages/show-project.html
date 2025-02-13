@@ -106,7 +106,7 @@
                     </div>
                 </div>
 
-                <div th:if="${developers.contains(session.user)}" class="w-75 d-flex flex-column align-items-center">
+                <div th:if="${developers.contains(session.user)}" class="w-75 d-flex flex-column align-items-center mx-auto">
                     <h4>Channels:</h4>
                     <div class="list-group w-75">
                         <div class="list-group-item w-100" th:each="channel : ${project.getChannels()}">
