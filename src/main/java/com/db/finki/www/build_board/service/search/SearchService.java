@@ -2,8 +2,7 @@ package com.db.finki.www.build_board.service.search;
 
 //spored title, content, type
 
-import com.db.finki.www.build_board.entity.threads.Topic;
-import com.db.finki.www.build_board.entity.threads.interfaces.NamedThread;
+import com.db.finki.www.build_board.entity.thread.itf.NamedThread;
 
 import java.util.List;
 

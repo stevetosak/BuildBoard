@@ -1,13 +1,10 @@
 package com.db.finki.www.build_board.service.search;
 
-import com.db.finki.www.build_board.entity.threads.BBThread;
-import com.db.finki.www.build_board.entity.threads.Project;
-import com.db.finki.www.build_board.entity.threads.Topic;
-import com.db.finki.www.build_board.entity.threads.interfaces.NamedThread;
-import com.db.finki.www.build_board.repository.threads.ProjectRepository;
-import com.db.finki.www.build_board.repository.threads.TopicRepository;
-import com.db.finki.www.build_board.service.threads.impl.NamedThreadService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.db.finki.www.build_board.entity.thread.Project;
+import com.db.finki.www.build_board.entity.thread.Topic;
+import com.db.finki.www.build_board.entity.thread.itf.NamedThread;
+import com.db.finki.www.build_board.repository.thread.ProjectRepository;
+import com.db.finki.www.build_board.repository.thread.TopicRepository;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -21,19 +18,15 @@ public class SearchServiceImpl implements SearchService {
     private final FilterMap<Topic> topicFilterMap;
     private final FilterMap<Project> projectFilterMap;
     private final ProjectRepository projectRepository;
-    private final NamedThreadService namedThreadService;
 
-    @Autowired
-    public SearchServiceImpl(TopicRepository topicRepository, FilterMap<Topic> TopicFilterMap, FilterMap<Project> ProjectFilterMap, ProjectRepository projectRepository, NamedThreadService namedThreadService) {
+    public SearchServiceImpl(TopicRepository topicRepository, FilterMap<Topic> TopicFilterMap, FilterMap<Project> ProjectFilterMap, ProjectRepository projectRepository) {
         this.topicRepository = topicRepository;
         this.topicFilterMap = TopicFilterMap;
         this.projectFilterMap = ProjectFilterMap;
         this.projectRepository = projectRepository;
-        this.namedThreadService = namedThreadService;
     }
 
 
-    //todo strictmode so and spec
 
     private List<Topic> searchTopics(String query, List<String> filters) {
         Specification<Topic> spec = Specification.where(null);
@@ -57,6 +50,10 @@ public class SearchServiceImpl implements SearchService {
         if(type == null){
             type = "all";
         }
+        if(filters == null || filters.isEmpty()){
+            filters = new ArrayList<>();
+            filters.add("all");
+        }
 
         if(Objects.equals(type, "project")){
             System.out.println("PROJECT");
@@ -69,6 +66,8 @@ public class SearchServiceImpl implements SearchService {
             result.addAll(searchProjects(query, filters));
             System.out.println("ALL");
         }
+
+
 
         return result;
     }

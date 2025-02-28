@@ -1,30 +1,62 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${project.getTitle()}"></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .error-bubble {
+       display: inline-block;
+       background-color: #dc3545; /* Bootstrap danger color */
+       color: white;
+       padding: 10px 15px;
+       border-radius: 20px;
+       font-weight: bold;
+       box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+   }
+        .badge{
+            background: #00e7ff80;
+        }
+   </style>
 </head>
 <body>
 <div th:replace="/home_pages/home :: navigation"></div>
+<div class="w-100 d-flex justify-content-center align-items-center mt-3">
+    <div th:if="${errMsg!=null}" class="error-bubble">
+      <h5 class="text-center">Error</h5>
+      <p th:text="${errMsg}" class="mb-0"></p>
+    </div>
+  </div>
 
 <main th:with="isManager=${session.user != null ?  session.user.getId()==project.getUser().getId() : false }"
       class="container mt-5">
     <div class="card shadow-sm mb-4">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
             <h3 th:text="${project.getTitle()}">Project Title</h3>
-            <div th:if="${isManager}" class="d-flex flex-row gap-2">
-                <button
-                        class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addTagModal">Add Tag
-                </button>
-                <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addTagModal">
-                    <a class="text-decoration-none text-reset"
-                       th:href="@{/project/{pr_title}/topic/add(pr_title=${project.getTitle()})}">Add Topic</a>
-                </button>
-                <button class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#addTagModal">
-                    <a class="text-decoration-none text-reset"
-                       th:href="@{/project/{pr_title}/modify(pr_title=${project.getTitle()})}">Modify project</a>
+            <div class="d-flex flex-row gap-2 align-items-center">
+                <div th:if="${isManager}">
+                    <button
+                            class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addTagModal">Add Tag
+                    </button>
+                    <a class="text-decoration-none text-reset p-2 border-success border rounded bg-success"
+                       th:href="@{/projects/{pr_title}/topics/add(pr_title=${project.getTitle()})}">Add Topic</a>
+                    <a class="text-decoration-none text-reset p-2 border-success border rounded bg-secondary"
+                       th:href="@{/projects/{pr_title}/edit(pr_title=${project.getTitle()})}">Modify project</a>
+                    <a class="text-decoration-none text-reset p-2 border border-success rounded bg-success"
+                       th:href="@{/projects/{pr_title}/requests(pr_title=${project.getTitle()})}">View project
+                        requests</a>
+                </div>
+                <a class="text-decoration-none text-reset p-2 border border-success rounded bg-secondary"
+                   th:href="@{/projects/{pr_title}/members(pr_title=${project.getTitle()})}">Show members</a>
+                <button th:if="${session.user != null && !project.getUser().equals(session.user)
+                 && !developers.contains(session.user)}"
+                        class="text-decoration-none text-reset p-2 border border-success rounded bg-success"
+                        th:attr="data-pr-title=${project.getTitle()}"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modal"
+                >
+                    Send request
                 </button>
             </div>
         </div>
@@ -39,13 +71,12 @@
                 <span th:if="!${hasRepoUrl}">There's no provided url for this project</span>
             </div>
             <div th:if="${!project.getTags().isEmpty()}">
-                <h6>Tags:</h6>
                 <ul class="list-inline">
                     <li th:each="tag : ${project.getTags()}"
                         class="list-inline-item badge bg-info text-dark d-inline-flex align-items-center">
                         <span th:text="${tag.getName()}">Tag Name</span>
                         <form th:if="${session.user!=null && session.user.equals(project.getUser())}"
-                              th:action="@{/project/delete-tag/{projectTitle}/{tagName} (projectTitle=${project.getTitle()}, tagName=${tag.getName()})}"
+                              th:action="@{/projects/{projectTitle}/tags/{tagName}/delete (projectTitle=${project.getTitle()}, tagName=${tag.getName()})}"
                               method="post" style="margin-left: 5px;">
                             <button type="submit" class="btn btn-sm btn-link text-danger p-0 ms-1"
                                     style="line-height: 1;">
@@ -58,13 +89,13 @@
                 </ul>
             </div>
             <div class="d-flex flex-row justify-content-between">
-                <div th:if="${!project.getTopics().isEmpty()}" class="w-75 d-flex flex-column align-items-center">
+                <div th:if="${!project.getTopics().isEmpty()}" class="w-75 d-flex flex-column align-items-center mx-auto">
                     <h4>Topics:</h4>
                     <div class="list-group w-75">
                         <div class="list-group-item w-100" th:each="topic : ${project.getTopics()}">
                             <div class="d-flex">
                                 <h5 class="mb-1">
-                                    <a th:href="@{/topic/{name} (name=${topic.getTitle()})}"
+                                    <a th:href="@{/topics/{id} (id=${topic.getId()})}"
                                        th:text="${topic.getTitle()}" class="text-decoration-none"></a>
                                 </h5>
                                 <!--                <small th:text="${thread.getFormattedDate()}">Date</small>-->
@@ -75,36 +106,40 @@
                     </div>
                 </div>
 
-                <div th:if="${!project.getTopics().isEmpty()}" class="w-75 d-flex flex-column align-items-center">
+                <div th:if="${developers.contains(session.user)}" class="w-75 d-flex flex-column align-items-center mx-auto">
                     <h4>Channels:</h4>
                     <div class="list-group w-75">
-                        <div class="list-group-item w-100" th:each="topic : ${project.getTopics()}">
-                            <div class="d-flex">
-                                <h5 class="mb-1">
-                                    <a th:href="@{/topic/{name} (name=${topic.getTitle()})}"
-                                       th:text="${topic.getTitle()}" class="text-decoration-none"></a>
-                                </h5>
-                                <!--                <small th:text="${thread.getFormattedDate()}">Date</small>-->
-                            </div>
-                            <!--            <p class="mb-1 text-muted" th:text="${thread.getDescription()}">Thread description here...</p>-->
-                            <!--            <small th:text="${thread.getAuthor()}">Posted by Author</small>-->
+                        <div class="list-group-item w-100" th:each="channel : ${project.getChannels()}">
+                            <form method="post" th:action="@{/projects/{projectName}/channels/{channelName}/delete (projectName=${project.getTitle()},channelName=${channel.getName()})}">
+                                <div class="d-flex justify-content-between">
+                                    <h5 class="mb-1">
+                                        <a th:href="@{/projects/{projectName}/channels/{name} (name=${channel.getName()},projectName=${project.getTitle()})}"
+                                           th:text="${channel.getName()}" class="text-decoration-none"></a>
+                                    </h5>
+                                    <div th:if="${channel.getDeveloper().getId() == session.user.getId() || project.getUser() == session.user}">
+                                        <button class="btn btn-sm btn-outline-danger">Delete</button>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
+                        <button class="btn btn-success btn-sm w-25 mt-2 mx-auto" data-bs-toggle="modal"
+                                data-bs-target="#addChannelModal">
+                            Add Channel
+                        </button>
                     </div>
                 </div>
 
             </div>
             <div class="d-flex justify-content-between align-items-center mt-3 pt-3">
                 <div class="d-flex flex-row">
-                    <form th:action="'/project/' + ${project.getTitle()} + '/discussion/like'" method="post">
-                        <input type="hidden" name="threadId" th:value="${project.getId()}">
+                    <form th:action="'/threads/' + ${project.getId()} + '/like'" method="post">
                         <button th:if="${session.user!=null}"
                                 type="submit" class="btn btn-outline-success btn-sm me-2 like-button">
                             <!--                                th:attr="data-reply-id=${reply.getDiscussion().getId()}">-->
                             👍 Like (<span th:text="${project.getNumLikes()}">0</span>)
                         </button>
                     </form>
-                    <form th:action="'/project/' + ${project.getTitle()} + '/discussion/dislike'" method="post">
-                        <input type="hidden" name="threadId" th:value="${project.getId()}">
+                    <form th:action="'/threads/' + ${project.getId()} + '/dislike'" method="post">
                         <button th:if="${session.user!=null}"
                                 class="btn btn-outline-danger btn-sm dislike-button">
                             <!--                                th:attr="data-reply-id=${reply.getDiscussion().getId()}">-->
@@ -115,9 +150,8 @@
             </div>
         </div>
         <div th:if="${isManager}" class="card-footer d-flex justify-content-between">
-            <form th:action="@{/project/delete/{title} (title=${project.getTitle()})}" method="post"
+            <form th:action="@{/projects/{title}/delete (title=${project.getTitle()})}" method="post"
                   style="display:inline;">
-                <input type="hidden" name="id" th:value="${project.getId()}"/>
                 <button type="submit" class="btn btn-danger btn-sm">Delete Project</button>
                 <input th:if="${session.user!=null}" type="hidden" name="username"
                        th:value="${session.user.getUsername()}">
@@ -127,6 +161,36 @@
 
 </main>
 
+<section id="errors" class="container bg bg-danger border border-dark w-50" th:if="${error != null}">
+    <p class="fw-bold fs-6" th:text="'Error: ' + ${error}"></p>
+</section>
+
+<div class="modal fade"
+     id="modal"
+     data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel"
+     aria-hidden="true"
+>
+    <form method="post" id="modal-form" th:action="@{/projects/{pr-tittle}/requests/create(pr-tittle=${project.getTitle()})}">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel2">Request</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body d-flex flex-column gap-2">
+                    <label>Reason</label>
+                    <textarea id="reason-desc"
+                              style="height: 20vh"
+                              class="w-100 border border-rounded"
+                              name="reason-desc"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success">Submit</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
 <!-- Add Tag Modal -->
 <div class="modal fade" id="addTagModal" tabindex="-1" aria-labelledby="addTagModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -136,7 +200,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form th:action="@{/project/{title}/add-tag(title=${project.getTitle()})}" method="post"
+                <form th:action="@{/projects/{title}/tags/add(title=${project.getTitle()})}" method="post"
                       id="addTagForm">
                     <div class="mb-3">
                         <label for="existingTags" class="form-label">Tag Name</label>
@@ -154,6 +218,32 @@
                                th:value="${session.user.getUsername()}">
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Add Tag</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/js/modal_utils.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<div class="modal fade" id="addChannelModal" tabindex="-1" aria-labelledby="addChannelModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addChannelModalLabel">Create a channel</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form th:action="@{/projects/{title}/channels/add(title=${project.getTitle()})}" method="post"
+                      id="addChannelForm">
+
+                    <div class="mb-3 d-flex flex-column justify-content-center">
+                        <input class="form-control" type="text" id="channelName" name="channelName"
+                               placeholder="Enter channel name"/>
+                        <textarea class="form-control mt-2" id="channelDescription" name="channelDescription" cols="30"
+                                  rows="10" placeholder="What is this channel about.."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Create Channel</button>
                 </form>
             </div>
         </div>
@@ -180,7 +270,7 @@
             }
         });
     });
-
+    modalConts.push(document.querySelector(".modal"))
 </script>
 
 

@@ -5,16 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Add Topic</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .error-bubble {
+        display: inline-block;
+        background-color: #dc3545; /* Bootstrap danger color */
+        color: white;
+        padding: 10px 15px;
+        border-radius: 20px;
+        font-weight: bold;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    }
+</style>
 </head>
 <body>
 <div th:replace="/home_pages/home :: navigation"></div>
-<main th:with="prefix=${project_title==null ? '' : '/project'}" class="container mt-5">
+<main th:with="prefix=${project_title==null ? '' : '/projects'}" class="container mt-5">
   <div class="card shadow-sm">
     <div class="card-header bg-primary text-white">
       <h4 class="mb-0">Add a New Topic</h4>
     </div>
     <div class="card-body">
-      <form th:action="@{{prfx}/topic/add(prfx=${prefix})}" method="post">
+      <form th:action="@{{prfx}/topics/add(prfx=${prefix})}" method="post">
         <div class="mb-3">
           <label for="title" class="form-label">Title</label>
           <input type="text" id="title" name="title" class="form-control" placeholder="Enter the topic title" required>
@@ -27,6 +38,12 @@
         <input th:if="${!#strings.isEmpty(prefix)}" type="hidden" name="project_title" th:value="${project_title}"/>
         <input type="hidden" name="username" th:value="${session.user.getUsername()}"/>
       </form>
+    </div>
+  </div>
+  <div class=" w-100 d-flex justify-content-center align-items-center mt-3">
+    <div th:if="${errMsg!=null}" class="error-bubble">
+      <h5 class="text-center">Error</h5>
+      <p th:text="${errMsg}" class="mb-0"></p>
     </div>
   </div>
 </main>

@@ -17,6 +17,7 @@
         <form method="post"
               class="d-flex me-5 mt-3 ms-5 mb-3 gap-2 flex-grow-1 flex-column gap-2 list-group-flush "
               action="/register"
+              id="register-form"
         >
             <label class="fw-bold ">Username:
                 <input name="username" type="text" th:value="${user.getUsername()}"
@@ -39,8 +40,15 @@
             </label>
             <label class="fw-bold ">Password:
                 <input name="password"
-                       placeholder="Leave empty if you don't want to change it"
+                       id="password"
+                       placeholder="Enter a strong password"
                        type="password" class="w-100 ps-2 list-group-item border border-secondary rounded">
+            </label>
+            <label class="fw-bold ">Confirm Password:
+                <input
+                        id="confirm-password"
+                        placeholder="Retype your password"
+                        type="password" class="w-100 ps-2 list-group-item border border-secondary rounded">
             </label>
             <div>
                 <label>Choose your gender:</label>
@@ -51,11 +59,55 @@
                     <input name="sex" type="radio" value="female">Female
                 </label>
             </div>
-            <button th:if="${canEdit}" class="btn btn-success btn-sm w-50 align-self-center">Create user
+            <button th:if="${canEdit}" class="btn btn-success btn-sm w-50 align-self-center">Register
             </button>
         </form>
     </div>
 </div>
+<footer
+        class="w-100 d-flex justify-content-center">
+    <div class="bg-danger w-80 mt-5 rounded p-2" th:if="${duplicatedUsername != null}">
+        <p
+                th:text="|The username ${duplicatedUsername?: ''}  already exists|"
+                class="text-center text-body mb-0"></p>
+    </div>
+    <div id="error" class="fs-6 text-danger mt-3"></div>
+</footer>
 </body>
+
+<script>
+    let form = document.getElementById("register-form");
+    let errorDiv = document.getElementById("error");
+
+    form.addEventListener("submit", (event) => {
+        let hasError = false;
+        errorDiv.innerHTML = '';
+        errorDiv.style.display = 'none';
+
+        form.querySelectorAll("input").forEach(input => {
+            if (input.value === '') {
+                hasError = true;
+                let errorMessage = document.createElement('p');
+                errorMessage.innerText = `Field ${input.name || input.id} cannot be empty.`;
+                errorDiv.appendChild(errorMessage);
+            }
+        });
+
+        let passwd = document.getElementById("password").value;
+        let confirm = document.getElementById("confirm-password").value;
+
+        if (passwd !== confirm) {
+            hasError = true;
+            let errorMessage = document.createElement('p');
+            errorMessage.innerText = "Passwords do not match.";
+            errorDiv.appendChild(errorMessage);
+        }
+
+        if (hasError) {
+            event.preventDefault();
+            errorDiv.style.display = 'block';
+        }
+    });
+</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </html>

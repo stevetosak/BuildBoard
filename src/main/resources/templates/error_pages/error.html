@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error</title>
+    <link rel="stylesheet" href="/css/icon.css">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light d-flex flex-column align-items-center justify-content-center" style="min-height: 100vh;">
+<img src="/favicon.ico" alt="logo" class="icon-big rounded-circle border border-info my-5">
+<div class="w-75 card shadow-lg text-center p-4">
+    <div class="card-body">
+        <h1 class="display-4 text-danger">Error</h1>
+        <hr>
+        <p class="d-flex flex-column justify-content-center align-items-center">
+            <span class="text-danger fs-3" th:text="${status}"></span>
+<!--            <span class="text-primary fs-5" th:text="${exception.getMessage()}"></span>-->
+        </p>
+        <hr>
+        <p th:text="${message}" class="text-muted">Description</p>
+        <a href="/" class="btn btn-primary mt-3">Back to Home</a>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

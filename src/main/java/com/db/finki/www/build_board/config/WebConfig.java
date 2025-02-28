@@ -1,6 +1,6 @@
 package com.db.finki.www.build_board.config;
 
-import com.db.finki.www.build_board.service.threads.impl.FileUploadService;
+import com.db.finki.www.build_board.service.util.FileUploadService;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
