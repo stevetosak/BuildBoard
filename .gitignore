@@ -1,0 +1,9 @@
+/target/*
+.idea
+.run
+*.iml
+*.env
+.vscode/
+node_modules/
+uploads/
+docs/test-data1.sql

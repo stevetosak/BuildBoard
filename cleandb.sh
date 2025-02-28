@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source ./.env.dbparams
+source .dbparams.env
 
 profile=$1
 
