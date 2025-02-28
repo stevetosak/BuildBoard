@@ -1,0 +1,19 @@
+BUILDBOARD NAPREDNA FAZA
+
+- support za sliki i videa(mozda) vo topic content
+- markdown edit za content na topic
+- notifikacii
+- achievements (builder ke ni teknit)
+- follow na topic, project, user
+- rating namesto like (+1 - 1)
+- filter spored vreme
+- analitika > topic views (clicks)
+- autocompletion na tags ko ke klavas
+- ai tag generation (ke vidime za ova)
+- topics rename vo posts
+- toggle za dodatni informacii so sakas da ti sa prikazat primer vo navbar ako si content creator...
+- referenciranje na threads (link)
+- communities (grupacija na posts)
+- prikaz koj tags se najcesto koristeni vo dadeno commmunity spored topics vo toj community
+- dinamicen search, grupacija na rezultati, (slicno ko na github so repo: samo repos itn...
+- statistiki za userot
