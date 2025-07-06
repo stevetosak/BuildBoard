@@ -17,3 +17,4 @@ BUILDBOARD NAPREDNA FAZA
 - prikaz koj tags se najcesto koristeni vo dadeno commmunity spored topics vo toj community
 - dinamicen search, grupacija na rezultati, (slicno ko na github so repo: samo repos itn...
 - statistiki za userot
+- announcements vo project page za developers.
