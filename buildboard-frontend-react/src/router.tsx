@@ -1,4 +1,9 @@
-import {createBrowserRouter, createRoutesFromElements, Route} from "react-router-dom";
+import {
+	createBrowserRouter,
+	createRoutesFromElements,
+	Route,
+} from "react-router-dom";
+import HomePage from "@/pages/HomePage.tsx";
 
 export const router = createBrowserRouter(
     createRoutesFromElements(
