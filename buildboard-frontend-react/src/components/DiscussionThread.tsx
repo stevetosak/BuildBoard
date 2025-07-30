@@ -61,20 +61,20 @@ export const DiscussionThread = ({className, data,preload = false}: { className?
                     </div>
                     <div>
                         {replying && (
-                            <Input>Add your reply...</Input>
+                            <Input type={'text'} placeholder={"Send a reply..."}></Input>
                         )}
 
                     </div>
                     <div>
                         <Button className={"hover:-translate-y-0.5 hover:bg-gray-300"}
-                                onClick={() => console.log("click")}>
+                                onClick={() => setReplying(prevState => !prevState)}>
                             <Reply/>
                         </Button>
                     </div>
                 </CardFooter>
 
             </Card>
-            <div className={"flex items-start"}>
+            <div className={"flex items-start mt-2"}>
                 <Button className={'hover:bg-gray-100 hover:-translate-y-0.5 hover:translate-x-0.5'}
                     onClick={() => {
                     setDisplayReplies(prevState => !prevState)

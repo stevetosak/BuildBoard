@@ -8,7 +8,7 @@ export const Replies = ({ threads, className }: { threads?: ThreadData[], classN
                 <div
                     key={idx}
                     className={`mt-5`}
-                    style={{ paddingLeft: `${thr.depth * 1.5}rem` }} // <- this does the indentation
+                    style={{ paddingLeft: `${thr.depth * 1.5}rem` }}
                 >
                     <DiscussionThread className="gap-1" data={thr} />
                 </div>
