@@ -3,13 +3,12 @@ import {Check, CircleEllipsis, Reply, TextQuote, X} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
 import type {ThreadData} from "@/types.ts";
 import {Replies} from "@/components/Replies.tsx";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {Input} from "@/components/ui/input.tsx";
 
 // todo decoupled loading da e pomegju threads: ne site naednas tuku sekoj DiscussionThread, pri kilk na show replies duri togas da gi fetchnit decata negovi
 
-
-export const DiscussionThread = ({className, data}: { className?: string, data: ThreadData }) => {
+export const DiscussionThread = ({className, data,preload = false}: { className?: string, data: ThreadData,preload?:boolean}) => {
 
     const mockReplies: ThreadData[] = [
         {
@@ -25,11 +24,11 @@ export const DiscussionThread = ({className, data}: { className?: string, data: 
     ]
     const [replying, setReplying] = useState<boolean>(false)
     const [replies, setReplies] = useState<ThreadData[]>([])
-    const [displayReplies,setDisplayReplies] = useState(false)
+    const [displayReplies,setDisplayReplies] = useState(preload)
 
 
     return (
-        <div className={`ml-${data.depth}`}>
+        <div >
             <Card className={`border rounded-3xl ${className}`}>
                 <CardHeader className={"flex justify-between"}>
                     <div className={"flex gap-2"}>
@@ -75,11 +74,13 @@ export const DiscussionThread = ({className, data}: { className?: string, data: 
                 </CardFooter>
 
             </Card>
-            <div className={"flex items-baseline"}>
-                <CircleEllipsis/>
-                <Button onClick={() => {
+            <div className={"flex items-start"}>
+                <Button className={'hover:bg-gray-100 hover:-translate-y-0.5 hover:translate-x-0.5'}
+                    onClick={() => {
                     setDisplayReplies(prevState => !prevState)
-                }}>{!displayReplies ? `View ${mockReplies.length} more replies` : "Hide"}</Button>
+                }}> <CircleEllipsis/>{
+                    !displayReplies ? `View ${mockReplies.length} more replies` : "Hide"}
+                </Button>
             </div>
 
             {displayReplies && <Replies threads={mockReplies}/>}
