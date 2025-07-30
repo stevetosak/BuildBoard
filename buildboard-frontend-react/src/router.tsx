@@ -3,13 +3,13 @@ import {
 	createRoutesFromElements,
 	Route,
 } from "react-router-dom";
-import HomePage from "@/pages/HomePage.tsx";
+import {TopicPage} from "@/pages/TopicPage.tsx";
 
 export const router = createBrowserRouter(
     createRoutesFromElements(
         <>
             <Route path={"/"}>{/*    tuka vo element ke napreme eden layout element za consistent ui*/}
-                <Route path={"topics/:topicName"}></Route>
+                <Route path={"topics/:topicName"} element={<TopicPage/>}></Route>
                 <Route path={"projects/:id/"}>
                     <Route path={"channels/:channelName"}></Route>
                     <Route path={"requests"}></Route>
