@@ -4,7 +4,7 @@ import {
     CardFooter,
     CardHeader,
 } from "@/components/ui/card.tsx";
-import {Check, CircleEllipsis, Reply, TextQuote, X} from "lucide-react";
+import {Check, CircleEllipsis, Reply, X} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
 import type {ThreadData} from "@/types.ts";
 import {Replies} from "@/components/Replies.tsx";

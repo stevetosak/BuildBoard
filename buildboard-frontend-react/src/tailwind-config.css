@@ -5,9 +5,13 @@
     --color-foregound: #2b62a2;
     --color-foreground-2: #0a1a31;
     --color-background-main: #000D20;
+    --color-background-main-s1: #020d20;
+    --color-background-main-s2: #000f1c;
     --color-bg-2: #070715;
     --color-background-card: #031023;
     --color-accent-2: #3fb786;
+    --color-foreground-gray: var(--color-gray-700);
+    --color-background-gray: var(--color-gray-900);
 }
 
 /*#5FE3A7*/

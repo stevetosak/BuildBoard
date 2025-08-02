@@ -57,6 +57,11 @@
   /*background: var(--color-background-main);*/
   color: white;
   height: 100%;
+  width: 100%;
+}
+
+.user-avatar{
+  @apply w-10 h-10 rounded-full p-1
 }
 
 
@@ -77,14 +82,14 @@ body {
   min-height: 100vh;
   height: 100%;
   background: var(--color-background-main);
+}
+
+*{
   color: #eaeaea;
 }
 
-
-
-
 h1 {
-  font-size: 3.2em;
+  font-size: 1.2em;
   line-height: 1.1;
 }
 
