@@ -14,9 +14,6 @@ import {
 	SidebarProvider,
 	SidebarTrigger,
 	Sidebar,
-	SidebarContent,
-	SidebarMenu,
-	SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
 export type SingleColorCtx = {
@@ -26,32 +23,30 @@ export type SingleColorCtx = {
 };
 
 //TODO: eslint + prettier config
+//TODO: vidi sho e fintatna so group-data[state]:neshto da napresh
 //TODO: vidi sho se at rules vo css @layers @themes @apply...
 //TODO: razmisli za code examples
+//TODO: fix intelisense for tailwind css
 const HomePage = () => {
 	const user = useLoaderData() as NonNullable<User>;
 
 	return (
 		<main className="w-full grid bg-bg-1 px-0 h-[100vh]  pb-3 pe-3 grid-cols-[1fr_3fr_1fr]">
 			<SidebarProvider>
-				<Sidebar
-					style={{
-						width: "100%",
-						height: "100%",
-					}}
-					className="border-r-2  border-r-non-accent "
-				>
+				<Sidebar className=" bg-sidebar-bg">
 					<SidebarHeader>
-						<SidebarMenu>
-							<SidebarMenuItem>
-								<div>
-									<img src={iconUrl} />
-								</div>
-							</SidebarMenuItem>
-						</SidebarMenu>
+						<div className="w-full flex justify-center">
+							<div className="w-1/2 h-full">
+								<img
+									src={iconUrl}
+									alt="Buildboard logo"
+									className="w-full h-full"
+								/>
+							</div>
+						</div>
 					</SidebarHeader>
 				</Sidebar>
-				<SidebarTrigger></SidebarTrigger>
+				<SidebarTrigger className="text-white"/>
 			</SidebarProvider>
 			<section></section>
 			<section className="flex border-l-2 border-l-white gap-2.5 justify-end pe-3 my-3">

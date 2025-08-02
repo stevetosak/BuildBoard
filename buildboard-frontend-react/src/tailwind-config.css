@@ -9,6 +9,7 @@
 	--color-bg-1: #000D20;
 	--color-bg-2: #0A1A31;
 	--color-non-accent: #0c1f3c; 
+	--color-sidebar-bg: #021126; 
 }
 
 :root {
@@ -55,7 +56,7 @@
     --sidebar-border: oklch(0.922 0 0);
     --sidebar-ring: oklch(0.708 0 0);
   }
- 
+
   .dark {
     --sidebar: oklch(0.205 0 0);
     --sidebar-foreground: oklch(0.985 0 0);
@@ -67,10 +68,4 @@
     --sidebar-ring: oklch(0.439 0 0);
   }
 
-   * {
-    @apply border-border outline-ring/50; 
-	}
-  body {
-    @apply bg-background text-foreground; 
-	} 
 }
