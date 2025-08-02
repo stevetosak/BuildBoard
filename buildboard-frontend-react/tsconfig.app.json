@@ -9,7 +9,9 @@
 
 		"baseUrl": ".",
 		"paths": {
-			"@/*": ["./src/*"]
+			"@/*": ["./src/*"],
+			"@pages/*" : ["./src/pages/*"],
+			"@components/*": ["./src/components/*"]
 		},
 
 		/* Bundler mode */
@@ -27,6 +29,7 @@
 		"erasableSyntaxOnly": true,
 		"noFallthroughCasesInSwitch": true,
 		"noUncheckedSideEffectImports": true
+
 	},
 	"include": ["src"]
 }
