@@ -10,7 +10,6 @@ export const router = createBrowserRouter(
 	createRoutesFromElements(
 		<>
 			<Route path={"/"}>
-				{/*    tuka vo element ke napreme eden layout element za consistent ui*/}
 				<Route
 					index
 					loader={homePageLoader}
