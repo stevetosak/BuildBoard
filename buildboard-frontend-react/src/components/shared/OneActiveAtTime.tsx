@@ -16,7 +16,7 @@ const OneActiveAtTime = ({ children, initActive = 0, activeCls, nonActiveCls }: 
 			{Children.map(children, (child, i) => (
 				<div
 					onMouseEnter={(_) => setIActive(i)}
-					className={`${iActive == i ? activeCls : nonActiveCls}`}
+					className={`${iActive == i ? activeCls : nonActiveCls} one-active-wrapper`}
 				>
 					{child}
 				</div>
