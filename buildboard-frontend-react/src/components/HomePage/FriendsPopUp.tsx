@@ -15,7 +15,7 @@ const FriendsPopUp = ({ user }: FriendsPopUpProps) => {
 	return (
 		<div
 			data-expanded={expanded}
-			className="group grid-rows-auto data-[expanded=true]:translate-x-full relative transition-transform ease-in-out duration-100 bg-sidebar-bg grid p-2 rounded-l-lg text-sidebar-foreground hover:text-white hover:border-white border-l-1 border-t-1 border-b-1 w-[12em] max-h-1/2"
+			className="group grid-rows-[3em_3em_auto] data-[expanded=true]:translate-x-full relative transition-transform ease-in-out duration-100 bg-sidebar-bg grid p-2 rounded-l-lg text-sidebar-foreground hover:text-white hover:border-white border-l-1 border-t-1 border-b-1 w-[12em] max-h-1/2 "
 		>
 			<Button
 				size="icon"

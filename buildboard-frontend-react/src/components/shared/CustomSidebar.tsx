@@ -19,7 +19,7 @@ const CustomSidebar = ({
 	bodyContent,
 }: CustomSidebarProps) => {
 	return (
-		<SidebarProvider className={`${side == 'right' ? 'flex-row-reverse' : 'flex-row'}`}>
+		<SidebarProvider className={`${side == 'right' ? 'flex-row-reverse' : 'flex-row'} `}>
 			<Sidebar
 				className=" bg-sidebar-bg"
 				side={side}

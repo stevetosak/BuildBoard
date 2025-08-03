@@ -41,9 +41,7 @@ const handleError = async (response:Response) => {
 	throw new Error("Unknown expection")
 }
 
-//TODO: klaj mu posle da ne e logiran i ne se zamaraj
 export const loader = async () => {
-	//TODO: make url builder 
 	const response = await fetch(API_ENDPOINTS.host + API_ENDPOINTS.endpoints.user  + "?username=buildboard")		
 	if(!response.ok)
 		return await handleError(response)

@@ -25,7 +25,7 @@ const UserInfo = ({ user }: UserInfoProp) =>
 				<HoverCardTrigger>
 					<UserIcon />
 				</HoverCardTrigger>
-				<HoverCardContent>See profile</HoverCardContent>
+				<HoverCardContent className="text-[.7rem] p-1 bg-sidebar-bg rounded ">See profile</HoverCardContent>
 			</HoverCard>
 		</OneActiveAtTime>
 	) : (
