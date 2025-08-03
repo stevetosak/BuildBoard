@@ -2,11 +2,13 @@ import { Children, useState, type ReactNode } from "react";
 
 type MaybeArray<T> = T | T[]
 type OneActiveAtTimeProps = {
-	children: MaybeArray<ReactNode>;
-	initActive? : number 
+	children: MaybeArray<ReactNode>,
+	activeCls : string,
+	nonActiveCls: string, 
+	initActive? : number
 };
 
-const OneActiveAtTime = ({ children, initActive = 0 }: OneActiveAtTimeProps) => {
+const OneActiveAtTime = ({ children, initActive = 0, activeCls, nonActiveCls }: OneActiveAtTimeProps) => {
 	const [iActive, setIActive] = useState<number>(initActive);
 
 	return (
@@ -14,7 +16,7 @@ const OneActiveAtTime = ({ children, initActive = 0 }: OneActiveAtTimeProps) => 
 			{Children.map(children, (child, i) => (
 				<div
 					onMouseEnter={(_) => setIActive(i)}
-					className={`${iActive == i ? "text-accent" : "text-white"}`}
+					className={`${iActive == i ? activeCls : nonActiveCls}`}
 				>
 					{child}
 				</div>

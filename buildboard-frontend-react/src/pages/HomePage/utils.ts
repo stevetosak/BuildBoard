@@ -1,4 +1,4 @@
-import API_ENDPOINTS from "@/apiUtils";
+import API_ENDPOINTS from "@/constants";
 
 type Channel = {
 	name: string;
@@ -14,13 +14,18 @@ type Tag = {
 	name: string;
 };
 
+type Friend = {
+	username : string, 
+	logo : URL
+}
+
 type NonNullUser = {
 	username: string;
 	following: {
 		channels: Channel[];
 		projects: Projects[];
 		tags: Tag[];
-		friends: NonNullUser["username"][];
+		friends: Friend[]
 	};
 };
 export type User = NonNullUser | null;
@@ -39,7 +44,7 @@ const handleError = async (response:Response) => {
 //TODO: klaj mu posle da ne e logiran i ne se zamaraj
 export const loader = async () => {
 	//TODO: make url builder 
-	const response = await fetch(API_ENDPOINTS.host + API_ENDPOINTS.endpoints.user  + "?username=")		
+	const response = await fetch(API_ENDPOINTS.host + API_ENDPOINTS.endpoints.user  + "?username=buildboard")		
 	if(!response.ok)
 		return await handleError(response)
 	return await response.json()
