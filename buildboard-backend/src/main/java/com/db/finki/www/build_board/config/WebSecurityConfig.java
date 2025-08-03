@@ -19,6 +19,9 @@ import org.springframework.security.web.context.DelegatingSecurityContextReposit
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
@@ -35,45 +38,64 @@ public class WebSecurityConfig {
         this.userDetailsService = userDetailsService;
         this.successHandler = successHandler;
     }
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//        http
+//                .csrf(AbstractHttpConfigurer::disable)
+//                .authorizeHttpRequests(request ->
+//                        request.requestMatchers(
+//                                        "/",
+//                                        "/contact",
+//                                        "/about",
+//                                    "/project_imgs/buildboard-logo.jpg",
+//                                "*.ico",
+//                                "*.jpg",
+//                                "*.png",
+//                                "/register",
+//                                        "/css/**",
+//                                        "/js/**"
+//                                ).permitAll()
+//                                .requestMatchers(
+//                                        new AntPathRequestMatcher("/topic/*", HttpMethod.GET.name()),
+//                                        new AntPathRequestMatcher("/project/*",HttpMethod.GET.name()),
+//                                        new AntPathRequestMatcher("/avatars/**",HttpMethod.GET.name())
+//                                ).permitAll()
+//                                .requestMatchers("/topic/**","/project/**").authenticated()
+//
+//                                .anyRequest().authenticated()
+//                ).formLogin(formLogin ->
+//                        formLogin.permitAll()
+//                                .defaultSuccessUrl("/")
+//                                .successHandler(successHandler)
+//                )
+//                .logout(logout ->
+//                        logout.logoutSuccessUrl("/")
+//                                .clearAuthentication(true)
+//                                .invalidateHttpSession(true)
+//                                .deleteCookies("JSESSIONID")
+//                );
+//
+//        return http.build();
+//
+//    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(request ->
-                        request.requestMatchers(
-                                        "/",
-                                        "/contact",
-                                        "/about",
-                                    "/project_imgs/buildboard-logo.jpg",
-                                "*.ico",
-                                "*.jpg",
-                                "*.png",
-                                "/register",
-                                        "/css/**",
-                                        "/js/**"
-                                ).permitAll()
-                                .requestMatchers(
-                                        new AntPathRequestMatcher("/topic/*", HttpMethod.GET.name()),
-                                        new AntPathRequestMatcher("/project/*",HttpMethod.GET.name()),
-                                        new AntPathRequestMatcher("/avatars/**",HttpMethod.GET.name())
-                                ).permitAll()
-                                .requestMatchers("/topic/**","/project/**").authenticated()
+        return http.csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .authorizeHttpRequests(requests -> requests.anyRequest().permitAll())
+                .build();
+    }
 
-                                .anyRequest().authenticated()
-                ).formLogin(formLogin ->
-                        formLogin.permitAll()
-                                .defaultSuccessUrl("/")
-                                .successHandler(successHandler)
-                )
-                .logout(logout ->
-                        logout.logoutSuccessUrl("/")
-                                .clearAuthentication(true)
-                                .invalidateHttpSession(true)
-                                .deleteCookies("JSESSIONID")
-                );
 
-        return http.build();
-
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration corsConfiguration = new CorsConfiguration();
+        corsConfiguration.addAllowedOrigin("http://localhost:5173");
+        corsConfiguration.setAllowCredentials(true);
+        UrlBasedCorsConfigurationSource corsConfigurationSource = new UrlBasedCorsConfigurationSource();
+        corsConfigurationSource.registerCorsConfiguration("/**", corsConfiguration);
+        return corsConfigurationSource;
     }
 
     @Bean

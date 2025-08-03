@@ -75,6 +75,7 @@ CREATE TABLE thread
     id      SERIAL PRIMARY KEY,
     content TEXT,
     created_at timestamp DEFAULT NOW() NOT NULL,
+    level int,
     user_id INT REFERENCES users (id) NOT NULL --IS_CREATED_BY TOTAL
 );
 CREATE TABLE project_thread

@@ -7,36 +7,62 @@ import {
 import {Check, CircleEllipsis, Reply, X} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
 import type {ThreadData} from "@/types.ts";
-import {Replies} from "@/components/Replies.tsx";
-import {useState} from "react";
+import {Replies} from "@/components/custom/Replies.tsx";
+import {type SetStateAction, useEffect, useState} from "react";
 import {AnimatePresence, motion} from "framer-motion";
-import {Textarea} from "@/components/ui/textarea.tsx";
+import * as React from "react";
+import {MessageInputBox} from "@/components/custom/MessageInputBox.tsx";
+import {api} from "@/services/apiconfig.ts";
 
-export const DiscussionThread = ({
-                                     className,
-                                     data,
-                                     isRoot = false,
-                                 }: {
+export const DiscussionThreadView = ({
+                                         className,
+                                         data,
+                                         replies,
+                                         setRepliesData,
+                                         isRoot = false,
+                                     }: {
     className?: string;
     data: ThreadData;
     isRoot?: boolean;
+    replies?: ThreadData[];
+    setRepliesData: React.Dispatch<SetStateAction<ThreadData[]>>
 }) => {
-    const mockReplies: ThreadData[] = [
-        {
-            user: "globov2",
-            depth: data.depth + 1,
-            content: "I am replying baby",
-        },
-        {
-            user: "kaliuser123",
-            content: "I use kali linux i am bed boy",
-            depth: data.depth + 1,
-        },
-    ];
+
+
 
     const [replying, setReplying] = useState(false);
-    const [replies, setReplies] = useState<ThreadData[]>([]);
     const [displayReplies, setDisplayReplies] = useState<boolean>(isRoot);
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        const content = e.currentTarget.value;
+        if (e.key === "Enter" && !e.shiftKey && content.trim() !== '') {
+            e.preventDefault();
+            handleReply(content);
+            setReplying(false)
+        }
+    }
+
+    const handleDisplayReplies = async () => {
+        if (!replies || replies.length === 0) {
+            await loadReplies()
+        }
+        setDisplayReplies(prevState => !prevState)
+    }
+
+    const loadReplies = async () => {
+        const response = await api.get<ThreadData[]>(`/replies?threadId=${data.id}`)
+        setRepliesData(() => [...response.data])
+    }
+
+    const handleReply = (content: string) => {
+        setRepliesData(prevReplies => [...prevReplies, {
+            user: data.user,
+            content: content,
+            level: data.level + 1,
+            date: data.date,
+            id: 2
+        }])
+    }
 
     return (
         <div
@@ -56,7 +82,7 @@ export const DiscussionThread = ({
                                 alt="User Avatar"
                             />
                             <span className="text-sm font-medium text-white">
-              {data.user}
+              {data.user.username}
             </span>
                         </div>
                         <span className="text-sm text-muted-foreground mt-1">25.08.2025</span>
@@ -74,12 +100,13 @@ export const DiscussionThread = ({
 
                     <CardFooter className="flex justify-between items-center pt-2">
                         <div className="flex gap-6">
-                            <Button  className="flex items-center gap-1 bg-background-card hover:bg-gray-900">
-                                <Check size={16} />
+                            <Button className="flex items-center gap-1 bg-background-card hover:bg-gray-900">
+                                <Check size={16}/>
                                 <span className={"text-sm text-muted-foreground"}>23</span>
                             </Button>
-                            <Button  className="flex items-center gap-1 bg-background-card hover:bg-gray-900 hover:border-s-muted hover:border-1">
-                                <X size={16} />
+                            <Button
+                                className="flex items-center gap-1 bg-background-card hover:bg-gray-900 hover:border-s-muted hover:border-1">
+                                <X size={16}/>
                                 <span className={"text-sm text-muted-foreground"}>23</span>
                             </Button>
                         </div>
@@ -100,32 +127,29 @@ export const DiscussionThread = ({
                             animate={{x: 0, opacity: 1}}
                             exit={{x: "100%", opacity: 0}}
                             transition={{type: "spring", stiffness: 300, damping: 30}}
-                            className="px-4 pb-4"
+                            className="px-4 mt-2"
                         >
-                            <Textarea
-                                placeholder="Send a reply..."
-                                className="border border-gray-700 text-sm"
-                            />
+                            <MessageInputBox handleKeyDown={handleKeyDown}/>
                         </motion.div>
                     )}
 
                 </Card>
             </AnimatePresence>
 
-            <div className="flex items-start">
+            {replies && <div className="flex items-start">
                 <Button
                     size="sm"
                     className="hover:bg-gray-900 hover:-translate-y-0.5 hover:translate-x-0.5 transition bg-background-main"
-                    onClick={() => setDisplayReplies((prev) => !prev)}
+                    onClick={() => handleDisplayReplies()}
                 >
                     <CircleEllipsis className="mr-2" size={16}/>
                     {!displayReplies
-                        ? `View ${mockReplies.length} more replies`
+                        ? `View ${replies?.length} more replies`
                         : "Hide"}
                 </Button>
-            </div>
+            </div>}
 
-            {displayReplies && <Replies threads={mockReplies}/>}
+            {displayReplies && <Replies threads={replies} setRepliesData={setRepliesData}/>}
         </div>
     );
 };

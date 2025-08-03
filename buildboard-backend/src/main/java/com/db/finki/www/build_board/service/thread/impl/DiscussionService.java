@@ -1,5 +1,6 @@
 package com.db.finki.www.build_board.service.thread.impl;
 
+import com.db.finki.www.build_board.entity.thread.BBThread;
 import com.db.finki.www.build_board.entity.thread.EmbeddableThread;
 import com.db.finki.www.build_board.entity.thread.discussion_thread.Discussion;
 import com.db.finki.www.build_board.entity.thread.discussion_thread.VDiscussion;
@@ -7,11 +8,14 @@ import com.db.finki.www.build_board.entity.user_type.BBUser;
 import com.db.finki.www.build_board.repository.thread.DiscussionRepository;
 import com.db.finki.www.build_board.repository.thread.EmbeddableRepo;
 import com.db.finki.www.build_board.repository.thread.VDiscussRepo;
+import com.db.finki.www.build_board.rest.dto.DiscussionThreadDto;
+import com.db.finki.www.build_board.rest.dto.UserDto;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class DiscussionService {
@@ -25,35 +29,53 @@ public class DiscussionService {
         this.embeddableRepo = embeddableRepo;
     }
 
-    public List<VDiscussion> getByTopic(int topicId){
+    public List<VDiscussion> getByTopic(int topicId) {
         List<VDiscussion> discussions = vDiscussRepo.findVDiscussionByParentTopicIdOrderByCreatedAtDesc(topicId);
-        List<VDiscussion> level0Discussions = new ArrayList<>(); 
+        List<VDiscussion> level0Discussions = new ArrayList<>();
 
-        for(VDiscussion dis : discussions){
-            if(dis.getDepth()==0){
+        for (VDiscussion dis : discussions) {
+            if (dis.getDepth() == 0) {
                 level0Discussions.add(dis);
-            }else{
+            } else {
                 VDiscussion parent = vDiscussRepo.findById((long) dis.getDiscussion().getParent().getId()).get();
                 parent.getChildren().add(dis);
             }
         }
 
-        return level0Discussions; 
+        return level0Discussions;
     }
 
-    public VDiscussion getVDiscussionById(int discussionId){
+    public List<DiscussionThreadDto> getDirectRepliesForThread(BBThread parent) {
+        return discussionRepository.findAllByParentIdAndLevel(parent.getId(), parent.getLevel() + 1).orElse(List.of())
+                .stream()
+                .map(disc -> new DiscussionThreadDto(
+                        disc.getId(),
+                        disc.getLevel(),
+                        disc.getContent(),
+                        disc.getCreatedAt().toString(),
+                        new UserDto(
+                                disc.getUser().getId(),
+                                disc.getUser().getUsername(),
+                                disc.getUser().getAvatarUrl()
+                        )
+                )).collect(Collectors.toList());
+
+    }
+
+    public VDiscussion getVDiscussionById(int discussionId) {
         return vDiscussRepo.findVDiscussionByDiscussionId(discussionId);
     }
-    public Discussion getDiscussionById(int discussionId){
+
+    public Discussion getDiscussionById(int discussionId) {
         return discussionRepository.findDiscussionById(discussionId);
     }
 
-    public List<VDiscussion> getAll(){
+    public List<VDiscussion> getAll() {
         return vDiscussRepo.findAll();
     }
 
     @Transactional
-    public Discussion create(String content, int parentId, BBUser user){
+    public Discussion create(String content, int parentId, BBUser user) {
 
         EmbeddableThread parent = embeddableRepo.findById((long) parentId).get();
 

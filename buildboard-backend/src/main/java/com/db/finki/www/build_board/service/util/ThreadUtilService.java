@@ -9,11 +9,11 @@ import org.springframework.stereotype.Service;
 import java.util.Set;
 
 @Service
-public class ThreadService {
+public class ThreadUtilService {
     private final BBThreadRepository bbThreadRepository;
     private final UserRepository userRepository;
 
-    public ThreadService(BBThreadRepository bbThreadRepository, UserRepository userRepository) {
+    public ThreadUtilService(BBThreadRepository bbThreadRepository, UserRepository userRepository) {
         this.bbThreadRepository = bbThreadRepository;
         this.userRepository = userRepository;
     }

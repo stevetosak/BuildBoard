@@ -7,17 +7,17 @@ VALUES
     ('user5', true, '$2a$12$zHrloz8WG2zo5S6MTf1C0ez1raMlmDJdB8OOa2I1S2pVy9oI76YTa', 'Fifth user', NOW(), 'M','ramche', 'ramche@gmail.com');
 
 
-INSERT INTO thread (content, user_id)
+INSERT INTO thread (content, user_id,level)
 VALUES
-    ('Main content for topic thread 1', 1), --1
-    ('Main content for topic thread 2', 2), --2
-    ('Discussion content for topic 1', 1), --3
-    ('Discussion content for topic 2', 2), --4
-    ('Project-specific thread content', 3), --5
-    ('Reply to topic 1', 4), -- 6
-    ('Further discussion on topic 2', 5), --7
-    ('Main content for topic thread', 1), --8
-    ('Project-specific thread content 2', 5); --9
+    ('Main content for topic thread 1', 1,1), --1
+    ('Main content for topic thread 2', 2,0), --2
+    ('Discussion content for topic 1', 1,1), --3
+    ('Discussion content for topic 2', 2,1), --4
+    ('Project-specific thread content', 3,0), --5
+    ('Reply to topic 1', 4,1), -- 6
+    ('Further discussion on topic 2', 5,2), --7
+    ('Main content for topic thread', 1,0), --8
+    ('Project-specific thread content 2', 5,0); --9
 
 insert into embeddable_thread(id)
 values (1),(2),(3),(4),(6),(7),(8);

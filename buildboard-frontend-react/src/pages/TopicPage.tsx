@@ -1,20 +1,20 @@
-import {DiscussionThread} from "@/components/DiscussionThread.tsx";
 import type {ThreadData} from "@/types.ts";
 import "../fonts.css"
+import {useLoaderData} from "react-router-dom";
+import {DiscussionThreadView} from "@/components/custom/DiscussionThreadView.tsx";
+import {useEffect, useState} from "react";
 
 
-
-const rootThread: ThreadData = {
-    user: "stevetosak",
-    content: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.',
-    depth: 0
-}
 
 export const TopicPage = () => {
+    const {topic,replies} = useLoaderData<{topic:ThreadData, replies: ThreadData[]}>();
+    const [repliesData, setRepliesData] = useState<ThreadData[]>(replies ?? []);
+
+
     return (
         <main className={"flex flex-col justify-center items-center kanit-light"}>
-            <div className={"mt-2"}>
-                <DiscussionThread data={rootThread} isRoot={true}/>
+            <div className={"mt-2 min-w-1/2"}>
+                <DiscussionThreadView data={topic} replies={repliesData} setRepliesData={setRepliesData} isRoot={true}/>
             </div>
         </main>
     )

@@ -2,10 +2,8 @@ package com.db.finki.www.build_board.controller.util;
 
 import com.db.finki.www.build_board.entity.thread.BBThread;
 import com.db.finki.www.build_board.entity.thread.Project;
-import com.db.finki.www.build_board.entity.thread.Topic;
-import com.db.finki.www.build_board.entity.thread.discussion_thread.Discussion;
 import com.db.finki.www.build_board.entity.user_type.BBUser;
-import com.db.finki.www.build_board.service.util.ThreadService;
+import com.db.finki.www.build_board.service.util.ThreadUtilService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,9 +13,9 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 
 @Controller
 public class LikesController {
-    private final ThreadService threadService;
+    private final ThreadUtilService threadService;
 
-    public LikesController(ThreadService threadService) {
+    public LikesController(ThreadUtilService threadService) {
         this.threadService = threadService;
     }
 

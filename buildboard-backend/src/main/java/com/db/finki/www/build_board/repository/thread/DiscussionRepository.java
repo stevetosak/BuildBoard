@@ -7,6 +7,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Optional;
+
 @Repository
 public interface DiscussionRepository extends JpaRepository<Discussion, Long> {
     Discussion findDiscussionById(int discussionId);
@@ -18,4 +21,5 @@ public interface DiscussionRepository extends JpaRepository<Discussion, Long> {
                 """, nativeQuery = true
     )
     void deleteById(@Param("id") long discussionId);
+    Optional<List<Discussion>> findAllByParentIdAndLevel(int parentId, int level);
 }

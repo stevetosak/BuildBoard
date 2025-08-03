@@ -1,9 +1,10 @@
-import {MessagesContainer} from "@/components/MessagesContainer.tsx"
+import {MessagesContainer} from "@/components/custom/MessagesContainer.tsx"
 import {Card, CardContent, CardFooter, CardHeader} from "@/components/ui/card.tsx"
 import "../fonts.css"
 import {Textarea} from "@/components/ui/textarea.tsx";
 import * as React from "react";
 import {useEffect, useRef, useState} from "react";
+import {MessageInputBox} from "@/components/custom/MessageInputBox.tsx";
 
 const messageData = [
     {
@@ -52,10 +53,10 @@ export const ChannelPage = () => {
     const cardContainerRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
-        if(cardContainerRef.current){
+        if (cardContainerRef.current) {
             cardContainerRef.current.scrollTop = cardContainerRef.current.scrollHeight;
         }
-    },[messages])
+    }, [messages])
 
     return (
         <main className={"flex kanit-light border-none"}>
@@ -73,13 +74,7 @@ export const ChannelPage = () => {
                 </div>
                 <CardFooter className="p-4 border-t border-gray-800 bg-background-main">
                     <div className="flex w-full items-center space-x-2">
-                        <Textarea
-                            onKeyDown={handleKeyDown}
-                            placeholder="Type your message..."
-                            className="flex-1 resize-none rounded-xl border border-background-gray bg-background-card
-                            text-white px-4 py-2 text-sm shadow-sm placeholder:text-foreground-gray
-                            focus:outline-none focus-visible:ring-0 focus:border-0 focus:border-r-3 focus:border-accent-2"
-                        />
+                        <MessageInputBox handleKeyDown={handleKeyDown}/>
                     </div>
                 </CardFooter>
 

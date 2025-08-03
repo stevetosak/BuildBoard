@@ -1,4 +1,4 @@
-import {Message} from "@/components/Message.tsx";
+import {Message} from "@/components/custom/Message.tsx";
 import {type Ref, useEffect, useRef} from "react";
 
 export const MessagesContainer = ({messages}: {
