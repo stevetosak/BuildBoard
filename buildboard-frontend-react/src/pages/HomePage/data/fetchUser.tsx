@@ -42,7 +42,7 @@ const handleError = async (response:Response) => {
 }
 
 export const loader = async () => {
-	const response = await fetch(API_ENDPOINTS.host + API_ENDPOINTS.endpoints.user  + "?username=buildboard")		
+	const response = await fetch(API_ENDPOINTS.user("buildboard"))		
 	if(!response.ok)
 		return await handleError(response)
 	return await response.json()
