@@ -9,6 +9,8 @@ const endpoints = {
 		 "/users" + `?username=${username}`,
 	threads: (page: number = 0) =>
 		 "/threads" + `?page=${page}`,
+    auth: () => '/auth',
+    register: () => "/register",
 };
 const endpointsKeys = Object.keys(endpoints)
 

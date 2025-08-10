@@ -30,24 +30,14 @@ const iconsForHeading = {
 	channels: <Rss size={"1em"} />,
 } as Record<keyof NonNullable<User>["following"], JSX.Element>;
 
-//TODO: mozhish da koristish Suspense + await namesto if(isLoading)
 //TODO: eslint + prettier config
 //TODO: vidi sho se at rules vo css @layers @themes @apply...
-//TODO: razmisli za code examples
-//TODO: fix intelisense for tailwind css
-//TODO: ovie sho ke se project, topics,tags... napraj gi da se dropdown
-//TODO: klaj na sidebierot ko ke imash nekoj na hover togash i borderot i ova drugovo da ti se vo bela boja
-//TDOO: add paging
+//TODO: add paging
 //TODO: add links to user profiles
-//TODO: Collapsable element into it's own component
-//TODO: ostaj aj customSidebar izvaj ja friends vo posebna komponenta
-//TODO: vidi kako popametno da gi koristish min i max height/width i calc
-//TODO: sekade napraj da se koristit URL so URLSearchParams
 //TODO: dogovorejtesa za edna fetch funkcija so generic za da ne se dupite so castiranje vo ts
 //TODO: add infinite scroll na loader componentite. Ideja napraj nekoja komponenta drugachija sho ke se zamarat so to i posle samo resikoristuvaj
 //TODO: reshigo tekstot, mnogu e mal msl prosechen
 //TODO: vidi sho e ona so layout vo firefox debuggerot
-//TODO: vidi gi poubo em i rem
 const HomePage = () => {
 	const user = useLoaderData() as NonNullable<User>;
 

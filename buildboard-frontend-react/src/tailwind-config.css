@@ -10,7 +10,10 @@
 	--color-bg-2: #0A1A31;
 	--color-non-accent: #0c1f3c; 
 	--color-sidebar-bg: #021126; 
-	--color-sidebar-lines:#081529; 
+	--color-sidebar-lines:#081529;
+    --color-card: red;
+    --color-destructive:white;
+    --color-input: white;
 }
 
 :root {
@@ -69,4 +72,23 @@
     --sidebar-ring: oklch(0.439 0 0);
   }
 
+}
+
+.user-info-input-hover{
+    @variant hover{
+        color: var(--color-accent);
+        outline: var(--color-accent);
+    }
+}
+.input-wrapper{
+    display: grid;
+    gap: .8em;
+}
+.user-info-card-btn{
+    cursor: pointer;
+    background: var(--color-accent);
+    @variant hover{
+        background: transparent;
+        border: 2px solid #fff
+    }
 }
