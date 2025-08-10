@@ -3,7 +3,7 @@ import {
     createRoutesFromElements,
     Route,
 } from "react-router-dom";
-import {TopicPage} from "@/pages/TopicPage.tsx";
+import {TopicPage} from "@/pages/TopicPage";
 
 export const router = createBrowserRouter(
     createRoutesFromElements(

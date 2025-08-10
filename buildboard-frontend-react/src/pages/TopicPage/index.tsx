@@ -1,8 +1,6 @@
-import {DiscussionThread} from "@/components/DiscussionThread.tsx";
-import type {ThreadData} from "@/types.ts";
-import "../fonts.css"
-
-
+import DiscussionThread from "@/pages/TopicPage/ui/DiscussionThread";
+import type {ThreadData} from "@/pages/TopicPage/data/fetchReplies";
+import "@/fonts.css"
 
 const rootThread: ThreadData = {
     user: "stevetosak",

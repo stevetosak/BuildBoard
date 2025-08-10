@@ -1,5 +1,5 @@
-import type {ThreadData} from "@/types.ts";
-import {DiscussionThread} from "@/components/DiscussionThread.tsx";
+import type {ThreadData} from "@/pages/TopicPage/data/fetchReplies";
+import DiscussionThread from "@/pages/TopicPage/ui/DiscussionThread";
 
 export const Replies = ({ threads }: { threads?: ThreadData[], className?: string }) => {
     return (
