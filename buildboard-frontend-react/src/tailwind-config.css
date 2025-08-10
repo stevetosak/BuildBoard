@@ -10,7 +10,9 @@
 	--color-bg-2: #0A1A31;
 	--color-non-accent: #0c1f3c; 
 	--color-sidebar-bg: #021126; 
-	--color-sidebar-lines:#081529; 
+	--color-sidebar-lines:#081529;
+    --color-card: red;
+    --color-destructive:white;
 }
 
 :root {
