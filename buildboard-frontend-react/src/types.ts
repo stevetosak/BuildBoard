@@ -5,7 +5,7 @@ export type ThreadUserDto = {
     avatarUrl: string
 }
 export type ThreadData = {
-    id:number,
+    id?:number,
     title?:string,
     content: string,
     date: string

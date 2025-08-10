@@ -17,21 +17,26 @@ import {api} from "@/services/apiconfig.ts";
 export const DiscussionThreadView = ({
                                          className,
                                          data,
-                                         replies,
-                                         setRepliesData,
+                                         threadLevelMap,
+                                         setThreadLevelMap,
                                          isRoot = false,
                                      }: {
     className?: string;
     data: ThreadData;
     isRoot?: boolean;
-    replies?: ThreadData[];
-    setRepliesData: React.Dispatch<SetStateAction<ThreadData[]>>
+    threadLevelMap: Map<number, ThreadData[]>;
+    setThreadLevelMap: React.Dispatch<SetStateAction<Map<number, ThreadData[]>>>
 }) => {
 
 
-
     const [replying, setReplying] = useState(false);
+    const [replies, setReplies] = useState<ThreadData[]>([])
     const [displayReplies, setDisplayReplies] = useState<boolean>(isRoot);
+
+    useEffect(() => {
+        setReplies(() => threadLevelMap?.get(data.level + 1) ?? [])
+    }, [threadLevelMap]);
+
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         const content = e.currentTarget.value;
@@ -42,6 +47,7 @@ export const DiscussionThreadView = ({
         }
     }
 
+
     const handleDisplayReplies = async () => {
         if (!replies || replies.length === 0) {
             await loadReplies()
@@ -51,18 +57,31 @@ export const DiscussionThreadView = ({
 
     const loadReplies = async () => {
         const response = await api.get<ThreadData[]>(`/replies?threadId=${data.id}`)
-        setRepliesData(() => [...response.data])
+        if (response.data.length > 0) {
+            setThreadLevelMap((map) => map.set(data.level + 1, response.data))
+        }
+
     }
 
     const handleReply = (content: string) => {
-        setRepliesData(prevReplies => [...prevReplies, {
-            user: data.user,
-            content: content,
-            level: data.level + 1,
-            date: data.date,
-            id: 2
-        }])
-    }
+        setThreadLevelMap(prevMap => {
+            const newMap = new Map(prevMap);
+
+            if (!newMap.has(data.level + 1)) {
+                newMap.set(data.level + 1, []);
+            }
+
+            newMap.get(data.level + 1)!.push({
+                user: data.user,
+                content,
+                level: data.level + 1,
+                date: data.date,
+            });
+
+            return newMap;
+        });
+    };
+
 
     return (
         <div
@@ -136,7 +155,7 @@ export const DiscussionThreadView = ({
                 </Card>
             </AnimatePresence>
 
-            {replies && <div className="flex items-start">
+            <div className="flex items-start">
                 <Button
                     size="sm"
                     className="hover:bg-gray-900 hover:-translate-y-0.5 hover:translate-x-0.5 transition bg-background-main"
@@ -144,12 +163,13 @@ export const DiscussionThreadView = ({
                 >
                     <CircleEllipsis className="mr-2" size={16}/>
                     {!displayReplies
-                        ? `View ${replies?.length} more replies`
+                        ? `View more replies`
                         : "Hide"}
                 </Button>
-            </div>}
+            </div>
 
-            {displayReplies && <Replies threads={replies} setRepliesData={setRepliesData}/>}
+            {displayReplies &&
+                <Replies replies={replies} threadLevelMap={threadLevelMap} setThreadLevelMap={setThreadLevelMap}/>}
         </div>
     );
 };

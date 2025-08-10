@@ -5,7 +5,6 @@ import {
 } from "react-router-dom";
 import {TopicPage} from "@/pages/TopicPage.tsx";
 import {ChannelPage} from "@/pages/ChannelPage.tsx";
-import {Layout} from "@/components/custom/Layout.tsx";
 import {api} from "@/services/apiconfig.ts";
 import type {ThreadData} from "@/types.ts";
 
