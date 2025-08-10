@@ -1,16 +1,16 @@
 import { Button } from "@/components/ui/button.tsx";
 import { Link, useLoaderData } from "react-router-dom";
 import iconUrl from "@assets/Icon.jpg";
-import type { User } from "./utils";
+import type { User } from "@pages/HomePage/data/fetchUser";
 import { Tag, FolderDot, Rss, ChevronDown } from "lucide-react";
-import { SidebarGroup, SidebarGroupLabel } from "@/components/ui/sidebar";
+import { SidebarGroup, SidebarGroupLabel } from "@components/ui/sidebar";
 import { Collapsible, CollapsibleTrigger } from "@components/ui/collapsible";
 import type { JSX } from "react";
 import { CollapsibleContent } from "@radix-ui/react-collapsible";
-import CustomSidebar from "@/components/shared/CustomSidebar";
-import UserInfo from "@/components/HomePage/UserInfo";
-import FriendsPopUp from "@/components/HomePage/FriendsPopUp";
-import ThreadsComponent from "@/components/HomePage/ThreadsComponent/ThreadsComponent";
+import CustomSidebar from "@components/shared/CustomSidebar";
+import UserInfo from "@pages/HomePage/ui/UserInfo";
+import FriendsPopUp from "@pages/HomePage/ui/FriendsPopUp";
+import ThreadsComponent from "@pages/HomePage/ui/ThreadsComponent";
 
 export type SingleColorCtx = {
 	registered: [boolean];
@@ -30,6 +30,7 @@ const iconsForHeading = {
 	channels: <Rss size={"1em"} />,
 } as Record<keyof NonNullable<User>["following"], JSX.Element>;
 
+//TODO: mozhish da koristish Suspense + await namesto if(isLoading)
 //TODO: eslint + prettier config
 //TODO: vidi sho se at rules vo css @layers @themes @apply...
 //TODO: razmisli za code examples

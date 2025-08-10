@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import LoadingBlock from "./LoadingBlock";
-import { handleInitFetch } from "./utils";
+import { handleInitFetch } from "@pages/HomePage/data/initialFetch";
 import {
 	Card,
 	CardContent,

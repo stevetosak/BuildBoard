@@ -39,4 +39,3 @@ export const fetchThreads = async (page: number) : Promise<Page<Thread[]>> => {
 };
 
 export const handleInitFetch = async () => fetchThreads(0);
-

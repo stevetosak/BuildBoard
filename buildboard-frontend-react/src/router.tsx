@@ -3,8 +3,8 @@ import {
 	createRoutesFromElements,
 	Route,
 } from "react-router-dom";
-import HomePage  from "@pages/HomePage/HomePage";
-import {loader as homePageLoader} from "@pages/HomePage/utils"
+import HomePage  from "@/pages/HomePage";
+import {loader as homePageLoader} from "@pages/HomePage/data/fetchUser"
 
 export const router = createBrowserRouter(
 	createRoutesFromElements(

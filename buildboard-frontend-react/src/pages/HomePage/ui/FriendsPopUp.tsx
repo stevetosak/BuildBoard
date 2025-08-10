@@ -1,6 +1,6 @@
-import type { User } from "@/pages/HomePage/utils";
-import { Button } from "../ui/button";
-import UserLogo from "../shared/UserLogo";
+import type { User } from "@pages/HomePage/data/fetchUser";
+import { Button } from "@components/ui/button";
+import UserLogo from "@components/shared/UserLogo";
 import { PanelLeftIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState } from "react";
