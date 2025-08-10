@@ -8,6 +8,8 @@ import {loader as homePageLoader} from "@pages/HomePage/data/fetchUser";
 import LandingPage from "@pages/LandingPage";
 import LoginPage from "@pages/Login";
 import validateUser  from "@pages/Login/data/validateUser.tsx";
+import Register from "@pages/Register";
+import registerUser from "@pages/Register/data/registerUser.tsx";
 
 export const router = createBrowserRouter(
     createRoutesFromElements(
@@ -27,7 +29,9 @@ export const router = createBrowserRouter(
                 <Route path={"requests"}></Route>
             </Route>
             <Route path={":username/profile"}></Route>
+
             <Route path={"login"} element={<LoginPage/>} action={validateUser} />
+            <Route path={'register'} element={<Register/>} action={registerUser} />
         </Route>,
     ),
 );
