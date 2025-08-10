@@ -19,7 +19,7 @@ export type Thread = {
 };
 
 const createPageURL = (page: number) => {
-	const url = new URL(API_ENDPOINTS.endpoints.threads, API_ENDPOINTS.host);
+	const url = new URL(API_ENDPOINTS.threads());
 	url.searchParams.set("page", page.toString());
 
 	return url;
