@@ -8,7 +8,7 @@ import {Check, CircleEllipsis, Reply, X} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
 import type {ThreadData} from "@/types.ts";
 import {Replies} from "@/components/custom/Replies.tsx";
-import {type SetStateAction, useEffect, useState} from "react";
+import {type SetStateAction,useState} from "react";
 import {AnimatePresence, motion} from "framer-motion";
 import * as React from "react";
 import {MessageInputBox} from "@/components/custom/MessageInputBox.tsx";
@@ -30,12 +30,11 @@ export const DiscussionThreadView = ({
 
 
     const [replying, setReplying] = useState(false);
-    const [replies, setReplies] = useState<ThreadData[]>([])
     const [displayReplies, setDisplayReplies] = useState<boolean>(isRoot);
 
-    useEffect(() => {
-        setReplies(() => threadLevelMap?.get(data.level + 1) ?? [])
-    }, [threadLevelMap]);
+    const replies = threadLevelMap.get(data.level + 1) ?? [];
+    console.log("Replies")
+    console.log(replies)
 
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -66,17 +65,17 @@ export const DiscussionThreadView = ({
     const handleReply = (content: string) => {
         setThreadLevelMap(prevMap => {
             const newMap = new Map(prevMap);
+            const key = data.level + 1;
 
-            if (!newMap.has(data.level + 1)) {
-                newMap.set(data.level + 1, []);
-            }
-
-            newMap.get(data.level + 1)!.push({
+            const existingReplies = newMap.get(data.level + 1) ?? []
+            const updatedReplies = [...existingReplies,{
                 user: data.user,
                 content,
                 level: data.level + 1,
                 date: data.date,
-            });
+            }]
+
+            newMap.set(key,updatedReplies)
 
             return newMap;
         });

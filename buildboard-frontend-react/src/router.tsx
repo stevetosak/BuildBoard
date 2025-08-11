@@ -1,7 +1,5 @@
 import {
     createBrowserRouter,
-    createRoutesFromElements,
-    Route, useParams,
 } from "react-router-dom";
 import {TopicPage} from "@/pages/TopicPage.tsx";
 import {ChannelPage} from "@/pages/ChannelPage.tsx";
