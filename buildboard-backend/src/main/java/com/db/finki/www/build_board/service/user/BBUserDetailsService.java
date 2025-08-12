@@ -64,9 +64,8 @@ public class BBUserDetailsService implements UserDetailsService {
         );
     }
 
-    public Authentication registerUser(String username, String email, String name, String password, String description, String sex) {
-        BBUser user = createUser(username, email, name, password, description, sex);
-        return new UsernamePasswordAuthenticationToken(user,user.getPassword(),user.getAuthorities());
+    public BBUser registerUser(String username, String email, String name, String password, String description, String sex) {
+        return createUser(username, email, name, password, description, sex);
     }
 
     public BBUser loadUserById(int id) {

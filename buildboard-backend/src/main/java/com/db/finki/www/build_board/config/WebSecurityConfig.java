@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -35,6 +36,7 @@ public class WebSecurityConfig {
         this.userDetailsService = userDetailsService;
         this.successHandler = successHandler;
     }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -44,20 +46,20 @@ public class WebSecurityConfig {
                                         "/",
                                         "/contact",
                                         "/about",
-                                    "/project_imgs/buildboard-logo.jpg",
-                                "*.ico",
-                                "*.jpg",
-                                "*.png",
-                                "/register",
+                                        "/project_imgs/buildboard-logo.jpg",
+                                        "*.ico",
+                                        "*.jpg",
+                                        "*.png",
+                                        "/register",
                                         "/css/**",
                                         "/js/**"
                                 ).permitAll()
                                 .requestMatchers(
                                         new AntPathRequestMatcher("/topic/*", HttpMethod.GET.name()),
-                                        new AntPathRequestMatcher("/project/*",HttpMethod.GET.name()),
-                                        new AntPathRequestMatcher("/avatars/**",HttpMethod.GET.name())
+                                        new AntPathRequestMatcher("/project/*", HttpMethod.GET.name()),
+                                        new AntPathRequestMatcher("/avatars/**", HttpMethod.GET.name())
                                 ).permitAll()
-                                .requestMatchers("/topic/**","/project/**").authenticated()
+                                .requestMatchers("/topic/**", "/project/**").authenticated()
 
                                 .anyRequest().authenticated()
                 ).formLogin(formLogin ->
@@ -70,7 +72,7 @@ public class WebSecurityConfig {
                                 .clearAuthentication(true)
                                 .invalidateHttpSession(true)
                                 .deleteCookies("JSESSIONID")
-                );
+                ).sessionManagement(sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         return http.build();
 

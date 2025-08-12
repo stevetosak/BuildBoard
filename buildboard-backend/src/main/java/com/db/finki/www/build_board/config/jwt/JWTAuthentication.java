@@ -9,9 +9,6 @@ import org.springframework.security.core.GrantedAuthority;
 import java.util.Collection;
 import java.util.List;
 
-/**
- * credentials e password
- */
 @Setter
 @Getter
 public class JWTAuthentication implements Authentication {
