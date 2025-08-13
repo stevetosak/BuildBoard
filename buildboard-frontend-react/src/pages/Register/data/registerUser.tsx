@@ -1,7 +1,9 @@
 import {type ActionFunction, redirect} from "react-router-dom";
 import {type ValidationError} from "@pages/shared/ValidationError.tsx";
 import {default as API_ENDPOINTS} from '@/constants.ts'
-import generateErrorAlert from "@pages/shared/alertGenerator.ts";
+import generateErrorAlert from "@pages/shared/alertGenerator";
+import { formDataToJson } from "@/shared/form-processing";
+import type { JWTResponse } from "@/shared/types";
 
 type ErrorMessages = "Username already exists"
 
@@ -14,23 +16,26 @@ type SuccessResponse = {
 type RegisterationResponse = SuccessResponse | ErrorResponse
 
 const hasErrorOccured = (response: Response, _data: SuccessResponse | ErrorResponse): _data is ErrorResponse => response.status === 404
-const userAlreadyExists = (username: string) => generateErrorAlert("Registration unsuccessful", `The username [${username}] already exists`)
+const userAlreadyExists = () => generateErrorAlert("Registration unsuccessful", `The username already exists`)
 
 const registerUser: ActionFunction = async ({request}) => {
-    const formData = await request.formData()
     const response = await fetch(API_ENDPOINTS.register(), {
         method: "POST",
         headers: {
-            "Content-Type": 'application/x-www-form-urlencoded',
+            "Content-Type": 'application/json',
         },
-        body: formData,
+        body: await formDataToJson(request.formData()),
     })
     const data = await response.json() as RegisterationResponse
 
     if (hasErrorOccured(response, data) && data.msg === 'Username already exists')
-        return {Element: userAlreadyExists(formData.get("username") as string)} satisfies ValidationError
+        return {Element: userAlreadyExists()} satisfies ValidationError
     if (!response.ok)
         throw new Error("Unknown error" + '\n' + await response.json())
+    
+    const {token} = await response.json() as JWTResponse
+    localStorage.setItem('token', token)
+
     return redirect("/homepage")
 }
 

@@ -8,11 +8,16 @@ import {default as JsIcon} from "@assets/JS.svg?react"
 import {default as JavaIcon} from "@assets/Java.svg?react"
 import {default as CollaborationIcon} from '@assets/Collabooration.svg?react'
 import {twMerge} from "tailwind-merge";
+import { useContext } from "react";
+import SecurityContext from "@/context/security-context";
 
 const sharedIconCls = 'w-[10em] h-[10em] animate-bounce'
 const liItemsDist = 'list-disc'
 
 const LandingPage = () => {
+    const user = useContext(SecurityContext)
+    console.log(user)
+
     return (
         <main className="grid grid-rows-[repeat(3,100vh)_auto] grid-cols-[100vw] bg-bg-1">
             <section className="relative overflow-hidden">
