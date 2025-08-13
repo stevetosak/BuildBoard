@@ -61,37 +61,4 @@ public class HomePageController {
         model.addAttribute("canEdit",true);
         return "home_pages/register";
     }
-
-    @PostMapping("/register")
-    public String registerPost(
-            @RequestParam String username,
-            @RequestParam String email,
-            @RequestParam String name,
-            @RequestParam String password,
-            @RequestParam String description,
-            @RequestParam String sex,
-            RedirectAttributes redirectAttributes,
-            HttpSession session,
-            HttpServletRequest request,
-            HttpServletResponse response
-    ) {
-        try {
-            Authentication authentication = bbUserDetailsService.registerUser(username, email, name, password,description, sex);
-
-            SecurityContext context = SecurityContextHolder.getContext();
-            context.setAuthentication(authentication);
-
-            securityContextRepository.saveContext(context,request,response);
-
-            session.setAttribute("user", authentication.getPrincipal());
-            return "redirect:/";
-        }catch (DataIntegrityViolationException e) {
-            if(e.getMessage().contains("users_username_key"))
-            {
-                redirectAttributes.addFlashAttribute("duplicatedUsername",username);
-                return "redirect:/register";
-            }
-            throw e;
-        }
-    }
 }

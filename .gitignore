@@ -1,7 +1,7 @@
 target
 target/*
-.idea
 .run
+.idea/
 *.iml
 *.env
 .vscode/

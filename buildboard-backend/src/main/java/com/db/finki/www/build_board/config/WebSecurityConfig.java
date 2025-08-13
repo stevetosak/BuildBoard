@@ -1,5 +1,6 @@
 package com.db.finki.www.build_board.config;
 
+import com.db.finki.www.build_board.config.jwt.JWTAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -16,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.DelegatingSecurityContextRepository;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
@@ -28,20 +30,16 @@ public class WebSecurityConfig {
 
     private final PasswordEncoder passwordEncoder;
     private final UserDetailsService userDetailsService;
-    private final AuthenticationSuccessHandler successHandler;
 
 
-    public WebSecurityConfig(PasswordEncoder passwordEncoder, UserDetailsService userDetailsService, AuthenticationSuccessHandler successHandler) {
+    public WebSecurityConfig(PasswordEncoder passwordEncoder, UserDetailsService userDetailsService) {
         this.passwordEncoder = passwordEncoder;
         this.userDetailsService = userDetailsService;
-        this.successHandler = successHandler;
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(request ->
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, JWTAuthenticationFilter jwtFilter) throws Exception {
+        http.authorizeHttpRequests(request ->
                         request.requestMatchers(
                                         "/",
                                         "/contact",
@@ -51,6 +49,7 @@ public class WebSecurityConfig {
                                         "*.jpg",
                                         "*.png",
                                         "/register",
+                                        "/login",
                                         "/css/**",
                                         "/js/**"
                                 ).permitAll()
@@ -60,20 +59,15 @@ public class WebSecurityConfig {
                                         new AntPathRequestMatcher("/avatars/**", HttpMethod.GET.name())
                                 ).permitAll()
                                 .requestMatchers("/topic/**", "/project/**").authenticated()
-
                                 .anyRequest().authenticated()
-                ).formLogin(formLogin ->
-                        formLogin.permitAll()
-                                .defaultSuccessUrl("/")
-                                .successHandler(successHandler)
-                )
-                .logout(logout ->
-                        logout.logoutSuccessUrl("/")
-                                .clearAuthentication(true)
-                                .invalidateHttpSession(true)
-                                .deleteCookies("JSESSIONID")
-                ).sessionManagement(sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-
+                ).formLogin(AbstractHttpConfigurer::disable)
+                .csrf(AbstractHttpConfigurer::disable)
+                .logout(AbstractHttpConfigurer::disable)
+                .sessionManagement(sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(
+                        jwtFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                );
         return http.build();
 
     }

@@ -92,6 +92,7 @@ private List<Project> projects = new ArrayList<>();
         this.description = description;
         this.sex=sex;
         this.isEnabled=true;
+        this.registeredAt=LocalDateTime.now();
     }
 
     public List<GrantedAuthority> getAuthority(){

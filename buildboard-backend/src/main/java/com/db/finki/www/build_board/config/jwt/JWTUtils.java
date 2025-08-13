@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
+import io.github.cdimascio.dotenv.Dotenv;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -16,13 +17,15 @@ import java.time.LocalDateTime;
 @Service
 public class JWTUtils {
     // openssl rand -base64 32 | tr '+/' '-_' | tr -d '='
-    @Value("${JWT_SECRET}")
-    private String secret;
+    public String secret;
     private final JWSSigner signer;
     private final JWSVerifier verifier;
     private final ObjectMapper objectMapper;
 
     public JWTUtils(ObjectMapper objectMapper) throws JOSEException {
+        Dotenv dotenv = Dotenv.load();
+        this.secret = dotenv.get("JWT_SECRET");
+
         this.objectMapper = objectMapper;
         this.signer = new MACSigner(secret);
         this.verifier = new MACVerifier(secret);
