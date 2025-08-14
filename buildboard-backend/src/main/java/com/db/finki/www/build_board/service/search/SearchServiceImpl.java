@@ -5,6 +5,10 @@ import com.db.finki.www.build_board.entity.thread.Topic;
 import com.db.finki.www.build_board.entity.thread.itf.NamedThread;
 import com.db.finki.www.build_board.repository.thread.ProjectRepository;
 import com.db.finki.www.build_board.repository.thread.TopicRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -26,27 +30,25 @@ public class SearchServiceImpl implements SearchService {
         this.projectRepository = projectRepository;
     }
 
-
-
-    private List<Topic> searchTopics(String query, List<String> filters) {
+    private Page<Topic> searchTopics(String query, List<String> filters, Pageable pageable) {
         Specification<Topic> spec = Specification.where(null);
         for (String filter : filters) {
             System.out.println("FILTER: " + filter);
             spec = spec.or(topicFilterMap.getFilter(filter).apply(query));
         }
-        return topicRepository.findAll(spec);
+        return topicRepository.findAll(spec, pageable);
     }
 
-    private List<Project> searchProjects(String query, List<String> filters) {
+    private Page<Project> searchProjects(String query, List<String> filters, Pageable pageable) {
         Specification<Project> spec = Specification.where(null);
         for (String filter : filters) {
             spec = spec.or(projectFilterMap.getFilter(filter).apply(query));
         }
-        return projectRepository.findAll(spec);
+        return projectRepository.findAll(spec, pageable);
     }
 
-    public List<NamedThread> search(String query, List<String> filters,String type) {
-        List<NamedThread> result = new ArrayList<>();
+    public Page<NamedThread> search(String query, List<String> filters, String type, Pageable pageable) {
+        List<NamedThread> results = new ArrayList<>();
         if(type == null){
             type = "all";
         }
@@ -57,18 +59,16 @@ public class SearchServiceImpl implements SearchService {
 
         if(Objects.equals(type, "project")){
             System.out.println("PROJECT");
-            result.addAll(searchProjects(query, filters));
+            results.addAll(searchProjects(query, filters, pageable).getContent());
         } else if(Objects.equals(type, "topic")){
-            result.addAll(searchTopics(query, filters));
+            results.addAll(searchTopics(query, filters, pageable).getContent());
             System.out.println("TOPIC");
         } else {
-            result.addAll(searchTopics(query, filters));
-            result.addAll(searchProjects(query, filters));
+            results.addAll(searchTopics(query, filters, pageable).getContent());
+            results.addAll(searchProjects(query, filters, pageable).getContent());
             System.out.println("ALL");
         }
 
-
-
-        return result;
+        return new PageImpl<>(results, pageable, results.size());
     }
 }

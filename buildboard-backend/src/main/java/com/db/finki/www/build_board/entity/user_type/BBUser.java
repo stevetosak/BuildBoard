@@ -1,5 +1,6 @@
 package com.db.finki.www.build_board.entity.user_type;
 
+import com.db.finki.www.build_board.dto.BBUserProfile;
 import com.db.finki.www.build_board.entity.thread.BBThread;
 import com.db.finki.www.build_board.entity.thread.Project;
 import com.db.finki.www.build_board.service.util.FileUploadService;
@@ -24,6 +25,9 @@ import java.util.*;
 @Entity
 @Table(name = "users")
 @Inheritance(strategy = InheritanceType.JOINED)
+/*
+* Dodadeno user_interested_thread user_follows_user
+* */
 public class BBUser implements UserDetails {
 
     @Id
@@ -49,7 +53,24 @@ public class BBUser implements UserDetails {
     private List<BBThread> threads;
 
     @ManyToMany(mappedBy = "developers")
-private List<Project> projects = new ArrayList<>();
+    private List<Project> projects = new ArrayList<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_interested_thread",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "thread_id")
+    )
+    private List<BBThread> interested;
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_follows_user",
+            joinColumns = @JoinColumn(name = "person1"),
+            inverseJoinColumns = @JoinColumn(name = "person2")
+    )
+    public List<BBUser> friends;
+
     @Override
     public boolean isEnabled() {
         return isEnabled;
@@ -64,8 +85,6 @@ private List<Project> projects = new ArrayList<>();
         Path path = Path.of(FileUploadService.USER_AVATAR_DIR + File.separator + "avatar-" + id);
         return Files.exists(path) ? File.separator + "avatars" + File.separator + "avatar-"+id : File.separator + "default-avatar.jpg";
     }
-
-
 
     @Override
     public boolean equals(Object other){

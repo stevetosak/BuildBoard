@@ -49,10 +49,10 @@ drop table if exists embeddable_thread;
 CREATE TABLE users
 (
     id            SERIAL PRIMARY KEY,
-    username      VARCHAR(32) UNIQUE NOT NULL,
-    email         varchar(60)        not null,
-    name          varchar(32)        not null,
-    is_activate   bool DEFAULT true,
+    username      VARCHAR(32) UNIQUE      NOT NULL,
+    email         varchar(60)             not null,
+    name          varchar(32)             not null,
+    is_activate   bool      DEFAULT true,
     password      VARCHAR(72),
     description   VARCHAR(200),
     registered_at TIMESTAMP DEFAULT NOW() NOT NULL,
@@ -72,10 +72,24 @@ CREATE TABLE project_manager
 );
 CREATE TABLE thread
 (
-    id      SERIAL PRIMARY KEY,
-    content TEXT,
-    created_at timestamp DEFAULT NOW() NOT NULL,
-    user_id INT REFERENCES users (id) NOT NULL --IS_CREATED_BY TOTAL
+    id         SERIAL PRIMARY KEY,
+    content    TEXT,
+    created_at timestamp DEFAULT NOW()   NOT NULL,
+    user_id    INT REFERENCES users (id) NOT NULL --IS_CREATED_BY TOTAL
+);
+create table user_interested_thread
+(
+    user_id   int references users (id) on delete cascade ,
+    thread_id int references thread (id) on delete cascade,
+    PRIMARY KEY (user_id,
+                 thread_id)
+);
+create table user_follows_user
+(
+    person1 int references users (id) on delete cascade,
+    person2 int references users (id) on delete cascade,
+    PRIMARY KEY (person1,
+                 person2)
 );
 CREATE TABLE project_thread
 (
@@ -83,72 +97,82 @@ CREATE TABLE project_thread
     repo_url TEXT,
     id       INT PRIMARY KEY REFERENCES thread (id) on delete cascade --INHERITANCE
 );
-create table embeddable_thread(
-   id int primary key references thread(id) on delete cascade
+create table embeddable_thread
+(
+    id int primary key references thread (id) on delete cascade
 );
 
 CREATE TABLE topic_thread
 (
     title     VARCHAR(256) NOT NULL,
-    id        INT PRIMARY KEY REFERENCES embeddable_thread(id) on delete cascade, --INHERITANCE
-    parent_id int REFERENCES project_thread(id) on delete CASCADE  --PARENT
+    id        INT PRIMARY KEY REFERENCES embeddable_thread (id) on delete cascade, --INHERITANCE
+    parent_id int REFERENCES project_thread (id) on delete CASCADE                 --PARENT
 );
 create table topic_guidelines
 (
     id          serial,
-    topic_id    int references topic_thread(id) on delete cascade,
+    topic_id    int references topic_thread (id) on delete cascade,
     description text,
-    PRIMARY KEY (id, topic_id)
+    PRIMARY KEY (id,
+                 topic_id)
 );
 CREATE TABLE discussion_thread
 (
-    id  INT PRIMARY KEY REFERENCES  embeddable_thread(id) on delete cascade, --INHERITANCE,
-    parent_id int REFERENCES embeddable_thread(id) NOT NULL --on delete CASCADE ne tuku preku trigger PARENT TOTAL BIGINT
+    id        INT PRIMARY KEY REFERENCES embeddable_thread (id) on delete cascade, --INHERITANCE,
+    parent_id int REFERENCES embeddable_thread (id) NOT NULL                       --on delete CASCADE ne tuku preku trigger PARENT TOTAL BIGINT
 );
 
 CREATE TABLE likes
 (
     user_id   INT REFERENCES users (id) on delete cascade,
     thread_id INT REFERENCES thread (id) on delete cascade,
-    PRIMARY KEY (user_id, thread_id)
+    PRIMARY KEY (user_id,
+                 thread_id)
 );
 CREATE TABLE topic_threads_moderators
 (
-    thread_id INT REFERENCES topic_thread(id) ON DELETE CASCADE,
-    user_id   INT REFERENCES moderator(id) ON DELETE CASCADE,
+    thread_id  INT REFERENCES topic_thread (id) ON DELETE CASCADE,
+    user_id    INT REFERENCES moderator (id) ON DELETE CASCADE,
     started_at TIMESTAMP DEFAULT NOW() NOT NULL,
-    PRIMARY KEY (thread_id, user_id)
+    PRIMARY KEY (thread_id,
+                 user_id)
 );
 CREATE TABLE tag
 (
-    name VARCHAR(64) PRIMARY KEY,
-    creator_id int REFERENCES moderator(id) on delete CASCADE not null
+    name       VARCHAR(64) PRIMARY KEY,
+    creator_id int REFERENCES moderator (id) on delete CASCADE not null
 );
 CREATE TABLE tag_threads
 (
     thread_id INT REFERENCES thread (id) ON DELETE CASCADE,
     tag_name  VARCHAR(64) REFERENCES tag (name) ON DELETE CASCADE,
-    PRIMARY KEY (thread_id, tag_name)
+    PRIMARY KEY (thread_id,
+                 tag_name)
 );
 
 CREATE TABLE blacklisted_user
 (
-    topic_id     INT REFERENCES topic_thread(id) ON DELETE CASCADE, --BLACLISTED_FROM
-    user_id      INT REFERENCES users(id) ON DELETE CASCADE, --REFERS_TO
-    moderator_id INT REFERENCES moderator(id) ON DELETE CASCADE, --BLACKLISTED_BY
+    topic_id     INT REFERENCES topic_thread (id) ON DELETE CASCADE, --BLACLISTED_FROM
+    user_id      INT REFERENCES users (id) ON DELETE CASCADE,        --REFERS_TO
+    moderator_id INT REFERENCES moderator (id) ON DELETE CASCADE,    --BLACKLISTED_BY
     start_date   TIMESTAMP,
     end_date     TIMESTAMP,
     reason       TEXT,
-    PRIMARY KEY (user_id, moderator_id, topic_id, start_date)
+    PRIMARY KEY (user_id,
+                 moderator_id,
+                 topic_id,
+                 start_date)
 );
 
 CREATE TABLE developer_associated_with_project
 (
-    project_id   INT REFERENCES project_thread(id) on delete cascade,
-    developer_id INT REFERENCES developer(id) on delete cascade,
+    project_id   INT REFERENCES project_thread (id) on delete cascade,
+    developer_id INT REFERENCES developer (id) on delete cascade,
     started_at   TIMESTAMP DEFAULT NOW() NOT NULL,
     ended_at     TIMESTAMP,
-    PRIMARY KEY (project_id, developer_id, started_at)
+    PRIMARY KEY (project_id,
+                 developer_id,
+                 started_at)
 );
 ---DO TUKA
 CREATE TABLE permissions
@@ -158,98 +182,142 @@ CREATE TABLE permissions
 CREATE TABLE project_roles
 (
     name        VARCHAR(32),
-    project_id  INT REFERENCES project_thread(id) ON DELETE CASCADE NOT NULL, --VALID_IN
+    project_id  INT REFERENCES project_thread (id) ON DELETE CASCADE NOT NULL, --VALID_IN
     description TEXT,
-    PRIMARY KEY (name, project_id)
+    PRIMARY KEY (name,
+                 project_id)
 );
 CREATE TABLE users_project_roles
 (
-    user_id INT REFERENCES developer(id) on delete cascade,
+    user_id    INT REFERENCES developer (id) on delete cascade,
     project_id INT,
     role_name  VARCHAR(32),
-    FOREIGN KEY (role_name, project_id)
-        REFERENCES project_roles (name, project_id) ON DELETE CASCADE,
-    PRIMARY KEY (user_id, project_id, role_name)
+    FOREIGN KEY (role_name,
+                 project_id)
+        REFERENCES project_roles (name,
+                                  project_id) ON DELETE CASCADE,
+    PRIMARY KEY (user_id,
+                 project_id,
+                 role_name)
 );
 CREATE TABLE project_roles_permissions
 (
     permission_name VARCHAR(32) REFERENCES permissions (name),
     role_name       VARCHAR(32),
     project_id      INT,
-    FOREIGN KEY (role_name, project_id)
-        REFERENCES project_roles (name, project_id) ON DELETE CASCADE,
-    PRIMARY KEY (permission_name, role_name, project_id)
+    FOREIGN KEY (role_name,
+                 project_id)
+        REFERENCES project_roles (name,
+                                  project_id) ON DELETE CASCADE,
+    PRIMARY KEY (permission_name,
+                 role_name,
+                 project_id)
 );
 
-create table submission(
-    id serial primary key,
-    created_at  TIMESTAMP default now() not null,
-    description VARCHAR(200) NOT NULL,
-    status varchar(32) default 'PENDING' CHECK(status IN ( 'ACCEPTED', 'DENIED', 'PENDING')) NOT NULL,
-    created_by int REFERENCES users(id) not null
+create table submission
+(
+    id          serial primary key,
+    created_at  TIMESTAMP   default now()                         not null,
+    description VARCHAR(200)                                      NOT NULL,
+    status      varchar(32) default 'PENDING' CHECK (status IN
+                                                     ('ACCEPTED',
+                                                      'DENIED',
+                                                      'PENDING')) NOT NULL,
+    created_by  int REFERENCES users (id)                         not null
 );
 
 CREATE TABLE project_request
 (
-    id          int PRIMARY KEY REFERENCES submission(id),
-    project_id  INT REFERENCES thread (id) ON DELETE CASCADE NOT NULL --RECIEVES
+    id         int PRIMARY KEY REFERENCES submission (id),
+    project_id INT REFERENCES thread (id) ON DELETE CASCADE NOT NULL --RECIEVES
 );
 
-create table feedback (
-    description TEXT,
-    submission_type varchar(1) CHECK(submission_type IN ('P','R')),
-    created_at timestamp default now() not null,
-    created_by int references users(id) NOT NULL, --WRITTEN_BY
-    submission_id int PRIMARY KEY references submission(id) on delete cascade
+create table feedback
+(
+    description     TEXT,
+    submission_type varchar(1) CHECK (submission_type IN
+                                      ('P',
+                                       'R')),
+    created_at      timestamp default now()   not null,
+    created_by      int references users (id) NOT NULL, --WRITTEN_BY
+    submission_id   int PRIMARY KEY references submission (id) on delete cascade
 );
 
 CREATE TABLE report
 (
-    id          int PRIMARY KEY REFERENCES submission(id),
-    thread_id   INT REFERENCES topic_thread(id) on delete cascade not null, --FOR_MISCONDUCT
-    for_user_id INT REFERENCES users (id) on delete cascade not null  --ABOUT
+    id          int PRIMARY KEY REFERENCES submission (id),
+    thread_id   INT REFERENCES topic_thread (id) on delete cascade not null, --FOR_MISCONDUCT
+    for_user_id INT REFERENCES users (id) on delete cascade        not null  --ABOUT
 );
 CREATE TABLE channel
 (
     name         VARCHAR(64),
     description  VARCHAR(200),
-    project_id   INT REFERENCES project_thread(id) ON DELETE CASCADE NOT NULL, --HAS
-    developer_id INT REFERENCES developer(id) NOT NULL, --CONSTRUCTS
-    PRIMARY KEY (name, project_id)
+    project_id   INT REFERENCES project_thread (id) ON DELETE CASCADE NOT NULL, --HAS
+    developer_id INT REFERENCES developer (id)                        NOT NULL, --CONSTRUCTS
+    PRIMARY KEY (name,
+                 project_id)
 );
 CREATE TABLE messages
 (
     sent_at      TIMESTAMP,
     content      VARCHAR(200) NOT NULL,
-    sent_by      INT REFERENCES developer(id),
+    sent_by      INT REFERENCES developer (id),
     project_id   INT,
     channel_name VARCHAR(64),
-    FOREIGN KEY (channel_name, project_id)
-        REFERENCES channel (name, project_id) ON DELETE CASCADE,
-    PRIMARY KEY (channel_name, project_id, sent_at, sent_by)
+    FOREIGN KEY (channel_name,
+                 project_id)
+        REFERENCES channel (name,
+                            project_id) ON DELETE CASCADE,
+    PRIMARY KEY (channel_name,
+                 project_id,
+                 sent_at,
+                 sent_by)
 );
 
 
 ------------------------VIEWS-----------------------------
-CREATE OR REPLACE VIEW v_project_thread
+CREATE
+OR REPLACE VIEW v_project_thread
 AS
-SELECT thread.id, content, user_id, title, repo_url
+SELECT thread.id,
+       content,
+       user_id,
+       title,
+       repo_url
 FROM project_thread project
          JOIN thread
-              ON project.id = thread.id;
-CREATE OR REPLACE VIEW v_topic_thread
+              ON project.id =
+                 thread.id;
+CREATE
+OR REPLACE VIEW v_topic_thread
 AS
-SELECT thread.id, content, user_id, title, parent_id
+SELECT thread.id,
+       content,
+       user_id,
+       title,
+       parent_id
 FROM topic_thread topic
          JOIN thread
-              ON topic.id = thread.id;
-CREATE OR REPLACE VIEW v_moderator
+              ON topic.id =
+                 thread.id;
+CREATE
+OR REPLACE VIEW v_moderator
 AS
-SELECT users.id, username, is_activate, password, description, registered_at, sex
+SELECT users.id,
+       username,
+       is_activate,
+       password,
+       description,
+       registered_at,
+       sex
 FROM moderator
-         JOIN users ON moderator.id = users.id;
+         JOIN users
+              ON moderator.id =
+                 users.id;
 
-create or replace view v_discussion_thread
+create
+or replace view v_discussion_thread
 as
 with recursive
     depth_table as
@@ -263,20 +331,30 @@ with recursive
     tmp as (select id, max(depth) as depth
             from depth_table
             group by id)
-select d.id as id, t.user_id as user_id, d.depth as depth, d1.parent_id as parent_id, t.created_at as "created_at"
+select d.id         as id,
+       t.user_id    as user_id,
+       d.depth      as depth,
+       d1.parent_id as parent_id,
+       t.created_at as "created_at"
 from tmp d
          join depth_table d1
-              on d.id = d1.id and d1.depth = d.depth
+              on d.id =
+                 d1.id and
+                 d1.depth =
+                 d.depth
          join thread t
-              on t.id = d.id;
+              on t.id =
+                 d.id;
 -------------------------- FUNCTIONS ----------------------
-CREATE OR REPLACE FUNCTION fn_validate_topic_title()
+CREATE
+OR REPLACE FUNCTION fn_validate_topic_title()
     RETURNS TRIGGER
     LANGUAGE plpgsql
 AS
 $$
 BEGIN
-    IF new.title IN
+    IF
+new.title IN
        (SELECT title
         FROM topic_thread
                  AS t
@@ -285,159 +363,217 @@ BEGIN
         )
     THEN
         RAISE EXCEPTION 'There already exists a topic with title % in parent topic with id %',new.title,new.parent_id;
-    END IF;
-    RETURN new;
+END IF;
+RETURN new;
 END;
 $$;
-create or replace function check_if_user_exists_in(table_name text, field_name text, field_value text) returns boolean
+create
+or replace function check_if_user_exists_in(table_name text, field_name text, field_value text) returns boolean
     language plpgsql
 as
 $$
 DECLARE
-    result BOOL;
+result BOOL;
 BEGIN
-    EXECUTE format('SELECT EXISTS (SELECT 1 FROM %I WHERE %I = %L)', table_name, field_name, field_value)
-        INTO result;
-    RETURN result;
+EXECUTE format(
+        'SELECT EXISTS (SELECT 1 FROM %I WHERE %I = %L)',
+        table_name,
+        field_name,
+        field_value)
+    INTO result;
+RETURN result;
 END
 $$;
-CREATE OR REPLACE FUNCTION fn_insert_topics_creator_as_moderator()
+CREATE
+OR REPLACE FUNCTION fn_insert_topics_creator_as_moderator()
     RETURNS TRIGGER
     LANGUAGE plpgsql
 AS
 $$
 DECLARE
-    v_user_id INT;
+v_user_id INT;
 BEGIN
-    SELECT v_topic_thread.user_id
-    INTO v_user_id
-    FROM v_topic_thread
-    WHERE v_topic_thread.id = new.id;
-    IF not check_if_user_exists_in('moderator', 'id', v_user_id::text) THEN
+SELECT v_topic_thread.user_id
+INTO v_user_id
+FROM v_topic_thread
+WHERE
+    v_topic_thread.id =
+    new.id;
+IF
+not check_if_user_exists_in('moderator', 'id', v_user_id::text) THEN
         INSERT INTO moderator values (v_user_id);
-    END IF;
-    INSERT INTO topic_threads_moderators(thread_id, user_id) VALUES (new.id, v_user_id);
-    RETURN NEW;
+END IF;
+INSERT INTO topic_threads_moderators(thread_id,
+                                     user_id)
+VALUES (new.id,
+        v_user_id);
+RETURN NEW;
 END
 $$;
 
-CREATE OR REPLACE FUNCTION fn_insert_project_manager()
+CREATE
+OR REPLACE FUNCTION fn_insert_project_manager()
     RETURNS TRIGGER
     LANGUAGE plpgsql
 AS
 $$
 DECLARE
-    usrId      INT;
-    new_project_id INT;
+usrId      INT;
+    new_project_id
+INT;
 BEGIN
-    SELECT user_id, id
-    into usrId,new_project_id
-    FROM v_project_thread p
-    WHERE NEW.id = p.id;
-    IF not EXISTS(
+SELECT user_id,
+       id
+into usrId,new_project_id
+FROM v_project_thread p
+WHERE
+    NEW.id =
+    p.id;
+IF
+not EXISTS(
       select 1
       from developer_associated_with_project dawp
       where dawp.project_id=new_project_id and dawp.developer_id=usrId
     ) THEN
         INSERT INTO developer_associated_with_project(project_id, developer_id, started_at)
             values (new_project_id, usrId, NOW());
-    end if;
-    IF not check_if_user_exists_in('project_manager', 'id', usrId::text) THEN
+end if;
+    IF
+not check_if_user_exists_in('project_manager', 'id', usrId::text) THEN
         INSERT INTO project_manager VALUES (usrId);
-    end if;
-    RETURN NEW;
+end if;
+RETURN NEW;
 END
 $$;
-create or replace function fn_remove_unused_tags()
+create
+or replace function fn_remove_unused_tags()
     returns trigger
     language plpgsql
 as
 $$
 BEGIN
-    IF not check_if_user_exists_in('tag_threads', 'tag_name', old.tag_name)
+    IF
+not check_if_user_exists_in('tag_threads', 'tag_name', old.tag_name)
     THEN
-        delete from tag t where t.name = old.tag_name;
-    end if;
-    return old;
+delete
+from tag t
+where
+    t.name =
+    old.tag_name;
+end if;
+return old;
 end;
 $$;
-create or replace function fn_add_dev_if_not_exist()
+create
+or replace function fn_add_dev_if_not_exist()
 returns trigger
 language plpgsql
 as $$
-    BEGIN
-        IF NOT check_if_user_exists_in('developer','id',new.developer_id::text) THEN
+BEGIN
+        IF
+NOT check_if_user_exists_in('developer','id',new.developer_id::text) THEN
             INSERT INTO developer values (NEW.developer_id);
-        end if;
-        RETURN new;
-    end;
+end if;
+RETURN new;
+end;
     $$;
 
-create or replace function fn_insert_general_for_project()
+create
+or replace function fn_insert_general_for_project()
     returns trigger
     language plpgsql
 as $$
 DECLARE
-    developer_id INT;
+developer_id INT;
 BEGIN
-    select user_id
-    into developer_id
-    from thread t
-    where t.id=NEW.id;
+select user_id
+into developer_id
+from thread t
+where
+    t.id =
+    NEW.id;
 
-    insert into channel(name,description,project_id,developer_id)
-    values ('General','General',NEW.id,developer_id);
+insert into channel(name,
+                    description,
+                    project_id,
+                    developer_id)
+values ('General',
+        'General',
+        NEW.id,
+        developer_id);
 
-    return new;
+return new;
 end;
 $$;
 
-CREATE OR REPLACE FUNCTION fn_defined_by_total_custom_roles()
+CREATE
+OR REPLACE FUNCTION fn_defined_by_total_custom_roles()
  RETURNS trigger
  LANGUAGE plpgsql
 AS $$
 BEGIN
-IF not exists(
+IF
+not exists(
     select 1
     from project_roles_permissions p
     where p.role_name=OLD.role_name and p.project_id = OLD.project_id
 ) THEN
-    DELETE FROM project_roles
-    where name=OLD.role_name and project_id=OLD.project_id;
+DELETE
+FROM project_roles
+where
+    name =
+    OLD.role_name
+  and
+    project_id =
+    OLD.project_id;
 END IF;
 RETURN OLD;
 END;
 $$
 ;
 
-CREATE OR REPLACE FUNCTION fn_remove_orphan_moderator()
+CREATE
+OR REPLACE FUNCTION fn_remove_orphan_moderator()
  RETURNS trigger
  LANGUAGE plpgsql
 AS $function$
 BEGIN
- IF not exists (
+ IF
+not exists (
     select 1
     from topic_threads_moderators t
     where t.user_id = OLD.user_id
  )
 THEN
-    DELETE FROM moderator where id=OLD.user_id;
- END IF;
- IF not exists ( 
+DELETE
+FROM moderator
+where id =
+      OLD.user_id;
+END IF;
+ IF
+not exists (
     select 1 
     from topic_threads_moderators t 
     where t.thread_id = OLD.thread_id 
  ) 
 THEN
-    delete from discussion_thread where parent_id=OLD.thread_id;
-    DELETE FROM topic_thread where id = OLD.thread_id;
+delete
+from discussion_thread
+where
+    parent_id =
+    OLD.thread_id;
+DELETE
+FROM topic_thread
+where id =
+      OLD.thread_id;
 -- 	delete from thread where id =  OLD.thread_id;
- END IF; 
- RETURN OLD;
+END IF;
+RETURN OLD;
 END;
 $function$
 ;
-create or replace function fn_aa_rm_orphan_dics()
+create
+or replace function fn_aa_rm_orphan_dics()
     returns trigger
     language plpgsql
 as
@@ -445,13 +581,21 @@ $$
 BEGIN
 --     RAISE NOTICE '%',OLD.id;
 
-    delete from discussion_thread dt
-    where dt.parent_id=OLD.id;
-    delete from embeddable_thread
-    where id = OLD.id;
-    delete from thread t
-    where t.id=OLD.id;
-    RETURN OLD;
+delete
+from discussion_thread dt
+where
+    dt.parent_id =
+    OLD.id;
+delete
+from embeddable_thread
+where id =
+      OLD.id;
+delete
+from thread t
+where
+    t.id =
+    OLD.id;
+RETURN OLD;
 END;
 $$;
 
@@ -471,61 +615,72 @@ $$;
 
 -------------------------- TRIGGERS ----------------------
 
-CREATE OR REPLACE TRIGGER tr_check_topic_name --RADI
-    BEFORE INSERT OR UPDATE
+CREATE
+OR REPLACE TRIGGER tr_check_topic_name --RADI
+    BEFORE INSERT OR
+UPDATE
     ON topic_thread
     FOR EACH ROW
-EXECUTE FUNCTION fn_validate_topic_title();
-CREATE OR REPLACE TRIGGER tr_insert_topics_creator_as_moderator --RADI
+    EXECUTE FUNCTION fn_validate_topic_title();
+CREATE
+OR REPLACE TRIGGER tr_insert_topics_creator_as_moderator --RADI
     AFTER INSERT
     ON topic_thread
     FOR EACH ROW
 EXECUTE FUNCTION fn_insert_topics_creator_as_moderator();
 ----
-create or replace TRIGGER tr_defined_by_total_custom_roles
+create
+or replace TRIGGER tr_defined_by_total_custom_roles
 after delete
 on project_roles_permissions
 for each row
 execute function fn_defined_by_total_custom_roles();
 
-CREATE OR REPLACE TRIGGER tr_remove_orphan_moderator --RADI
+CREATE
+OR REPLACE TRIGGER tr_remove_orphan_moderator --RADI
 AFTER DELETE
 ON topic_threads_moderators
 FOR EACH ROW
 EXECUTE FUNCTION fn_remove_orphan_moderator();
 
 
-CREATE OR REPLACE TRIGGER tr_a_insert_project_manager --RADI
+CREATE
+OR REPLACE TRIGGER tr_a_insert_project_manager --RADI
     AFTER INSERT
     ON project_thread
     FOR EACH ROW
 EXECUTE FUNCTION fn_insert_project_manager();
 
-create or replace trigger tr_remove_unused_tags --RADI
+create
+or replace trigger tr_remove_unused_tags --RADI
     after delete
-    on tag_threads
+on tag_threads
     for each row
 execute function fn_remove_unused_tags();
 
-create or replace trigger tr_add_dev_if_not_exist --RADI
+create
+or replace trigger tr_add_dev_if_not_exist --RADI
 before insert on developer_associated_with_project
     for each row
     execute function fn_add_dev_if_not_exist();
 
-create or replace trigger tr_insert_general_for_project --RADI
+create
+or replace trigger tr_insert_general_for_project --RADI
     after insert on project_thread
     for each row
 execute function fn_insert_general_for_project();
 
-create or replace trigger tr_rm_orphan_disc
+create
+or replace trigger tr_rm_orphan_disc
     after delete
-    on discussion_thread
+on discussion_thread
     for each row
 execute function fn_aa_rm_orphan_dics();
 
-create or replace trigger tr_rm_orphan_disc
+create
+or replace trigger tr_rm_orphan_disc
     after delete
-    on topic_thread
+on topic_thread
     for each row
 execute function fn_aa_rm_orphan_dics();
 
