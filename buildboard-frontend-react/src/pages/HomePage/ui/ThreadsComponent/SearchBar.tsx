@@ -12,7 +12,7 @@ const SearchBar = ({className}:SearchBarProp) => {
 	const [query, setQuery] = useState<string>("");
 	return (
       <div
-        className={cn(" group flex h-10 items-center rounded-md border border-input pl-3 text-lg text-white focus-within:border-accent  ring-offset-background bg-bg-2 border-sidebar-lines",className)}
+        className={cn(" group flex h-10 items-center rounded-md border border-input pl-3 text-lg text-white focus-within:border-accent  ring-offset-background bg-bg-2 ",className)}
       >
         <SearchIcon className="h-[16px] w-[16px] group-focus-within:text-accent" />
         <input

@@ -40,34 +40,36 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JWTAuthenticationFilter jwtFilter) throws Exception {
         http.authorizeHttpRequests(request ->
-                        request.requestMatchers(
-                                        "/",
-                                        "/contact",
-                                        "/about",
-                                        "/project_imgs/buildboard-logo.jpg",
-                                        "*.ico",
-                                        "*.jpg",
-                                        "*.png",
-                                        "/register",
-                                        "/login",
-                                        "/css/**",
-                                        "/js/**"
-                                ).permitAll()
-                                .requestMatchers(
-                                        new AntPathRequestMatcher("/topic/*", HttpMethod.GET.name()),
-                                        new AntPathRequestMatcher("/project/*", HttpMethod.GET.name()),
-                                        new AntPathRequestMatcher("/avatars/**", HttpMethod.GET.name())
-                                ).permitAll()
-                                .requestMatchers("/topic/**", "/project/**").authenticated()
-                                .anyRequest().authenticated()
-                ).formLogin(AbstractHttpConfigurer::disable)
+                                request.requestMatchers(new AntPathRequestMatcher("/**", HttpMethod.OPTIONS.name())).permitAll()
+                                        .requestMatchers(
+                                                "/",
+                                                "/contact",
+                                                "/about",
+                                                "/project_imgs/buildboard-logo.jpg",
+                                                "*.ico",
+                                                "*.jpg",
+                                                "*.png",
+                                                "/register",
+                                                "/login",
+                                                "/css/**",
+                                                "/js/**"
+                                                        ).permitAll()
+                                        .requestMatchers(
+                                                new AntPathRequestMatcher("/topic/*", HttpMethod.GET.name()),
+                                                new AntPathRequestMatcher("/project/*", HttpMethod.GET.name()),
+                                                new AntPathRequestMatcher("/avatars/**", HttpMethod.GET.name()),
+                                                new AntPathRequestMatcher("/users/**", HttpMethod.GET.name())
+                                                        ).permitAll()
+                                        .requestMatchers("/topic/**", "/project/**").authenticated()
+                                        .anyRequest().authenticated()
+                                  ).formLogin(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
                 .logout(AbstractHttpConfigurer::disable)
                 .sessionManagement(sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(
                         jwtFilter,
                         UsernamePasswordAuthenticationFilter.class
-                );
+                                );
         return http.build();
 
     }

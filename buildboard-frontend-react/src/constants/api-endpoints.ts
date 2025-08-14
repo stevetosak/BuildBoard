@@ -6,7 +6,7 @@
 */
 const endpoints = {
 	user: (username: string) =>
-		 "/users" + `?username=${username}`,
+		 "/users" + `/${username}`,
 	threads: (page: number = 0) =>
 		 "/threads" + `?page=${page}`,
     auth: () => '/login',

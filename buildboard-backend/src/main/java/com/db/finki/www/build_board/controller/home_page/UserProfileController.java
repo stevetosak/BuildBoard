@@ -48,7 +48,7 @@ public class UserProfileController {
             if (interested.getClass().equals(Topic.class)) {
                 Topic topic = (Topic) interested;
                 topicDtos.add(new BBUserProfile.TopicDto(topic.getTitle()));
-            } else if(interested.getClass().equals(Project.class)) {
+            } else if (interested.getClass().equals(Project.class)) {
                 Project project = (Project) interested;
                 projectDtos.add(new BBUserProfile.ProjectDto(project.getTitle()));
             }

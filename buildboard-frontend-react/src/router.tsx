@@ -3,8 +3,7 @@ import {
     createRoutesFromElements,
     Route,
 } from "react-router-dom";
-// import HomePage from "@/pages/HomePage";
-// import {loader as homePageLoader} from "@pages/HomePage/data/fetchUser";
+import HomePage from "@pages/HomePage";
 import LandingPage from "@pages/LandingPage";
 import LoginPage from "@pages/Login";
 import validateUser  from "@pages/Login/data/validateUser.tsx";
@@ -21,8 +20,7 @@ export const router = createBrowserRouter(
             />
             <Route
                 path="/homepage"
-                // loader={homePageLoader}
-                // element={<HomePage/>}
+                element={<HomePage/>}
             />
             <Route path={"topics/:id"}></Route>
             <Route path={"projects/:id/"}>

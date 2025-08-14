@@ -39,14 +39,20 @@ export type Page<T> = {
 };
 
 export type NamedThread = {
-    meta: {
-        username: string;
-        userLogo: URL;
-        createdAt: string;
-    };
-    content: {
-        title: string;
-        tags: string[]; //Trebat da se razmislit za ova kako ke se handelvit
-        content: string;
-    };
+    createdAt:string,
+    creator:{
+        username:string,
+        logo:string
+    },
+    content:{
+        title:string,
+        content:string,
+        tags:string[]
+    }
 };
+
+export const getAuthHeader = ():RequestInit => ({
+    headers: { 
+        "Authorization" : "Bearer " + localStorage.getItem("token")
+    } 
+})

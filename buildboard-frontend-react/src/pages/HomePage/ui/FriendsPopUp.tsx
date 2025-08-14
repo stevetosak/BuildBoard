@@ -1,4 +1,4 @@
-import type { User } from "@pages/HomePage/data/fetchUser";
+import type { UserProfile } from "@shared/api-types";
 import { Button } from "@components/ui/button";
 import UserLogo from "@components/shared/UserLogo";
 import { PanelLeftIcon } from "lucide-react";
@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 
 type FriendsPopUpProps = {
-	user: NonNullable<User>;
+	user: NonNullable<UserProfile>;
 };
 
 const FriendsPopUp = ({ user }: FriendsPopUpProps) => {
@@ -29,7 +29,7 @@ const FriendsPopUp = ({ user }: FriendsPopUpProps) => {
 			<h3 className="justify-self-center">Friends</h3>
 
 			<div className="overflow-scroll flex flex-col gap-1 items-start p-2">
-				{user.following.friends.map((friend) => (
+				{user.friends.map((friend) => (
 					<Button variant="link" key={friend.username} className="p-0 gap-2">
 						<div className="border-2 rounded p-0.5">
 							<UserLogo url={friend.logo} alt={`${friend.username} logo`} />

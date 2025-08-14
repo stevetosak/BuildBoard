@@ -1,5 +1,5 @@
 import {type ActionFunction, redirect} from "react-router-dom";
-import {default as API_ENDPOINTS} from '@/constants'
+import {default as API_ENDPOINTS} from '@constants/api-endpoints'
 import {type ValidationError} from "@pages/shared/ValidationError.tsx";
 import generateErrorAlert from "@pages/shared/alertGenerator.tsx";
 import type { JWTResponse } from "@/shared/types";
