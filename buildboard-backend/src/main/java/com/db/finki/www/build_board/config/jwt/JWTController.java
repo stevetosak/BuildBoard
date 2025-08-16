@@ -9,6 +9,7 @@ import com.db.finki.www.build_board.service.user.BBUserDetailsService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
@@ -44,6 +45,13 @@ public class JWTController {
     @ExceptionHandler({BadCredentialsException.class, UsernameNotFoundException.class})
     public ProblemDetail handleBadCredentialsException(BadCredentialsException e) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,"The username or password provided isn't correct");
+    }
+
+    @ExceptionHandler({DataIntegrityViolationException.class})
+    public ProblemDetail handleDataIntegrityViolationException(DataIntegrityViolationException e) {
+        if(e.getMessage().contains("duplicate key"))
+            return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,"The username already exists");
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,"Data integrity violation");
     }
 
     @PostMapping("/login")

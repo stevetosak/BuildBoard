@@ -9,12 +9,15 @@ type SearchBarProp = {
 	triggerFetch: React.Dispatch<React.SetStateAction<SearchOptions>>;
 };
 
-// type:thread_type i tag:tag_name
+const isFiltersInputCorrect = (filters:string| SearchOptions['filters']):filters is SearchOptions['filters'] => { 
+	return filters == 'all' || filters == 'title' || filters == 'content' 
+}
+
 const parseInput = (
 	userInput: string,
 	setOptions: (options: SearchOptions) => void,
 ) => {
-	if (userInput.match(/(type:\w+).*?(type:\w+)|type:(?!project|topic)\w+/))
+	if (userInput.match(/(type:\w+).*?(type:\w+)|type:(?!project|topic)\w+|(filters:\w+).*?(filters:\w+)/))
 		return;
 
 	const searchOptions = userInput.split(/\s+/).reduce(
@@ -24,14 +27,20 @@ const parseInput = (
 			} else if (word.startsWith("tag:")) {
 				acc.tags.push(word.split(":")[1]);
 			}
+			else if(word.startsWith("filters:")){
+				const potentialFilter = word.split(":")[1]
+				if(isFiltersInputCorrect(potentialFilter))
+					acc.filters = potentialFilter 
+			}
 			else {
 				if (acc.query.length == 0) acc.query = word;
 				else acc.query += " " + word;
 			}
 			return acc;
 		},
-		{ query: "", tags: [] as string[], threadType: "" } satisfies SearchOptions,
+		{ query: "", tags: [] as string[], threadType: "", filters:'all' } as SearchOptions,
 	);
+
 	setOptions(searchOptions);
 };
 

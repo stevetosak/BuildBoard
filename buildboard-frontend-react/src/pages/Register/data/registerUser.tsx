@@ -5,18 +5,16 @@ import generateErrorAlert from "@pages/shared/alertGenerator";
 import { formDataToJson } from "@/shared/form-processing";
 import type { JWTResponse } from "@shared/security-utils";
 
-type ErrorMessages = "Username already exists"
 
 type ErrorResponse = {
-    msg: ErrorMessages
+    detail: string 
 }
-type SuccessResponse = {
-    [K: string]: string
-}
-type RegisterationResponse = SuccessResponse | ErrorResponse
+type RegisterationResponse = JWTResponse | ErrorResponse
 
-const hasErrorOccured = (response: Response, _data: SuccessResponse | ErrorResponse): _data is ErrorResponse => response.status === 404
+const hasErrorOccured = (response: Response, _data: JWTResponse | ErrorResponse): _data is ErrorResponse => response.status > 300
 const userAlreadyExists = () => generateErrorAlert("Registration unsuccessful", `The username already exists`)
+
+const DUPLICATE_USER = 'username already exists'
 
 const registerUser: ActionFunction = async ({request}) => {
     const response = await fetch(API_ENDPOINTS.register(), {
@@ -28,12 +26,12 @@ const registerUser: ActionFunction = async ({request}) => {
     })
     const data = await response.json() as RegisterationResponse
 
-    if (hasErrorOccured(response, data) && data.msg === 'Username already exists')
+    if (hasErrorOccured(response, data) && data.detail.toLowerCase().includes(DUPLICATE_USER))
         return {Element: userAlreadyExists()} satisfies ValidationError
     if (!response.ok)
         throw new Error("Unknown error" + '\n' + await response.json())
     
-    const {token} = await response.json() as JWTResponse
+    const {token} = data as JWTResponse
     localStorage.setItem('token', token)
 
     return redirect("/homepage")

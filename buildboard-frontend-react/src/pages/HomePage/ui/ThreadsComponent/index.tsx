@@ -66,7 +66,7 @@ const handleRegistrationOfObserver = (
 const createKeyForNamedThread = (namedThread: NamedThread) => namedThread.content.title  + '-' +  namedThread.threadType
 
 const ThreadsComponent = () => {
-	const [searchOptions, setSearchOptions] = useState<SearchOptions>({query:"", tags: [], threadType: ""});
+	const [searchOptions, setSearchOptions] = useState<SearchOptions>({query:"", tags: [], threadType: "", filters:'all'});
 	const {
 		data: namedThreads,
 		hasNextPage,
@@ -141,6 +141,7 @@ const ThreadsComponent = () => {
 														{namedThread.createdAt}
 													</span>
 												</div>
+												<h3 className="mt-1">{namedThread.content.title}</h3>
 											</CardHeader>
 											<CardContent className="text-left ">
 												<p className="text-sm text-gray-300 truncate">
