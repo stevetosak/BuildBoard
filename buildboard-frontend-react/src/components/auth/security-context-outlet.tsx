@@ -1,12 +1,13 @@
 import SecurityContextProvider from "@/components/auth/security-context-provider";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 
 const SecurityOutlet = ( )=> {    
     const token = localStorage.getItem("token")
+    const {pathname} = useLocation(); 
 
     return ( 
         <SecurityContextProvider token={token}>
-            <Outlet/>
+            <Outlet key={pathname}/>
         </SecurityContextProvider>
     );
 }

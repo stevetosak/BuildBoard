@@ -18,6 +18,7 @@ import {
 	type InterestedHeaders,
 } from "@shared/url-generation";
 import DisplayDataIfLoaded from "./ui/DisplayDataIfLoaded";
+import { Link } from "react-router-dom";
 
 export type SingleColorCtx = {
 	registered: [boolean];
@@ -95,7 +96,7 @@ const HomePage = () => {
 													className="self-start text-lg cursor-pointer"
 													variant="link"
 												>
-													{getUrlForThread(threadName, threadType)}
+													<Link to={'/' + getUrlForThread(threadName, threadType)}>{threadName}</Link>
 												</Button>
 											),
 										)}

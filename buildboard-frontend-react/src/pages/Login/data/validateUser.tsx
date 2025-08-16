@@ -1,4 +1,4 @@
-import {type ActionFunction, redirect} from "react-router-dom";
+import {type ActionFunction, redirect } from "react-router-dom";
 import {default as API_ENDPOINTS} from '@constants/api-endpoints'
 import {type ValidationError} from "@pages/shared/ValidationError.tsx";
 import generateErrorAlert from "@pages/shared/alertGenerator.tsx";
@@ -26,7 +26,7 @@ const validateUser:ActionFunction = async ({request}) => {
    const {token} = await resposne.json() as JWTResponse 
    localStorage.setItem("token", token) 
 
-   return redirect('/homepage')
+   return redirect('/homepage' );
 }
 
 export default validateUser;

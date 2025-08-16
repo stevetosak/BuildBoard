@@ -9,6 +9,7 @@ const createPageURL = (page: number) => {
 };
 
 export const fetchThreads = async (pageNumber:number) : Promise<Page<NamedThread[]>> => {
+	console.log("Fetching threads for page", pageNumber);
 	if (pageNumber < 0) throw new Error("The requested page must be > 0");
 
 	const response = await fetch(createPageURL(pageNumber), getAuthHeader());
@@ -18,3 +19,4 @@ export const fetchThreads = async (pageNumber:number) : Promise<Page<NamedThread
 	const pageResponse = await response.json() as Page<NamedThread[]>
 	return pageResponse;
 };
+	

@@ -1,6 +1,7 @@
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import LoadingBlock from "./LoadingBlock";
 import { fetchThreads } from "@pages/HomePage/data/initialFetch";
+import { Fragment } from "react";
 import {
 	Card,
 	CardContent,
@@ -12,7 +13,7 @@ import DisplayDataIfLoaded from "../DisplayDataIfLoaded";
 import { useNavigate } from "react-router-dom";
 import { getUrlForThread } from "@shared/url-generation";
 import { useRef, type RefObject } from "react";
-import React from "react";
+import { debounceGenerator, type NamedThread } from "@shared/api-utils";
 
 const LoadingBlocks = () => {
 	return (
@@ -30,14 +31,13 @@ const LoadingBlocks = () => {
 
 const createIntersectionObserver = (
 	callbackWhenIntersting: () => void,
-	isFetching: boolean,
 ): IntersectionObserver => {
 	const observer = new IntersectionObserver(
 		(entry) => {
 			const lastCard = entry[0];
-			if (lastCard.isIntersecting && !isFetching) {
-				callbackWhenIntersting();
+			if (lastCard.isIntersecting) {
 				observer.disconnect();
+				callbackWhenIntersting();
 			}
 		},
 		{ threshold: 0.8 },
@@ -54,6 +54,9 @@ const handleRegistrationOfObserver = (
 	observer.current.observe(el);
 };
 
+const createKeyForNamedThread = (namedThread: NamedThread) => namedThread.content.title  + '-' +  namedThread.threadType
+
+
 const ThreadsComponent = () => {
 	const {
 		data: namedThreads,
@@ -65,14 +68,14 @@ const ThreadsComponent = () => {
 		queryFn: ({ pageParam }) => fetchThreads(pageParam),
 		initialPageParam: 0,
 		getNextPageParam: (lastPage) =>
-		lastPage.pageable.pageNumber + 1 < lastPage.totalPages
-			? lastPage.pageable.pageNumber + 1
-			: undefined,
+			lastPage.pageable.pageNumber + 1 < lastPage.totalPages
+				? lastPage.pageable.pageNumber + 1
+				: undefined,
 	});
 
 	const navigate = useNavigate();
 	const observer = useRef<IntersectionObserver>(
-		createIntersectionObserver(fetchNextPage, isFetchingNextPage),
+		createIntersectionObserver(debounceGenerator(fetchNextPage, 50)),
 	);
 
 	return (
@@ -89,13 +92,15 @@ const ThreadsComponent = () => {
 					{(namedThreads) =>
 						namedThreads.pages.map((page, i) => {
 							const isLastPage = i === namedThreads.pages.length - 1;
+							
 
 							if (!hasNextPage) observer.current.disconnect();
 
 							return (
-								<React.Fragment key={i}>
+								<Fragment key={createKeyForNamedThread(page.content[0])}>
 									{page.content.map((namedThread, idx) => (
 										<Card
+										 	key={createKeyForNamedThread(namedThread)}
 											ref={
 												hasNextPage &&
 												isLastPage &&
@@ -153,7 +158,7 @@ const ThreadsComponent = () => {
 											Loading <span className="animate-pulse">...</span>
 										</span>
 									)}
-								</React.Fragment>
+								</Fragment>
 							);
 						})
 					}
