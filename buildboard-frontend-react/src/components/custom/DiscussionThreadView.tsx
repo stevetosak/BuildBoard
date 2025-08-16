@@ -6,33 +6,35 @@ import {
 } from "@/components/ui/card.tsx";
 import {Check, CircleEllipsis, Reply, X} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
-import type {ThreadData} from "@/types.ts";
+import type {ThreadData, ThreadResponse, ThreadUserDto, ThreadElement} from "@/types.ts";
 import {Replies} from "@/components/custom/Replies.tsx";
-import {type SetStateAction,useState} from "react";
+import {type SetStateAction, useMemo, useState} from "react";
 import {AnimatePresence, motion} from "framer-motion";
 import * as React from "react";
 import {MessageInputBox} from "@/components/custom/MessageInputBox.tsx";
 import {api} from "@/services/apiconfig.ts";
+import {getLevelMap, type ThreadNode, ThreadTree} from "@/lib/utils.ts";
 
 export const DiscussionThreadView = ({
                                          className,
-                                         data,
-                                         threadLevelMap,
-                                         setThreadLevelMap,
+                                         node,
                                          isRoot = false,
+    handleAddReply,
+                                         tree,
+                                         updateTree,
                                      }: {
     className?: string;
-    data: ThreadData;
+    node: ThreadNode;
     isRoot?: boolean;
-    threadLevelMap: Map<number, ThreadData[]>;
-    setThreadLevelMap: React.Dispatch<SetStateAction<Map<number, ThreadData[]>>>
+    tree: ThreadTree,
+    handleAddReply: (targetNodeIdx:number, child:ThreadElement) => void
+    updateTree: (threadResponse: ThreadResponse) => void
 }) => {
 
 
     const [replying, setReplying] = useState(false);
-    const [displayReplies, setDisplayReplies] = useState<boolean>(isRoot);
-
-    const replies = threadLevelMap.get(data.level + 1) ?? [];
+    const [displayReplies, setDisplayReplies] = useState<boolean>(true);
+    const replies = node.children
     console.log("Replies")
     console.log(replies)
 
@@ -41,7 +43,8 @@ export const DiscussionThreadView = ({
         const content = e.currentTarget.value;
         if (e.key === "Enter" && !e.shiftKey && content.trim() !== '') {
             e.preventDefault();
-            handleReply(content);
+            handleAddReply(node.element.id,{id:9999,parentId:node.element.parentId,level:node.element.level +1,
+                content:content,user: {id:55,username:"Tosman223",avatarUrl:"nema"},numLikes:0,numReplies:0,type:"discussion",createdAt: Date.now()})
             setReplying(false)
         }
     }
@@ -55,31 +58,13 @@ export const DiscussionThreadView = ({
     }
 
     const loadReplies = async () => {
-        const response = await api.get<ThreadData[]>(`/replies?threadId=${data.id}`)
-        if (response.data.length > 0) {
-            setThreadLevelMap((map) => map.set(data.level + 1, response.data))
-        }
-
+        const response = await api.get<ThreadResponse>(`/replies?threadId=${node.element.id}`)
+        console.log("LOADING REPLIES FOR CURRENT NODE >>>")
+        console.log(node)
+        console.log("RECIEVED RESPONSE")
+        console.log(response.data)
+        updateTree(response.data)
     }
-
-    const handleReply = (content: string) => {
-        setThreadLevelMap(prevMap => {
-            const newMap = new Map(prevMap);
-            const key = data.level + 1;
-
-            const existingReplies = newMap.get(data.level + 1) ?? []
-            const updatedReplies = [...existingReplies,{
-                user: data.user,
-                content,
-                level: data.level + 1,
-                date: data.date,
-            }]
-
-            newMap.set(key,updatedReplies)
-
-            return newMap;
-        });
-    };
 
 
     return (
@@ -100,19 +85,20 @@ export const DiscussionThreadView = ({
                                 alt="User Avatar"
                             />
                             <span className="text-sm font-medium text-white">
-              {data.user.username}
+              {node.element.user.username}
             </span>
                         </div>
-                        <span className="text-sm text-muted-foreground mt-1">25.08.2025</span>
+                        <span
+                            className="text-sm text-muted-foreground mt-1">{new Date(node.element.createdAt).toDateString()}</span>
                     </CardHeader>
 
                     <CardContent className="text-left">
                         {isRoot ? (
                             <h2 className="text-lg font-semibold leading-snug">
-                                {data.content}
+                                {node.element.content}
                             </h2>
                         ) : (
-                            <p className="text-sm text-gray-300">{data.content}</p>
+                            <p className="text-sm text-gray-300">{node.element.content}</p>
                         )}
                     </CardContent>
 
@@ -154,21 +140,39 @@ export const DiscussionThreadView = ({
                 </Card>
             </AnimatePresence>
 
-            <div className="flex items-start">
-                <Button
-                    size="sm"
-                    className="hover:bg-gray-900 hover:-translate-y-0.5 hover:translate-x-0.5 transition bg-background-main"
-                    onClick={() => handleDisplayReplies()}
-                >
-                    <CircleEllipsis className="mr-2" size={16}/>
-                    {!displayReplies
-                        ? `View more replies`
-                        : "Hide"}
-                </Button>
-            </div>
+            { node.element.numReplies > 0 &&
+                <div className="flex items-start">
+                    <Button
+                        size="sm"
+                        className="hover:bg-gray-900 hover:-translate-y-0.5 hover:translate-x-0.5 transition bg-background-main"
+                        onClick={() => handleDisplayReplies()}
+                    >
+                        <CircleEllipsis className="mr-2" size={16}/>
+                        {!displayReplies
+                            ? `View ${node.element.numReplies} more replies`
+                            : "Hide"}
+                    </Button>
+                </div>
+            }
 
-            {displayReplies &&
-                <Replies replies={replies} threadLevelMap={threadLevelMap} setThreadLevelMap={setThreadLevelMap}/>}
+
+
+            { displayReplies &&
+                <div className="w-full">
+                    {replies?.map((thr, idx) => (
+                        <div
+                            key={idx}
+                            className={`mt-5`}
+                            style={{ paddingLeft: `${thr.element.level}rem` }}
+                        >
+                            <DiscussionThreadView className="gap-1" node={thr} tree={tree} updateTree={updateTree} handleAddReply={handleAddReply}/>
+                        </div>
+                    ))}
+                </div>
+            }
+
+
+                {/*<Replies tree={tree} updateTree={updateTree} replies={replies} />*/}
         </div>
     );
 };

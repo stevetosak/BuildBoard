@@ -8,7 +8,6 @@ import com.db.finki.www.build_board.entity.user_type.BBUser;
 import com.db.finki.www.build_board.repository.thread.DiscussionRepository;
 import com.db.finki.www.build_board.repository.thread.EmbeddableRepo;
 import com.db.finki.www.build_board.repository.thread.VDiscussRepo;
-import com.db.finki.www.build_board.rest.dto.DiscussionThreadDto;
 import com.db.finki.www.build_board.rest.dto.UserDto;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -45,22 +44,6 @@ public class DiscussionService {
         return level0Discussions;
     }
 
-    public List<DiscussionThreadDto> getDirectRepliesForThread(BBThread parent) {
-        return discussionRepository.findAllByParentIdAndLevel(parent.getId(), parent.getLevel() + 1).orElse(List.of())
-                .stream()
-                .map(disc -> new DiscussionThreadDto(
-                        disc.getId(),
-                        disc.getLevel(),
-                        disc.getContent(),
-                        disc.getCreatedAt().toString(),
-                        new UserDto(
-                                disc.getUser().getId(),
-                                disc.getUser().getUsername(),
-                                disc.getUser().getAvatarUrl()
-                        )
-                )).collect(Collectors.toList());
-
-    }
 
     public VDiscussion getVDiscussionById(int discussionId) {
         return vDiscussRepo.findVDiscussionByDiscussionId(discussionId);

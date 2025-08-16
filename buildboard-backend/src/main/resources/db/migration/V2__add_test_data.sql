@@ -7,17 +7,78 @@ VALUES
     ('user5', true, '$2a$12$zHrloz8WG2zo5S6MTf1C0ez1raMlmDJdB8OOa2I1S2pVy9oI76YTa', 'Fifth user', NOW(), 'M','ramche', 'ramche@gmail.com');
 
 
-INSERT INTO thread (content, user_id,level)
+INSERT INTO users (username, is_activate, password, description, registered_at, sex, name, email)
 VALUES
-    ('Main content for topic thread 1', 1,1), --1
-    ('Main content for topic thread 2', 2,0), --2
-    ('Discussion content for topic 1', 1,1), --3
-    ('Discussion content for topic 2', 2,1), --4
-    ('Project-specific thread content', 3,0), --5
-    ('Reply to topic 1', 4,1), -- 6
-    ('Further discussion on topic 2', 5,2), --7
-    ('Main content for topic thread', 1,0), --8
-    ('Project-specific thread content 2', 5,0); --9
+    -- Password: user6pass
+    ('user6', true, '$2a$12$jB9g/.KP95fsYYOTy0pwZ.kFrwA/G2cMvPvFLzGtCk8jJ2qO3O.3u', 'Sixth user', NOW(), 'M', 'marko', 'marko@gmail.com'),
+    -- Password: user7pass
+    ('user7', true, '$2a$12$KRxRufuMscrlQOLKGw4fBehNLWaP7Zu.M964G2JedKVM4o4wTiJaG', 'Seventh user', NOW(), 'F', 'jana', 'jana@gmail.com'),
+    -- Password: user8pass
+    ('user8', true, '$2a$12$SCqlK.Rl72tFT0kIUNP6KuSy6BYzfdb9sKJPSWbIK8/uk7y8U7hgS', 'Eighth user', NOW(), 'M', 'nikola', 'nikola@gmail.com'),
+    -- Password: user9pass
+    ('user9', true, '$2a$12$LpDTYNb/i0cohkmszkx93ef9rkgFTNFQz/KqHEYIAE9MPOmlyXJ9m', 'Ninth user', NOW(), 'F', 'elena', 'elena@gmail.com'),
+    -- Password: user10pass
+    ('user10', true, '$2a$12$p/kZdDKCUCmXjWTsknss/.UaD4a8vxrTcfvc6mdkpHRRPqRZLLtr6', 'Tenth user', NOW(), 'M', 'petar', 'petar@gmail.com');
+
+-- Add new developers
+INSERT INTO developer (id)
+VALUES
+    (6), -- user6
+    (7), -- user7
+    (8), -- user8
+    (9), -- user9
+    (10); -- user10
+
+
+
+-- Original threads with parent_id moved here
+INSERT INTO thread (content, user_id, level, parent_id)
+VALUES
+    ('Main content for topic thread 1', 1, 1, 5), -- Topic 1, parent is Project Thread 5
+    ('Main content for topic thread 2', 2, 0, NULL), -- Topic 2, no parent
+    ('Discussion content for topic 1', 1, 1, 1), -- Discussion of Topic 1
+    ('Discussion content for topic 2', 2, 1, 2), -- Discussion of Topic 2
+    ('Project-specific thread content', 3, 0, NULL), -- Project Thread 5
+    ('Reply to topic 1', 4, 1, 1), -- Reply to Topic 1
+    ('Further discussion on topic 2', 5, 2, 4), -- Reply to Discussion 4
+    ('Main content for topic thread', 1, 0, NULL), -- Topic 7
+    ('Project-specific thread content 2', 5, 0, NULL); -- Project Thread 9
+
+INSERT INTO thread (content, user_id, level, parent_id)
+VALUES
+    ('Main content for topic thread 3', 6, 1, 14), -- Topic 3, parent is Project Thread 14
+    ('Main content for topic thread 4', 7, 0, NULL), -- Topic 4
+    ('Discussion content for topic 3', 6, 1, 10), -- Discussion of Topic 3
+    ('Discussion content for topic 4', 7, 1, 11), -- Discussion of Topic 4
+    ('Project-specific thread content 3', 8, 0, NULL), -- Project Thread 14
+    ('Reply to topic 3', 9, 1, 10), -- Reply to Topic 3
+    ('Further discussion on topic 4', 10, 2, 13), -- Reply to Discussion 13
+    ('Main content for topic thread 5', 6, 0, NULL), -- Topic 8
+    ('Project-specific thread content 4', 10, 0, NULL),
+    ('Further discussion on topic 4', 10, 3, 13),
+    ('Further discussion on topic 4', 10, 3, 13),
+    ('Further discussion on topic 4', 10, 3, 13),
+    ('Further discussion on topic 4', 10, 3, 13),
+    ('Further discussion on topic 4', 10, 3, 16),
+    ('Further discussion on topic 4', 10, 3, 16),
+    ('Further discussion on topic 4', 10, 3, 16),
+    ('Further discussion on topic 4', 10, 3, 16),
+    ('Further discussion on topic 4', 10, 3, 16),
+    ('Further discussion on topic 4', 10, 3, 16),
+    ('Further discussion on topic 4 dir child', 10, 2, 11),
+    ('Further discussion on topic 4', 10, 2, 11),
+    ('Further discussion on topic 4', 10, 2, 11),
+    ('Further discussion on topic 4', 10, 2, 11),
+    ('Further discussion on topic 4', 10, 2, 11),
+    ('Further discussion on topic 4', 10, 2, 11),
+    ('Further discussion on topic 4', 10, 2, 11),
+    ('Further discussion on topic 4', 10, 3, 13),
+    ('Further discussion on topic 4', 10, 3, 13),
+    ('Further discussion on topic 4', 10, 3, 13),
+    ('Further discussion on topic 4', 10, 3, 13),
+    ('Further discussion on topic 4', 10, 3, 13);-- Reply to Discussion 13-- Project Thread 18
+
+
 
 insert into embeddable_thread(id)
 values (1),(2),(3),(4),(6),(7),(8);
@@ -28,29 +89,127 @@ VALUES
     (5, 'Project 1 Thread', 'http://github.com/project1'),
     (9, 'Project 2 Thread', 'http://github.com/project1');
 
-INSERT INTO topic_thread (id, title, parent_id)
+INSERT INTO topic_thread (id, title)
 VALUES
-    (1, 'Topic 1' , 5),
-    (2, 'Topic 2', NULL),
-    (8, 'Topic 7' , NULL);
+    (1, 'Topic 1'),
+    (2, 'Topic 2'),
+    (8, 'Topic 7'),
+    (10, 'Topic 3'),
+    (11, 'Topic 4'),
+    (17, 'Topic 8');
 
 insert into topic_guidelines(topic_id,description)
 values
     (1,'Follow guidelines'),
     ( 2,'Be respectful');
 
-INSERT INTO discussion_thread (id, parent_id)
+INSERT INTO discussion_thread (id)
 VALUES
-    (3, 1),
-    (4, 2),
-    (6, 1),
-    (7, 4);
+    (3),
+    (4),
+    (6),
+    (7),
+    (12),
+    (13),
+    (15),
+    (16);
+
+
+-- Replies for Topic 1
+-- Assume the 20 discussions we just inserted are consecutive IDs.
+-- We'll create replies pointing to a mix of those IDs.
+
+-- Direct replies to Topic 1 itself
+INSERT INTO thread (content, user_id, level, parent_id)
+VALUES
+    ('Direct reply A to Topic 1', 6, 1, 1),
+    ('Direct reply B to Topic 1', 7, 1, 1),
+    ('Direct reply C to Topic 1', 8, 1, 1);
+
+-- Replies to the first few discussions under Topic 1
+INSERT INTO thread (content, user_id, level, parent_id)
+SELECT 'Reply to Discussion ' || id || ' of Topic 1', (6 + id % 5), 2, id
+FROM thread
+WHERE parent_id = 1
+ORDER BY id
+LIMIT 7;
+
+-- Replies to some replies (level 3)
+INSERT INTO thread (content, user_id, level, parent_id)
+SELECT 'Nested reply under reply of Discussion ' || id, (7 + id % 4), 3, id
+FROM thread
+WHERE parent_id IN (SELECT id FROM thread WHERE parent_id = 1)
+ORDER BY id
+LIMIT 5;
+
+-- Even deeper (level 4)
+INSERT INTO thread (content, user_id, level, parent_id)
+SELECT 'Deep nested reply under reply ' || id, (8 + id % 3), 4, id
+FROM thread
+WHERE parent_id IN (SELECT id FROM thread WHERE level = 2 AND parent_id IN (SELECT id FROM thread WHERE parent_id = 1))
+ORDER BY id
+LIMIT 5;
+
+-- Link all new replies into discussion_thread
+INSERT INTO discussion_thread (id)
+SELECT id FROM thread
+WHERE parent_id IS NOT NULL AND id NOT IN (SELECT id FROM discussion_thread);
+
+
+------------------------------------------------------------
+
+-- Replies for Topic 2 (mirroring Topic 1 pattern)
+
+-- Direct replies to Topic 2
+INSERT INTO thread (content, user_id, level, parent_id)
+VALUES
+    ('Direct reply A to Topic 2', 6, 1, 2),
+    ('Direct reply B to Topic 2', 7, 1, 2),
+    ('Direct reply C to Topic 2', 8, 1, 2);
+
+-- Replies to the first few discussions under Topic 2
+INSERT INTO thread (content, user_id, level, parent_id)
+SELECT 'Reply to Discussion ' || id || ' of Topic 2', (6 + id % 5), 2, id
+FROM thread
+WHERE parent_id = 2
+ORDER BY id
+LIMIT 7;
+
+-- Replies to some replies (level 3)
+INSERT INTO thread (content, user_id, level, parent_id)
+SELECT 'Nested reply under reply of Discussion ' || id, (7 + id % 4), 3, id
+FROM thread
+WHERE parent_id IN (SELECT id FROM thread WHERE parent_id = 2)
+ORDER BY id
+LIMIT 5;
+
+-- Even deeper (level 4)
+INSERT INTO thread (content, user_id, level, parent_id)
+SELECT 'Deep nested reply under reply ' || id, (8 + id % 3), 4, id
+FROM thread
+WHERE parent_id IN (SELECT id FROM thread WHERE level = 2 AND parent_id IN (SELECT id FROM thread WHERE parent_id = 2))
+ORDER BY id
+LIMIT 5;
+
+-- Link new replies into discussion_thread
+INSERT INTO discussion_thread (id)
+SELECT id FROM thread
+WHERE parent_id IS NOT NULL AND id NOT IN (SELECT id FROM discussion_thread);
+
+
+
 
 
 INSERT INTO likes (user_id, thread_id)
 VALUES
     (1, 3),
-    (2, 4),
+    (2, 11),
+    (3, 11),
+    (4, 11),
+    (4, 16),
+    (1, 16),
+    (2, 16),
+    (3, 16),
     (3, 5),
     (4, 6),
     (5, 7);
@@ -104,40 +263,9 @@ VALUES
 ---------------- NOV TEST DATA
 
 -- Add new users
-INSERT INTO users (username, is_activate, password, description, registered_at, sex, name, email)
-VALUES
-    -- Password: user6pass
-    ('user6', true, '$2a$12$jB9g/.KP95fsYYOTy0pwZ.kFrwA/G2cMvPvFLzGtCk8jJ2qO3O.3u', 'Sixth user', NOW(), 'M', 'marko', 'marko@gmail.com'),
-    -- Password: user7pass
-    ('user7', true, '$2a$12$KRxRufuMscrlQOLKGw4fBehNLWaP7Zu.M964G2JedKVM4o4wTiJaG', 'Seventh user', NOW(), 'F', 'jana', 'jana@gmail.com'),
-    -- Password: user8pass
-    ('user8', true, '$2a$12$SCqlK.Rl72tFT0kIUNP6KuSy6BYzfdb9sKJPSWbIK8/uk7y8U7hgS', 'Eighth user', NOW(), 'M', 'nikola', 'nikola@gmail.com'),
-    -- Password: user9pass
-    ('user9', true, '$2a$12$LpDTYNb/i0cohkmszkx93ef9rkgFTNFQz/KqHEYIAE9MPOmlyXJ9m', 'Ninth user', NOW(), 'F', 'elena', 'elena@gmail.com'),
-    -- Password: user10pass
-    ('user10', true, '$2a$12$p/kZdDKCUCmXjWTsknss/.UaD4a8vxrTcfvc6mdkpHRRPqRZLLtr6', 'Tenth user', NOW(), 'M', 'petar', 'petar@gmail.com');
 
--- Add new developers
-INSERT INTO developer (id)
-VALUES
-    (6), -- user6
-    (7), -- user7
-    (8), -- user8
-    (9), -- user9
-    (10); -- user10
 
--- Add new threads
-INSERT INTO thread (content, user_id)
-VALUES
-    ('Main content for topic thread 3', 6), --10
-    ('Main content for topic thread 4', 7), --11
-    ('Discussion content for topic 3', 6), --12
-    ('Discussion content for topic 4', 7), --13
-    ('Project-specific thread content 3', 8), --14
-    ('Reply to topic 3', 9), --15
-    ('Further discussion on topic 4', 10), --16
-    ('Main content for topic thread 5', 6), --17
-    ('Project-specific thread content 4', 10); --18
+-- Add new threa
 
 -- Add embeddable_thread entries for topic and discussion threads
 INSERT INTO embeddable_thread (id)
@@ -150,26 +278,11 @@ VALUES
     (14, 'Project 3 Thread', 'http://github.com/project3'),
     (18, 'Project 4 Thread', 'http://github.com/project4');
 
--- Add new topic_threads
-INSERT INTO topic_thread (id, title, parent_id)
-VALUES
-    (10, 'Topic 3', 14),
-    (11, 'Topic 4', NULL),
-    (17, 'Topic 8', NULL);
-
 -- Add new topic_guidelines
 INSERT INTO topic_guidelines (topic_id, description)
 VALUES
     (10, 'Stay on topic'),
     (11, 'No personal attacks');
-
--- Add new discussion_threads
-INSERT INTO discussion_thread (id, parent_id)
-VALUES
-    (12, 10),
-    (13, 11),
-    (15, 10),
-    (16, 13);
 
 -- Add new likes
 INSERT INTO likes (user_id, thread_id)

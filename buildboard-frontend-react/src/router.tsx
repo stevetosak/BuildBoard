@@ -4,7 +4,7 @@ import {
 import {TopicPage} from "@/pages/TopicPage.tsx";
 import {ChannelPage} from "@/pages/ChannelPage.tsx";
 import {api} from "@/services/apiconfig.ts";
-import type {ThreadData} from "@/types.ts";
+import type {ThreadData, ThreadElement, ThreadResponse} from "@/types.ts";
 
 export const router = createBrowserRouter([
         {
@@ -13,7 +13,7 @@ export const router = createBrowserRouter([
             loader: async ({params}) => {
                 const {topicName} = params;
                 console.log("TOPIC NAME: " + topicName)
-                const response = await api.get<{ topic: ThreadData, replies: ThreadData[] }>(`/topics/${topicName}`)
+                const response = await api.get<ThreadResponse>(`/topics/${topicName}`)
                 console.log("RESP DATA")
                 console.log(response.data)
                 return response.data;

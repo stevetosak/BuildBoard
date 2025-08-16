@@ -22,6 +22,10 @@ public class BBThread {
 
     protected String content;
     protected int level;
+    @ManyToOne()
+    @JoinColumn(name = "parent_id")
+    protected BBThread parent;
+    protected String type;
 
     @ManyToOne
     @JoinColumn(name="user_id")

@@ -1,0 +1,73 @@
+inicijalno sakame da sa loadvit topicot so n direktni deca.
+Prasalnik e dali i kolku indirektni deca da se loadvat.
+
+Inicijalno za sekoj thread so e loadnat trebit i da se znet uste kolku deca imat toj za da mozit da imat prikaz 
+kako: view x more replies.
+
+Ko ke kliknis view more replies se loadvat m deca kade m e nekoj limit. Ako imat pojke od m deca na poslednoto dete pak ke imat view more so istiot m limit
+
+Promena vo strukturata:
+- Relacijata parent_id e postavena vo thread entitetot i trgnata e od discussison i topic.
+- dodaden e type field vo thread so ke mozit da sa koristit za polesno filtriranje, vo smisla where type = 't' join <tabelata t>
+- dodadena e nova kolona level so pretstavuvat na koe nivo, vo odnos na root threadot se naogjat nekoj thread, ako mu e child na root
+
+So novava struktura mozno e slednovo query: 
+
+
+WITH RECURSIVE topic_tree AS (
+    SELECT id, content, parent_id, user_id, level
+    FROM thread
+    WHERE id = 11
+
+    UNION ALL
+
+    SELECT child.id, child.content, child.parent_id, child.user_id, child.level
+    FROM thread child
+             JOIN topic_tree parent ON child.parent_id = parent.id
+),
+thread_data AS (
+    SELECT
+        tc.*,
+        (SELECT COUNT(*) FROM topic_tree row WHERE tc.id = row.parent_id) AS num_replies,
+        (SELECT COUNT(*) FROM likes l WHERE l.thread_id = tc.id) AS num_likes
+    FROM topic_tree tc
+)
+SELECT *
+FROM thread_data
+ORDER BY
+    CASE WHEN parent_id IS NULL THEN 0 ELSE 1 END,
+    level,
+    0.3 * num_replies + 0.7 * num_likes DESC LIMIT 5;
+    
+
+- se pocnuvat od target threadot (topic) i rekurzivno se iteriraat negovite deca spored child.parent_id = parent.id
+- se dobivaat kako rezultat samiot root thread, i site negovi deca. Bidejki se odi po red, vo smisla sekoe dete rekurzivno si gi bara svoite deca, rezultatot e sortiran prirodno spored level.
+- potoa za da se dobijat threads spored nekoj prioritet ni se potrebni metrikite num_replies i num_likes.
+- so pomos na tie metriki rezultatot se sortira po slednite kriteriumi: root_thread > level > engagement_score
+- engagement score = 0.3 * num_replies + 0.7 * num_likes (factors subject to change)
+- So ova se dobivaat najrelevantnite diskusii vo prviot page odnosno pri prviot fetch od db.
+
+
+
+
+1 - TOPIC
+2 - TOPIC
+8 - TOPIC
+
+				1
+			6		3
+			
+			  2
+		  7	  4
+		  
+		    10
+		  12  15
+		  
+		    11
+		  13
+		 16
+		  
+		   
+		   
+		
+					
