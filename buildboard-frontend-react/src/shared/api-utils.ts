@@ -55,10 +55,10 @@ export type NamedThread = {
 };
 
 export const debounceGenerator = <T,>(f:(...args:T[]) => unknown, delay:number) => {
-	let timeoutId: NodeJS.Timeout | null = null;
+	let timeoutId: number | undefined;
 	return (...args:T[]) => {
-		if (timeoutId) clearTimeout(timeoutId);
-		timeoutId = setTimeout(() => {
+		window.clearTimeout(timeoutId);
+		timeoutId = window.setTimeout(() => {
 			f(...args);
 		}, delay);
 	}

@@ -1,7 +1,7 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import LoadingBlock from "./LoadingBlock";
-import { fetchThreads } from "@pages/HomePage/data/initialFetch";
-import { Fragment } from "react";
+import { fetchThreads } from "@pages/HomePage/data/fetchThreads";
+import { Fragment, useState } from "react";
 import {
 	Card,
 	CardContent,
@@ -14,6 +14,15 @@ import { useNavigate } from "react-router-dom";
 import { getUrlForThread } from "@shared/url-generation";
 import { useRef, type RefObject } from "react";
 import { debounceGenerator, type NamedThread } from "@shared/api-utils";
+
+
+export type SearchOptions = { 
+	query: string;
+	tags: string[];
+	threadType: string;
+	filters:"title"|"content"|"all"
+}
+
 
 const LoadingBlocks = () => {
 	return (
@@ -56,16 +65,16 @@ const handleRegistrationOfObserver = (
 
 const createKeyForNamedThread = (namedThread: NamedThread) => namedThread.content.title  + '-' +  namedThread.threadType
 
-
 const ThreadsComponent = () => {
+	const [searchOptions, setSearchOptions] = useState<SearchOptions>({query:"", tags: [], threadType: ""});
 	const {
 		data: namedThreads,
 		hasNextPage,
 		fetchNextPage,
 		isFetchingNextPage,
 	} = useInfiniteQuery({
-		queryKey: ["namedThreads"],
-		queryFn: ({ pageParam }) => fetchThreads(pageParam),
+		queryKey: ["namedThreads", searchOptions],
+		queryFn: ({ pageParam, queryKey }) => fetchThreads(pageParam, queryKey[1] as SearchOptions),
 		initialPageParam: 0,
 		getNextPageParam: (lastPage) =>
 			lastPage.pageable.pageNumber + 1 < lastPage.totalPages
@@ -83,7 +92,7 @@ const ThreadsComponent = () => {
 			className="grid grid-rows-[8em_auto] h-screen overflow-scroll"
 			style={{ scrollbarWidth: "none" }}
 		>
-			<SearchBar className="w-1/2 justify-self-center self-center" />
+			<SearchBar triggerFetch={setSearchOptions} className=""/>
 			<div className="flex flex-col gap-5 p-5 row-start-2 items-center">
 				<DisplayDataIfLoaded
 					data={namedThreads}
@@ -97,7 +106,7 @@ const ThreadsComponent = () => {
 							if (!hasNextPage) observer.current.disconnect();
 
 							return (
-								<Fragment key={createKeyForNamedThread(page.content[0])}>
+								<Fragment key={page.content.length > 0 ? createKeyForNamedThread(page.content[0]) : 0}>
 									{page.content.map((namedThread, idx) => (
 										<Card
 										 	key={createKeyForNamedThread(namedThread)}
@@ -132,13 +141,10 @@ const ThreadsComponent = () => {
 														{namedThread.createdAt}
 													</span>
 												</div>
-												<span className="text-sm text-muted-foreground mt-1">
-													{}
-												</span>
 											</CardHeader>
 											<CardContent className="text-left ">
 												<p className="text-sm text-gray-300 truncate">
-													{namedThread.content.content}
+													{namedThread.content.content + '...'}
 												</p>
 											</CardContent>
 											<CardFooter className="flex wrap gap-5">

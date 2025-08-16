@@ -34,7 +34,7 @@ const FriendsPopUp = ({ user }: FriendsPopUpProps) => {
 						<div className="border-2 rounded p-0.5">
 							<UserLogo url={friend.logo} alt={`${friend.username} logo`} />
 						</div>
-						<Link to="profile">{friend.username}</Link>
+						<Link to={"/profile/" + friend.username}>{friend.username}</Link>
 					</Button>
 				))}
 			</div>
