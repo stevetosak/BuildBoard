@@ -14,6 +14,7 @@ public class NamedThreadDTO {
     public LocalDateTime createdAt;
     public Creator creator;
     public Content content;
+    public String threadType;
 
     @Data
     @AllArgsConstructor

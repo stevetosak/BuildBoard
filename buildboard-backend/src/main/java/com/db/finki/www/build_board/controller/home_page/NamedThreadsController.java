@@ -40,6 +40,7 @@ public class NamedThreadsController {
 
         return ResponseEntity.ok(namedThreads.map(namedThread -> builder
                 .createdAt(namedThread.getCreatedAt())
+                .threadType(namedThread.getTypeName())
                 .creator(new NamedThreadDTO.Creator(namedThread
                         .getUser()
                         .getUsername(),

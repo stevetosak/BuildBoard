@@ -39,10 +39,10 @@ const UserInfo = ({ user }: UserInfoProp) => {
 			nonActiveCls="text-white"
 		>
 			<Button variant={"outline"}>
-				<Link to="/user/register">Register</Link>
+				<Link to="/register">Register</Link>
 			</Button>
 			<Button variant={"outline"}>
-				<Link to="/user/login">Login</Link>
+				<Link to="/login">Login</Link>
 			</Button>
 		</OneActiveAtTime>
 	);

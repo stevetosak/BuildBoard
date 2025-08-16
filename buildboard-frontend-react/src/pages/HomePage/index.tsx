@@ -13,7 +13,10 @@ import ThreadsComponent from "@pages/HomePage/ui/ThreadsComponent";
 import SecurityContext from "@/context/security-context";
 import { useQuery } from "@tanstack/react-query";
 import type { UserProfile } from "@shared/api-utils";
-import { getUrlForThread, type InterestedHeaders } from "@shared/url-generation";
+import {
+	getUrlForThread,
+	type InterestedHeaders,
+} from "@shared/url-generation";
 import DisplayDataIfLoaded from "./ui/DisplayDataIfLoaded";
 
 export type SingleColorCtx = {
@@ -32,6 +35,18 @@ const iconsForHeading = {
 	topics: <Rss size={"1em"} />,
 } as Record<keyof UserProfile["interested"], JSX.Element>;
 
+const LogoComponentIfUserUndefined = () => (
+	<section>
+		<div className="w-[10em] h-[10em]">
+			<img
+				src={iconUrl}
+				alt="Buildboard logo"
+				className="w-full h-full"
+			/>
+		</div>
+	</section>
+);
+
 const HomePage = () => {
 	const user = useContext(SecurityContext);
 	const { data: userProfile } = useQuery({
@@ -43,7 +58,7 @@ const HomePage = () => {
 		<main className="w-full grid bg-bg-1 px-0 h-[100vh] pb-3 grid-cols-[1fr_3fr_1fr]">
 			<DisplayDataIfLoaded
 				data={userProfile}
-				dataUndefinedComponent={<div></div>}
+				dataUndefinedComponent={<LogoComponentIfUserUndefined />}
 			>
 				{(user) => (
 					<CustomSidebar
@@ -57,7 +72,9 @@ const HomePage = () => {
 								/>
 							</div>
 						}
-						bodyContent={(Object.keys(user.interested) as InterestedHeaders[]).map((threadType) => (
+						bodyContent={(
+							Object.keys(user.interested) as InterestedHeaders[]
+						).map((threadType) => (
 							<Collapsible
 								key={threadType}
 								className="group/collapsible text-[1.5rem]"
@@ -71,15 +88,17 @@ const HomePage = () => {
 										</CollapsibleTrigger>
 									</SidebarGroupLabel>
 									<CollapsibleContent className="flex pt-1 flex-col gap-1 overflow-scroll">
-										{user.interested[threadType].map(({name:threadName}, idx) => (
-											<Button
-												key={idx}
-												className="self-start text-lg cursor-pointer"
-												variant="link"
-											>
-												{getUrlForThread(threadName, threadType)}	
-											</Button>
-										))}
+										{user.interested[threadType].map(
+											({ name: threadName }, idx) => (
+												<Button
+													key={idx}
+													className="self-start text-lg cursor-pointer"
+													variant="link"
+												>
+													{getUrlForThread(threadName, threadType)}
+												</Button>
+											),
+										)}
 									</CollapsibleContent>
 								</SidebarGroup>
 							</Collapsible>

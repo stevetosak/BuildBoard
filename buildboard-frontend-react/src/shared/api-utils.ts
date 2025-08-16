@@ -1,3 +1,5 @@
+import type { InterestedHeaders } from "./url-generation";
+
 export type Channel = {
 	name: string;
 };
@@ -48,5 +50,6 @@ export type NamedThread = {
 		content: string;
 		tags: string[];
 	};
+	threadType : InterestedHeaders
 };
 

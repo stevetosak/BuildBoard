@@ -9,11 +9,14 @@ import {
 } from "@/components/ui/card";
 import SearchBar from "./SearchBar";
 import DisplayDataIfLoaded from "../DisplayDataIfLoaded";
+import { useNavigate } from "react-router-dom";
+import { getUrlForThread } from "@shared/url-generation";
+import { useRef, type RefObject } from "react";
 
 const LoadingBlocks = () => {
 	return (
 		<>
-			{Array.from(Array(3)).map((_,i) => (
+			{Array.from(Array(3)).map((_, i) => (
 				<LoadingBlock
 					key={i}
 					w={"80%"}
@@ -24,13 +27,44 @@ const LoadingBlocks = () => {
 	);
 };
 
+const createIntersectionObserver = (
+	callbackWhenIntersting: () => void,
+): IntersectionObserver => {
+	const observer = new IntersectionObserver(
+		(entry) => {
+			const lastCard = entry[0];
+			if (lastCard.isIntersecting) {
+				callbackWhenIntersting();
+			}
+		},
+		{ threshold: 0.5 },
+	);
+	return observer;
+};
+
+const handleRegistrationOfObserver = (
+	observer: RefObject<IntersectionObserver>,
+	el: HTMLElement | null,
+	i: number,
+	total: number,
+) => {
+	if (total - 1 !== i || !el) return;
+	observer.current.disconnect();
+	observer.current.observe(el);
+};
+
 const ThreadsComponent = () => {
 	const page = 0;
 	const { data: namedThreads } = useQuery({
 		queryKey: [page],
 		queryFn: ({ queryKey }) => fetchThreads(queryKey[0]),
 	});
-
+	const navigate = useNavigate();
+	const observer = useRef<IntersectionObserver>(
+		createIntersectionObserver(() => {
+			console.log("last card is visible");
+		}),
+	);
 	return (
 		<section
 			className="grid grid-rows-[8em_auto] h-screen overflow-scroll"
@@ -43,10 +77,26 @@ const ThreadsComponent = () => {
 					dataUndefinedComponent={<LoadingBlocks />}
 				>
 					{(namedThreads) =>
-						namedThreads.content.map((namedThread) => (
+						namedThreads.content.map((namedThread, i) => (
 							<Card
-								key={namedThread.content.title}
-								className={`border-0 border-l-1 border-accent-2 rounded-none rounded-r-xl cursor-pointer bg-bg-2 text-[#eaeaea] w-3/4 min-w-[10em]`}
+								ref={(el) =>
+									handleRegistrationOfObserver(
+										observer,
+										el,
+										i,
+										namedThreads.content.length,
+									)
+								}
+								key={namedThread.threadType + "-" + namedThread.content.title}
+								className={`border-0 border-l-1 border-accent rounded-none rounded-r-xl cursor-pointer bg-bg-2 text-[#eaeaea] w-3/4 min-w-[10em] hover:border-2 transition-border duration-50`}
+								onClick={() =>
+									navigate(
+										getUrlForThread(
+											namedThread.content.title,
+											namedThread.threadType,
+										),
+									)
+								}
 							>
 								<CardHeader className="w-full">
 									<div className="w-full grid-cols-[repeat(2,max-content)_auto] gap-2 items-center grid">
