@@ -1,5 +1,5 @@
 import SecurityContext from "@/context/security-context";
-import type { UserAuth } from "@/shared/types";
+import type { UserAuth } from "@shared/security-utils";
 import {  type ReactElement } from "react";
 import {useJwt} from 'react-jwt'
 

@@ -1,5 +1,6 @@
 import API_ENDPOINTS from "@constants/api-endpoints.ts";
-import {type Page, type NamedThread, getAuthHeader} from "@shared/api-types.ts";
+import {type Page, type NamedThread } from "@shared/api-utils";
+import { getAuthHeader } from "@shared/security-utils";
 
 const createPageURL = (page: number) => {
 	const url = new URL(API_ENDPOINTS.threads());

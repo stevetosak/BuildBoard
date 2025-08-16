@@ -10,3 +10,16 @@ export type UserAuth = {
 export type JWTResponse = { 
     token : string 
 }
+
+export const getAuthHeader = (): RequestInit => {
+	let user = localStorage.getItem("token") || "";
+    
+    if(user)
+        user = "Bearer " + user;  
+
+	return {
+		headers: {
+			Authorization: user
+		},
+	};
+};

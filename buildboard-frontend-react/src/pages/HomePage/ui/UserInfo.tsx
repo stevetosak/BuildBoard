@@ -1,4 +1,4 @@
-import type { UserProfile } from "@shared/api-types";
+import type { UserProfile } from "@shared/api-utils";
 import OneActiveAtTime from "@components/shared/OneActiveAtTime";
 import {
 	HoverCard,
@@ -10,7 +10,7 @@ import { Button } from "@components/ui/button";
 import { Link } from "react-router-dom";
 
 type UserInfoProp = {
-	user: NonNullable<UserProfile>;
+	user: UserProfile | undefined;
 };
 
 const UserInfo = ({ user }: UserInfoProp) => {

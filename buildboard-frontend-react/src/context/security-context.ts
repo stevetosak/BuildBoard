@@ -1,4 +1,4 @@
-import type { UserAuth } from "@/shared/types";
+import type { UserAuth } from "@shared/security-utils";
 import { createContext } from "react";
 
 const SecurityContext = createContext<UserAuth>(null)

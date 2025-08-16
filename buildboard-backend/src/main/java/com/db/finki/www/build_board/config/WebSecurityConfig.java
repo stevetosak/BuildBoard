@@ -32,15 +32,25 @@ public class WebSecurityConfig {
     private final UserDetailsService userDetailsService;
 
 
-    public WebSecurityConfig(PasswordEncoder passwordEncoder, UserDetailsService userDetailsService) {
+    public WebSecurityConfig(
+            PasswordEncoder passwordEncoder,
+            UserDetailsService userDetailsService
+                            ) {
         this.passwordEncoder = passwordEncoder;
         this.userDetailsService = userDetailsService;
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, JWTAuthenticationFilter jwtFilter) throws Exception {
-        http.authorizeHttpRequests(request ->
-                                request.requestMatchers(new AntPathRequestMatcher("/**", HttpMethod.OPTIONS.name())).permitAll()
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http,
+            JWTAuthenticationFilter jwtFilter
+                                                  ) throws Exception {
+        http
+                .authorizeHttpRequests(request ->
+                                request
+                                        .requestMatchers(new AntPathRequestMatcher("/**",
+                                                HttpMethod.OPTIONS.name()))
+                                        .permitAll()
                                         .requestMatchers(
                                                 "/",
                                                 "/contact",
@@ -53,16 +63,19 @@ public class WebSecurityConfig {
                                                 "/login",
                                                 "/css/**",
                                                 "/js/**"
-                                                        ).permitAll()
+                                                        )
+                                        .permitAll()
+                                        //Bez jwt, samo get
                                         .requestMatchers(
-                                                new AntPathRequestMatcher("/topic/*", HttpMethod.GET.name()),
-                                                new AntPathRequestMatcher("/project/*", HttpMethod.GET.name()),
-                                                new AntPathRequestMatcher("/avatars/**", HttpMethod.GET.name()),
-                                                new AntPathRequestMatcher("/users/**", HttpMethod.GET.name())
-                                                        ).permitAll()
-                                        .requestMatchers("/topic/**", "/project/**").authenticated()
-                                        .anyRequest().authenticated()
-                                  ).formLogin(AbstractHttpConfigurer::disable)
+                                                new AntPathRequestMatcher("/threads",
+                                                        HttpMethod.GET.name())
+                                                        )
+                                        .permitAll()
+                                        // Sve
+                                        .anyRequest()
+                                        .authenticated()
+                                      )
+                .formLogin(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
                 .logout(AbstractHttpConfigurer::disable)
                 .sessionManagement(sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

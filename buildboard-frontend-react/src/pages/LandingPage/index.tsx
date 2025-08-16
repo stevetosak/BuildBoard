@@ -1,5 +1,5 @@
 import icon from "@assets/Icon.jpg";
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import {default as CIcon} from "@assets/C.svg?react"
 import {default as CppIcon} from "@assets/Cpp.svg?react"
 import {default as CSharp} from "@assets/CSharp.svg?react"
@@ -16,7 +16,10 @@ const liItemsDist = 'list-disc'
 
 const LandingPage = () => {
     const user = useContext(SecurityContext)
-    console.log(user)
+    const navigate = useNavigate()
+
+    if(user) 
+        navigate('/homepage')
 
     return (
         <main className="grid grid-rows-[repeat(3,100vh)_auto] grid-cols-[100vw] bg-bg-1">

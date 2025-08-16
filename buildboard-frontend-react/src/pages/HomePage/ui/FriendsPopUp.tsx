@@ -1,4 +1,4 @@
-import type { UserProfile } from "@shared/api-types";
+import type { UserProfile } from "@shared/api-utils";
 import { Button } from "@components/ui/button";
 import UserLogo from "@components/shared/UserLogo";
 import { PanelLeftIcon } from "lucide-react";

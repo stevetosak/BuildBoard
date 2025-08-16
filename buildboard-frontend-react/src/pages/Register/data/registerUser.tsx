@@ -3,7 +3,7 @@ import {type ValidationError} from "@pages/shared/ValidationError.tsx";
 import {default as API_ENDPOINTS} from '@constants/api-endpoints.ts'
 import generateErrorAlert from "@pages/shared/alertGenerator";
 import { formDataToJson } from "@/shared/form-processing";
-import type { JWTResponse } from "@/shared/types";
+import type { JWTResponse } from "@shared/security-utils";
 
 type ErrorMessages = "Username already exists"
 
