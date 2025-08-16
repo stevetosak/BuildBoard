@@ -35,7 +35,7 @@ public class NamedThreadsController {
                 filters,
                 type,
                 PageRequest.of(page,
-                        10));
+                        5));
         NamedThreadDTO.NamedThreadDTOBuilder builder = NamedThreadDTO.builder();
 
         return ResponseEntity.ok(namedThreads.map(namedThread -> builder

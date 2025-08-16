@@ -37,6 +37,7 @@ export type Page<T> = {
 	pageable: {
 		pageNumber: number;
 	};
+	totalPages: number;
 };
 
 export type NamedThread = {

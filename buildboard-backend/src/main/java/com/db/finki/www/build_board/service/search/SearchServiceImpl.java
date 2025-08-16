@@ -56,19 +56,37 @@ public class SearchServiceImpl implements SearchService {
             filters = new ArrayList<>();
             filters.add("all");
         }
+        long totalNumberOfElements = 0;
 
         if(Objects.equals(type, "project")){
             System.out.println("PROJECT");
-            results.addAll(searchProjects(query, filters, pageable).getContent());
+            Page<Project> projects = searchProjects(query,
+                    filters,
+                    pageable);
+            results.addAll(projects.getContent());
+            totalNumberOfElements = projects.getTotalElements();
         } else if(Objects.equals(type, "topic")){
-            results.addAll(searchTopics(query, filters, pageable).getContent());
-            System.out.println("TOPIC");
+            Page<Topic> topics = searchTopics(query,
+                    filters,
+                    pageable);
+            results.addAll(topics.getContent());
+            totalNumberOfElements = topics.getTotalElements();
         } else {
-            results.addAll(searchTopics(query, filters, pageable).getContent());
-            results.addAll(searchProjects(query, filters, pageable).getContent());
-            System.out.println("ALL");
+            Page<Topic> topics = searchTopics(query,
+                    filters,
+                    pageable);
+
+            totalNumberOfElements += topics.getTotalElements();
+            results.addAll(topics.getContent());
+
+            Page<Project> projects = searchProjects(query,
+                    filters,
+                    pageable);
+
+            totalNumberOfElements+=projects.getTotalElements();
+            results.addAll(projects.getContent());
         }
 
-        return new PageImpl<>(results, pageable, results.size());
+        return new PageImpl<>(results, pageable, totalNumberOfElements);
     }
 }
