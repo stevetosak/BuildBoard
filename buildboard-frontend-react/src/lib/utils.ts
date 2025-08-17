@@ -15,10 +15,15 @@ export type ThreadNode = {
 export class ThreadTree {
     root: ThreadNode;
 
-    constructor(threadResponse: ThreadResponse) {
-        this.root = this.constructThreadTree(threadResponse)
+
+    constructor(root: ThreadNode) {
+        this.root = root
     }
 
+    static fromResponse = (threadResponse: ThreadResponse) => {
+        const root = this.constructThreadTree(threadResponse)
+        return new ThreadTree(root)
+    }
 
     find = (targetNodeId: number,currentNode: ThreadNode = this.root) : ThreadNode | undefined => {
         console.log("SEARCHING  >>>>")
@@ -55,7 +60,7 @@ export class ThreadTree {
         node.children.forEach((c) => this.logChildren(c))
     }
 
-    constructThreadTree = (threadResponse: ThreadResponse,parent: ThreadNode | null = null) => {
+    private static constructThreadTree = (threadResponse: ThreadResponse,parent: ThreadNode | null = null) => {
         const levelMap: Map<number, ThreadElement[]> = getLevelMap(threadResponse.children)
         console.log("LEVEL MAP")
         console.log(levelMap)
@@ -64,7 +69,7 @@ export class ThreadTree {
         return root;
     }
 
-    populate = (levelMap: Map<number, ThreadElement[]>, level: number, node: ThreadNode) => {
+    private static populate = (levelMap: Map<number, ThreadElement[]>, level: number, node: ThreadNode) => {
         console.log("Populating:", node, level)
         console.log("LEVEL MAP GET")
         console.log(levelMap.get(level))
@@ -79,6 +84,8 @@ export class ThreadTree {
         node.children.push(...children)
         node.children.forEach(child => this.populate(levelMap, level + 1, child))
     }
+
+
 }
 
 export const getLevelMap = (threads: ThreadElement[]) => {

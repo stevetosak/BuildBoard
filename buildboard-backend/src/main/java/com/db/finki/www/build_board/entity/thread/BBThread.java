@@ -47,9 +47,19 @@ public class BBThread {
     )
     protected Set<BBUser> likes = new HashSet<>();
 
-    private LocalDateTime createdAt = LocalDateTime.now();
+    protected LocalDateTime createdAt = LocalDateTime.now();
 
     public int getNumLikes(){
         return likes.size();
+    }
+
+    public BBThread(Integer id, String content, int level, BBThread parent, String type, BBUser user, LocalDateTime createdAt) {
+        this.id = id;
+        this.content = content;
+        this.level = level;
+        this.parent = parent;
+        this.type = type;
+        this.user = user;
+        this.createdAt = createdAt;
     }
 }

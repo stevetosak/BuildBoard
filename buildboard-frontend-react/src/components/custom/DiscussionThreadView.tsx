@@ -148,7 +148,7 @@ export const DiscussionThreadView = ({
                         onClick={() => handleDisplayReplies()}
                     >
                         <CircleEllipsis className="mr-2" size={16}/>
-                        {!displayReplies
+                        {node.element.numReplies - replies.length > 0
                             ? `View ${node.element.numReplies} more replies`
                             : "Hide"}
                     </Button>

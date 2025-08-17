@@ -271,25 +271,32 @@ from tmp d
          join thread t
               on t.id = d.id;
 -------------------------- FUNCTIONS ----------------------
--- CREATE OR REPLACE FUNCTION fn_validate_topic_title()
---     RETURNS TRIGGER
---     LANGUAGE plpgsql
--- AS
--- $$
--- BEGIN
---     IF NEW.title IN (
---         SELECT tt.title, t1.parent_id
---         FROM topic_thread tt
---                  JOIN thread t1 ON t1.id = tt.id
---         WHERE t1.parent_id = NEW.parent_id
---            OR (t1.parent_id IS NULL AND NEW.parent_id IS NULL)
---     )
---     THEN
---         RAISE EXCEPTION 'There already exists a topic with title % in parent topic with id %', NEW.title, NEW.parent_id;
---     END IF;
---     RETURN NEW;
--- END;
--- $$;
+CREATE OR REPLACE FUNCTION fn_validate_topic_title()
+    RETURNS TRIGGER
+    LANGUAGE plpgsql
+AS $$
+BEGIN
+    IF EXISTS (
+        SELECT 1
+        FROM topic_thread t
+                 JOIN thread th ON th.id = t.id
+                 JOIN thread new_th ON new_th.id = NEW.id
+        WHERE t.title = NEW.title
+          AND (
+            th.parent_id = new_th.parent_id
+                OR (th.parent_id IS NULL AND new_th.parent_id IS NULL)
+            )
+          AND t.id <> NEW.id
+    ) THEN
+        RAISE EXCEPTION
+            'There already exists a topic with title % in parent thread %',
+            NEW.title, NEW.id;
+    END IF;
+
+    RETURN NEW;
+END;
+$$;
+
 create or replace function check_if_user_exists_in(table_name text, field_name text, field_value text) returns boolean
     language plpgsql
 as
@@ -411,74 +418,72 @@ END;
 $$
 ;
 
--- todo
--- CREATE OR REPLACE FUNCTION fn_remove_orphan_moderator()
---  RETURNS trigger
---  LANGUAGE plpgsql
--- AS $function$
--- BEGIN
--- --  IF not exists (
--- --     select 1
--- --     from topic_threads_moderators t
--- --     where t.user_id = OLD.user_id
--- --  )
--- -- THEN
--- --     DELETE FROM moderator where id=OLD.user_id;
--- --  END IF;
--- --  IF not exists (
--- --     select 1
--- --     from topic_threads_moderators t
--- --     where t.thread_id = OLD.thread_id
--- --  )
--- -- THEN
--- --     delete from discussion_thread where parent_id=OLD.thread_id;
--- --     DELETE FROM topic_thread where id = OLD.thread_id;
--- -- -- 	delete from thread where id =  OLD.thread_id;
--- --  END IF;
--- --  RETURN OLD;
--- END;
--- $function$
+CREATE OR REPLACE FUNCTION fn_remove_orphan_moderator()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+ IF not exists (
+    select 1
+    from topic_threads_moderators t
+    where t.user_id = OLD.user_id
+ )
+THEN
+    DELETE FROM moderator where id=OLD.user_id;
+ END IF;
+ IF not exists (
+    select 1
+    from topic_threads_moderators t
+    where t.thread_id = OLD.thread_id
+ )
+THEN
+    delete from discussion_thread where parent_id=OLD.thread_id;
+    DELETE FROM topic_thread where id = OLD.thread_id;
+	delete from thread where id =  OLD.thread_id;
+ END IF;
+ RETURN OLD;
+END;
+$function$
 ;
--- create or replace function fn_aa_rm_orphan_dics()
---     returns trigger
---     language plpgsql
--- as
--- $$
--- BEGIN
--- --     todo
--- --     RAISE NOTICE '%',OLD.id;
---
--- --     delete from discussion_thread dt
--- --     where dt.parent_id=OLD.id;
--- --     delete from embeddable_thread
--- --     where id = OLD.id;
--- --     delete from thread t
--- --     where t.id=OLD.id;
--- --     RETURN OLD;
--- END;
--- $$;
+create or replace function fn_aa_rm_orphan_dics()
+    returns trigger
+    language plpgsql
+as
+$$
+BEGIN
+    RAISE NOTICE '%',OLD.id;
+
+    delete from discussion_thread dt
+    where dt.parent_id=OLD.id;
+    delete from embeddable_thread
+    where id = OLD.id;
+    delete from thread t
+    where t.id=OLD.id;
+    RETURN OLD;
+END;
+$$;
 
 
 
--- create or replace function fn_remove_thread()
--- returns trigger
--- language plpgsql
--- as
--- $$
--- BEGIN
---     delete from thread where id = OLD.id;
---     return OLD;
--- END;
--- $$;
+create or replace function fn_remove_thread()
+returns trigger
+language plpgsql
+as
+$$
+BEGIN
+    delete from thread where id = OLD.id;
+    return OLD;
+END;
+$$;
 
 
 -------------------------- TRIGGERS ----------------------
 --
--- CREATE OR REPLACE TRIGGER tr_check_topic_name --RADI
---     BEFORE INSERT OR UPDATE
---     ON topic_thread
---     FOR EACH ROW
--- EXECUTE FUNCTION fn_validate_topic_title();
+CREATE OR REPLACE TRIGGER tr_check_topic_name --RADI
+    BEFORE INSERT OR UPDATE
+    ON topic_thread
+    FOR EACH ROW
+EXECUTE FUNCTION fn_validate_topic_title();
 CREATE OR REPLACE TRIGGER tr_insert_topics_creator_as_moderator --RADI
     AFTER INSERT
     ON topic_thread
@@ -491,11 +496,11 @@ on project_roles_permissions
 for each row
 execute function fn_defined_by_total_custom_roles();
 
--- CREATE OR REPLACE TRIGGER tr_remove_orphan_moderator --RADI
--- AFTER DELETE
--- ON topic_threads_moderators
--- FOR EACH ROW
--- EXECUTE FUNCTION fn_remove_orphan_moderator();
+CREATE OR REPLACE TRIGGER tr_remove_orphan_moderator --RADI
+AFTER DELETE
+ON topic_threads_moderators
+FOR EACH ROW
+EXECUTE FUNCTION fn_remove_orphan_moderator();
 
 
 CREATE OR REPLACE TRIGGER tr_a_insert_project_manager --RADI
@@ -520,35 +525,35 @@ create or replace trigger tr_insert_general_for_project --RADI
     for each row
 execute function fn_insert_general_for_project();
 
--- create or replace trigger tr_rm_orphan_disc
---     after delete
---     on discussion_thread
---     for each row
--- execute function fn_aa_rm_orphan_dics();
---
--- create or replace trigger tr_rm_orphan_disc
---     after delete
---     on topic_thread
---     for each row
--- execute function fn_aa_rm_orphan_dics();
+create or replace trigger tr_rm_orphan_disc
+    after delete
+    on discussion_thread
+    for each row
+execute function fn_aa_rm_orphan_dics();
+
+create or replace trigger tr_rm_orphan_disc
+    after delete
+    on topic_thread
+    for each row
+execute function fn_aa_rm_orphan_dics();
 
 
 ------------------------------------------
 
--- create or replace trigger tr_remove_thread_from_project
--- after delete
--- on project_thread
--- for each row
--- execute function fn_remove_thread();
---
--- create or replace trigger tr_remove_thread_from_topic
--- after delete
--- on topic_thread
--- for each row
--- execute function fn_remove_thread();
---
--- create or replace trigger tr_remove_thread_from_discussion
--- after delete
--- on discussion_thread
--- for each row
--- execute function fn_remove_thread();
+create or replace trigger tr_remove_thread_from_project
+after delete
+on project_thread
+for each row
+execute function fn_remove_thread();
+
+create or replace trigger tr_remove_thread_from_topic
+after delete
+on topic_thread
+for each row
+execute function fn_remove_thread();
+
+create or replace trigger tr_remove_thread_from_discussion
+after delete
+on discussion_thread
+for each row
+execute function fn_remove_thread();

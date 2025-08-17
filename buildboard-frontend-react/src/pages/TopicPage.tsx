@@ -10,17 +10,20 @@ import {api} from "@/services/apiconfig.ts";
 
 export const TopicPage = () => {
     const topicResponse= useLoaderData<ThreadResponse>();
-    const [threadLevelMap,setThreadLevelMap] = useState<Map<number,ThreadElement[]>>(getLevelMap(topicResponse.children))
-    const [tree,setTree] = useState<ThreadTree>(new ThreadTree(topicResponse))
+    const [tree,setTree] = useState<ThreadTree>(ThreadTree.fromResponse(topicResponse))
     // const tree = new ThreadTree(topicResponse)
     tree.display()
 
     const handleLoadReplies = (threadResponse:ThreadResponse) => {
-        const branch = new ThreadTree(threadResponse);
-        tree.addChildren(branch)
+        const branch = ThreadTree.fromResponse(threadResponse)
+        const newTree = new ThreadTree(tree.root)
+        newTree.addChildren(branch)
+        setTree(newTree)
     }
     const handleAddReply = (targetNodeIdx:number,newThread: ThreadElement) => {
-        tree.addChild(targetNodeIdx,newThread)
+        const newTree = new ThreadTree(tree.root)
+        newTree.addChild(targetNodeIdx,newThread)
+        setTree(newTree)
         api.post(`/threads/reply?id=${targetNodeIdx}`,newThread)
     }
 

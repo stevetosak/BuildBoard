@@ -26,7 +26,7 @@ public class TopicRestController {
     public ResponseEntity<ThreadTreeResponse> getTopic(@PathVariable String topicName) {
         Topic t = topicService.getByTitle(topicName);
         System.out.println(t);
-        ThreadTreeResponse threads = threadService.getTopicResponse(t,0,20);
+        ThreadTreeResponse threads = threadService.getTopicResponse(t,0,10);
         return ResponseEntity.ok(threads);
     }
 }
