@@ -335,7 +335,46 @@ VALUES
     (NOW(), 'Let’s discuss new features.', 8, 18, 'General'), -- Sent by user8 in Project 4
     (NOW(), 'I have an idea for a new feature.', 9, 18, 'Ideas'); -- Sent by user9 in Project 4
 
+INSERT INTO user_interested_thread (user_id, thread_id)
+VALUES
+    (1, 1),
+    (1, 3),
+    (2, 2),
+    (2, 4),
+    (3, 5),
+    (4, 6),
+    (5, 7),
+    (6, 10),
+    (6, 12),
+    (7, 11),
+    (7, 13),
+    (8, 14),
+    (9, 15),
+    (10, 16),
+    (1, 8),
+    (5, 9);
 
+-- user_follows_user: who follows whom
+INSERT INTO user_follows_user (person1, person2)
+VALUES
+    (1, 2),
+    (1, 3),
+    (2, 3),
+    (2, 4),
+    (3, 1),
+    (3, 5),
+    (4, 1),
+    (4, 5),
+    (5, 2),
+    (6, 7),
+    (6, 8),
+    (7, 6),
+    (7, 9),
+    (8, 6),
+    (8, 10),
+    (9, 7),
+    (9, 10),
+    (10, 8);
 
 
 

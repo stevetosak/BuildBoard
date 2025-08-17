@@ -25,19 +25,12 @@ public class Project extends BBThread implements NamedThread {
     @Column(name = "repo_url")
     private String repoUrl;
 
-    public Project(String title, String repoUrl, String description, BBUser user){
-        setTitle(title);
-        setRepoUrl(repoUrl);
-        setDescription(description);
-        setUser(user);
-    }
-
-    @OneToMany(cascade = {CascadeType.PERSIST,CascadeType.MERGE}, mappedBy = "parent")
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "parent")
     private List<Topic> topics = new ArrayList<>();
 
-    @ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.MERGE})
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
-            name ="developer_associated_with_project",
+            name = "developer_associated_with_project",
             joinColumns = @JoinColumn(name = "project_id"),
             inverseJoinColumns = @JoinColumn(name = "developer_id")
     )
@@ -50,11 +43,17 @@ public class Project extends BBThread implements NamedThread {
     @OrderBy("name")
     private Set<Channel> channels;
 
+    public Project(String title, String repoUrl, String description, BBUser user) {
+        setTitle(title);
+        setRepoUrl(repoUrl);
+        setDescription(description);
+        setUser(user);
+    }
+
     @Override
     public String getTypeName() {
         return "projects";
     }
-
 
     public String getDescription() {return content;}
     public void setDescription(String description) {this.content = description;}

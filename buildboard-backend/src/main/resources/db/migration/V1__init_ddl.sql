@@ -80,6 +80,20 @@ CREATE TABLE thread
     parent_id int references thread(id),
     type varchar(20) check (type in ('discussion','topic','project'))
 );
+create table user_interested_thread
+(
+    user_id   int references users (id) on delete cascade ,
+    thread_id int references thread (id) on delete cascade,
+    PRIMARY KEY (user_id,
+                 thread_id)
+);
+create table user_follows_user
+(
+    person1 int references users (id) on delete cascade,
+    person2 int references users (id) on delete cascade,
+    PRIMARY KEY (person1,
+                 person2)
+);
 CREATE TABLE project_thread
 (
     title    VARCHAR(256) UNIQUE NOT NULL,
@@ -255,11 +269,11 @@ as
 with recursive
     depth_table as
         (select parent_id, id, 0 as depth
-         from thread
+         from discussion_thread
          UNION ALL
          select discuss.parent_id, dpth.id, dpth.depth + 1
          from depth_table dpth
-                  join thread discuss
+                  join discussion_thread discuss
                        on dpth.parent_id = discuss.id),
     tmp as (select id, max(depth) as depth
             from depth_table
@@ -274,7 +288,8 @@ from tmp d
 CREATE OR REPLACE FUNCTION fn_validate_topic_title()
     RETURNS TRIGGER
     LANGUAGE plpgsql
-AS $$
+AS
+$$
 BEGIN
     IF EXISTS (
         SELECT 1
@@ -431,16 +446,16 @@ BEGIN
 THEN
     DELETE FROM moderator where id=OLD.user_id;
  END IF;
- IF not exists (
-    select 1
-    from topic_threads_moderators t
-    where t.thread_id = OLD.thread_id
- )
+ IF not exists ( 
+    select 1 
+    from topic_threads_moderators t 
+    where t.thread_id = OLD.thread_id 
+ ) 
 THEN
     delete from discussion_thread where parent_id=OLD.thread_id;
     DELETE FROM topic_thread where id = OLD.thread_id;
-	delete from thread where id =  OLD.thread_id;
- END IF;
+-- 	delete from thread where id =  OLD.thread_id;
+ END IF; 
  RETURN OLD;
 END;
 $function$
@@ -465,20 +480,20 @@ $$;
 
 
 
-create or replace function fn_remove_thread()
-returns trigger
-language plpgsql
-as
-$$
-BEGIN
-    delete from thread where id = OLD.id;
-    return OLD;
-END;
-$$;
+-- create or replace function fn_remove_thread()
+-- returns trigger
+-- language plpgsql
+-- as
+-- $$
+-- BEGIN
+--     delete from thread where id = OLD.id;
+--     return OLD;
+-- END;
+-- $$;
 
 
 -------------------------- TRIGGERS ----------------------
---
+
 CREATE OR REPLACE TRIGGER tr_check_topic_name --RADI
     BEFORE INSERT OR UPDATE
     ON topic_thread
@@ -537,23 +552,20 @@ create or replace trigger tr_rm_orphan_disc
     for each row
 execute function fn_aa_rm_orphan_dics();
 
-
-------------------------------------------
-
-create or replace trigger tr_remove_thread_from_project
-after delete
-on project_thread
-for each row
-execute function fn_remove_thread();
-
-create or replace trigger tr_remove_thread_from_topic
-after delete
-on topic_thread
-for each row
-execute function fn_remove_thread();
-
-create or replace trigger tr_remove_thread_from_discussion
-after delete
-on discussion_thread
-for each row
-execute function fn_remove_thread();
+-- create or replace trigger tr_remove_thread_from_project
+-- after delete
+-- on project_thread
+-- for each row
+-- execute function fn_remove_thread();
+--
+-- create or replace trigger tr_remove_thread_from_topic
+-- after delete
+-- on topic_thread
+-- for each row
+-- execute function fn_remove_thread();
+--
+-- create or replace trigger tr_remove_thread_from_discussion
+-- after delete
+-- on discussion_thread
+-- for each row
+-- execute function fn_remove_thread();

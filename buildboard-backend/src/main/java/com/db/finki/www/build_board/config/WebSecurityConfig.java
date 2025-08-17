@@ -1,5 +1,6 @@
 package com.db.finki.www.build_board.config;
 
+import com.db.finki.www.build_board.config.jwt.JWTAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -11,17 +12,16 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.DelegatingSecurityContextRepository;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
@@ -30,72 +30,61 @@ public class WebSecurityConfig {
 
     private final PasswordEncoder passwordEncoder;
     private final UserDetailsService userDetailsService;
-    private final AuthenticationSuccessHandler successHandler;
 
 
-    public WebSecurityConfig(PasswordEncoder passwordEncoder, UserDetailsService userDetailsService, AuthenticationSuccessHandler successHandler) {
+    public WebSecurityConfig(
+            PasswordEncoder passwordEncoder,
+            UserDetailsService userDetailsService
+                            ) {
         this.passwordEncoder = passwordEncoder;
         this.userDetailsService = userDetailsService;
-        this.successHandler = successHandler;
-    }
-//    @Bean
-//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//        http
-//                .csrf(AbstractHttpConfigurer::disable)
-//                .authorizeHttpRequests(request ->
-//                        request.requestMatchers(
-//                                        "/",
-//                                        "/contact",
-//                                        "/about",
-//                                    "/project_imgs/buildboard-logo.jpg",
-//                                "*.ico",
-//                                "*.jpg",
-//                                "*.png",
-//                                "/register",
-//                                        "/css/**",
-//                                        "/js/**"
-//                                ).permitAll()
-//                                .requestMatchers(
-//                                        new AntPathRequestMatcher("/topic/*", HttpMethod.GET.name()),
-//                                        new AntPathRequestMatcher("/project/*",HttpMethod.GET.name()),
-//                                        new AntPathRequestMatcher("/avatars/**",HttpMethod.GET.name())
-//                                ).permitAll()
-//                                .requestMatchers("/topic/**","/project/**").authenticated()
-//
-//                                .anyRequest().authenticated()
-//                ).formLogin(formLogin ->
-//                        formLogin.permitAll()
-//                                .defaultSuccessUrl("/")
-//                                .successHandler(successHandler)
-//                )
-//                .logout(logout ->
-//                        logout.logoutSuccessUrl("/")
-//                                .clearAuthentication(true)
-//                                .invalidateHttpSession(true)
-//                                .deleteCookies("JSESSIONID")
-//                );
-//
-//        return http.build();
-//
-//    }
-
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http.csrf(AbstractHttpConfigurer::disable)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .authorizeHttpRequests(requests -> requests.anyRequest().permitAll())
-                .build();
     }
 
-
     @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.addAllowedOrigin("http://localhost:5173");
-        corsConfiguration.setAllowCredentials(true);
-        UrlBasedCorsConfigurationSource corsConfigurationSource = new UrlBasedCorsConfigurationSource();
-        corsConfigurationSource.registerCorsConfiguration("/**", corsConfiguration);
-        return corsConfigurationSource;
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http,
+            JWTAuthenticationFilter jwtFilter
+                                                  ) throws Exception {
+        http
+                .authorizeHttpRequests(request ->
+                                request
+                                        .requestMatchers(new AntPathRequestMatcher("/**",
+                                                HttpMethod.OPTIONS.name()))
+                                        .permitAll()
+                                        .requestMatchers(
+                                                "/",
+                                                "/contact",
+                                                "/about",
+                                                "/project_imgs/buildboard-logo.jpg",
+                                                "*.ico",
+                                                "*.jpg",
+                                                "*.png",
+                                                "/register",
+                                                "/login",
+                                                "/css/**",
+                                                "/js/**"
+                                                        )
+                                        .permitAll()
+                                        //Bez jwt, samo get
+                                        .requestMatchers(
+                                                new AntPathRequestMatcher("/threads",
+                                                        HttpMethod.GET.name())
+                                                        )
+                                        .permitAll()
+                                        // Sve
+                                        .anyRequest()
+                                        .authenticated()
+                                      )
+                .formLogin(AbstractHttpConfigurer::disable)
+                .csrf(AbstractHttpConfigurer::disable)
+                .logout(AbstractHttpConfigurer::disable)
+                .sessionManagement(sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(
+                        jwtFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                                );
+        return http.build();
+
     }
 
     @Bean

@@ -1,5 +1,6 @@
 @import "tailwindcss";
-
+/*#5FE3A7*/
+@import "tw-animate-css";
 @theme {
     --color-accent: #39c987;
     --color-foregound: #2b62a2;
@@ -14,4 +15,100 @@
     --color-background-gray: var(--color-gray-900);
 }
 
-/*#5FE3A7*/
+
+
+*{
+  scrollbar-width: none;
+}
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+	--color-accent: #5fe3a7;
+	--color-foregound: #2b62a2;
+	--color-bg-1: #000D20;
+	--color-bg-2: #0A1A31;
+	--color-non-accent: #0c1f3c;
+	--color-sidebar-bg: #021126;
+	--color-sidebar-lines:#081529;
+    --color-card: red;
+    --color-destructive:white;
+    --color-input: white;
+}
+
+:root {
+	--sidebar: hsl(0 0% 98%);
+	--sidebar-foreground: hsl(240 5.3% 26.1%);
+	--sidebar-primary: hsl(240 5.9% 10%);
+	--sidebar-primary-foreground: hsl(0 0% 98%);
+	--sidebar-accent: hsl(240 4.8% 95.9%);
+	--sidebar-accent-foreground: hsl(240 5.9% 10%);
+	--sidebar-border: hsl(220 13% 91%);
+	--sidebar-ring: hsl(217.2 91.2% 59.8%);
+}
+
+.dark {
+	--sidebar: hsl(240 5.9% 10%);
+	--sidebar-foreground: hsl(240 4.8% 95.9%);
+	--sidebar-primary: hsl(224.3 76.3% 48%);
+	--sidebar-primary-foreground: hsl(0 0% 100%);
+	--sidebar-accent: hsl(240 3.7% 15.9%);
+	--sidebar-accent-foreground: hsl(240 4.8% 95.9%);
+	--sidebar-border: hsl(240 3.7% 15.9%);
+	--sidebar-ring: hsl(217.2 91.2% 59.8%);
+}
+
+@theme inline {
+	--color-sidebar: var(--sidebar);
+	--color-sidebar-foreground: var(--sidebar-foreground);
+	--color-sidebar-primary: var(--sidebar-primary);
+	--color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+	--color-sidebar-accent: var(--sidebar-accent);
+	--color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+	--color-sidebar-border: var(--sidebar-border);
+	--color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  :root {
+    --sidebar: oklch(0.985 0 0);
+    --sidebar-foreground: oklch(0.145 0 0);
+    --sidebar-primary: oklch(0.205 0 0);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.97 0 0);
+    --sidebar-accent-foreground: oklch(0.205 0 0);
+    --sidebar-border: oklch(0.922 0 0);
+    --sidebar-ring: oklch(0.708 0 0);
+  }
+
+  .dark {
+    --sidebar: oklch(0.205 0 0);
+    --sidebar-foreground: oklch(0.985 0 0);
+    --sidebar-primary: oklch(0.488 0.243 264.376);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.269 0 0);
+    --sidebar-accent-foreground: oklch(0.985 0 0);
+    --sidebar-border: oklch(1 0 0 / 10%);
+    --sidebar-ring: oklch(0.439 0 0);
+  }
+
+}
+
+.user-info-input-hover{
+    @variant hover{
+        color: var(--color-accent);
+        outline: var(--color-accent);
+    }
+}
+.input-wrapper{
+    display: grid;
+    gap: .8em;
+}
+.user-info-card-btn{
+    cursor: pointer;
+    background: var(--color-accent);
+    @variant hover{
+        background: transparent;
+        border: 2px solid #fff
+    }
+}
