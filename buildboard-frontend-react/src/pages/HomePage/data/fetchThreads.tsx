@@ -21,6 +21,7 @@ const createPageURL = (page: number, searchOptions:SearchOptions) => {
 };
 
 export const fetchThreads = async (pageNumber:number, searchOptions:SearchOptions) : Promise<Page<NamedThread[]>> => {
+	console.log(searchOptions.query)
 	if (pageNumber < 0) throw new Error("The requested page must be > 0");
 
 	const response = await fetch(createPageURL(pageNumber,searchOptions), getAuthHeader());

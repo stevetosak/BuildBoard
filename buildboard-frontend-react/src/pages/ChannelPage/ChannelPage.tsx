@@ -1,10 +1,9 @@
-import {MessagesContainer} from "@/components/custom/MessagesContainer.tsx"
-import {Card, CardContent, CardFooter, CardHeader} from "@/components/ui/card.tsx"
-import "../fonts.css"
-import {Textarea} from "@/components/ui/textarea.tsx";
+import {MessagesContainer} from "@components/custom/MessagesContainer.tsx"
+import {Card, CardContent, CardFooter, CardHeader} from "@components/ui/card.tsx"
+import "../../fonts.css"
 import * as React from "react";
 import {useEffect, useRef, useState} from "react";
-import {MessageInputBox} from "@/components/custom/MessageInputBox.tsx";
+import {MessageInputBox} from "@components/custom/MessageInputBox.tsx";
 
 const messageData = [
     {

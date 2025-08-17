@@ -1,9 +1,9 @@
-import type {ThreadData, ThreadElement, ThreadResponse} from "@/types.ts";
-import "../fonts.css"
+import type { ThreadElement, ThreadResponse} from "@/types.ts";
+import "../../fonts.css"
 import {useLoaderData} from "react-router-dom";
-import {DiscussionThreadView} from "@/components/custom/DiscussionThreadView.tsx";
+import {DiscussionThreadView} from "@components/custom/DiscussionThreadView.tsx";
 import {useState} from "react";
-import {getLevelMap, ThreadTree} from "@/lib/utils.ts";
+import { ThreadTree} from "@lib/utils.ts";
 import {api} from "@/services/apiconfig.ts";
 
 

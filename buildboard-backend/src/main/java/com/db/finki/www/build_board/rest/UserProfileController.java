@@ -1,24 +1,16 @@
-package com.db.finki.www.build_board.controller.home_page;
+package com.db.finki.www.build_board.rest;
 
 import com.db.finki.www.build_board.dto.BBUserProfile;
-import com.db.finki.www.build_board.entity.entity_enum.Status;
 import com.db.finki.www.build_board.entity.thread.Project;
 import com.db.finki.www.build_board.entity.thread.Topic;
 import com.db.finki.www.build_board.entity.user_type.BBUser;
 import com.db.finki.www.build_board.service.user.BBUserDetailsService;
 import com.db.finki.www.build_board.service.request.ProjectRequestService;
 import com.db.finki.www.build_board.service.util.FileUploadService;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 

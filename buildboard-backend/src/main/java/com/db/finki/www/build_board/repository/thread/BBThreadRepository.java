@@ -15,7 +15,7 @@ public interface BBThreadRepository extends JpaRepository<BBThread, Long> {
             WITH RECURSIVE tree AS (
                         SELECT id,content,created_at,level,parent_id,user_id,type
                         FROM thread
-                        WHERE id = :topicId
+                        WHERE id = :rootId
             
                         UNION ALL
             
@@ -38,5 +38,5 @@ public interface BBThreadRepository extends JpaRepository<BBThread, Long> {
                         0.3 * numReplies + 0.7 * numLikes DESC OFFSET :page * :size LIMIT :size;
             """,
             nativeQuery = true)
-    List<ThreadView> getThreadTree(int topicId, int page, int size);
+    List<ThreadView> getThreadTree(int rootId, int page, int size);
 }

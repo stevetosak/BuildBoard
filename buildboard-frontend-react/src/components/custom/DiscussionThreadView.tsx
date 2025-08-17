@@ -6,14 +6,13 @@ import {
 } from "@/components/ui/card.tsx";
 import {Check, CircleEllipsis, Reply, X} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
-import type {ThreadData, ThreadResponse, ThreadUserDto, ThreadElement} from "@/types.ts";
-import {Replies} from "@/components/custom/Replies.tsx";
-import {type SetStateAction, useMemo, useState} from "react";
+import type { ThreadResponse, ThreadElement} from "@/types.ts";
+import { useState} from "react";
 import {AnimatePresence, motion} from "framer-motion";
 import * as React from "react";
 import {MessageInputBox} from "@/components/custom/MessageInputBox.tsx";
 import {api} from "@/services/apiconfig.ts";
-import {getLevelMap, type ThreadNode, ThreadTree} from "@/lib/utils.ts";
+import {type ThreadNode, ThreadTree} from "@/lib/utils.ts";
 
 export const DiscussionThreadView = ({
                                          className,
@@ -170,9 +169,6 @@ export const DiscussionThreadView = ({
                     ))}
                 </div>
             }
-
-
-                {/*<Replies tree={tree} updateTree={updateTree} replies={replies} />*/}
         </div>
     );
 };

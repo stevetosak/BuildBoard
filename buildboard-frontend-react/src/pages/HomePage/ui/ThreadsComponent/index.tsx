@@ -23,7 +23,7 @@ export type SearchOptions = {
 	filters:"title"|"content"|"all"
 }
 
-
+//TODO: add page count to thread response
 const LoadingBlocks = () => {
 	return (
 		<>
@@ -119,7 +119,7 @@ const ThreadsComponent = () => {
 											}
 											className={`border-0 border-l-1 border-accent rounded-none rounded-r-xl cursor-pointer bg-bg-2 text-[#eaeaea] w-3/4 min-w-[10em] hover:border-2 transition-border duration-50`}
 											onClick={() =>
-												navigate(
+												navigate( "/" +
 													getUrlForThread(
 														namedThread.content.title,
 														namedThread.threadType,

@@ -68,7 +68,8 @@ public class WebSecurityConfig {
                                         //Bez jwt, samo get
                                         .requestMatchers(
                                                 new AntPathRequestMatcher("/threads",
-                                                        HttpMethod.GET.name())
+                                                        HttpMethod.GET.name()),
+                                                new AntPathRequestMatcher("/api/**")
                                                         )
                                         .permitAll()
                                         // Sve

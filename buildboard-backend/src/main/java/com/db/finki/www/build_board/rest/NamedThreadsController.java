@@ -1,4 +1,4 @@
-package com.db.finki.www.build_board.controller.home_page;
+package com.db.finki.www.build_board.rest;
 
 import com.db.finki.www.build_board.dto.NamedThreadDTO;
 import com.db.finki.www.build_board.entity.thread.Tag;

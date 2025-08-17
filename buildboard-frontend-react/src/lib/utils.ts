@@ -26,9 +26,6 @@ export class ThreadTree {
     }
 
     find = (targetNodeId: number,currentNode: ThreadNode = this.root) : ThreadNode | undefined => {
-        console.log("SEARCHING  >>>>")
-        console.log("CURRENT NODE:::::::::")
-        console.log(currentNode)
         if(targetNodeId === currentNode.element.id) return currentNode
         for(const child of currentNode.children){
             const found = this.find(targetNodeId,child)
