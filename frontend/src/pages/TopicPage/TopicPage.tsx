@@ -5,6 +5,7 @@ import {DiscussionThreadView} from "@components/custom/DiscussionThreadView.tsx"
 import {useState} from "react";
 import { ThreadTree} from "@lib/utils.ts";
 import {api} from "@/services/apiconfig.ts";
+import {getAuthHeader, getToken} from "@shared/security-utils.ts";
 
 
 
@@ -20,12 +21,19 @@ export const TopicPage = () => {
         newTree.addChildren(branch)
         setTree(newTree)
     }
-    const handleAddReply = (targetNodeIdx:number,newThread: ThreadElement) => {
+    const handleAddReply =  async (targetNodeIdx:number,newThread: ThreadElement) => {
+        const response = await api.post<ThreadElement>(`/replies/add`,newThread,{
+            headers:{
+                Authorization: `Bearer ${getToken()}`
+            }
+        })
         const newTree = new ThreadTree(tree.root)
-        newTree.addChild(targetNodeIdx,newThread)
+        newTree.addChild(targetNodeIdx,response.data)
         setTree(newTree)
-        api.post(`/threads/reply?id=${targetNodeIdx}`,newThread)
+
     }
+
+    //todo refactor jwt, morat da ojt po claim userid za da
 
     return (
         <main className={"flex flex-col justify-center items-center kanit-light"}>

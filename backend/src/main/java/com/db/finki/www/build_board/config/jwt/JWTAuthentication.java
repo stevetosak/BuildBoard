@@ -1,10 +1,12 @@
 package com.db.finki.www.build_board.config.jwt;
 
 import com.db.finki.www.build_board.dto.BBUserMinClaimSet;
+import com.db.finki.www.build_board.entity.user_type.BBUser;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.web.authentication.WebAuthenticationDetails;
 
 import java.util.Collection;
 import java.util.List;
@@ -12,7 +14,7 @@ import java.util.List;
 @Setter
 @Getter
 public class JWTAuthentication implements Authentication {
-    private BBUserMinClaimSet principal;
+    private BBUser principal;
     private boolean isAuth;
 
     public JWTAuthentication(){
@@ -33,9 +35,8 @@ public class JWTAuthentication implements Authentication {
     public Object getDetails() {
         throw new UnsupportedOperationException("Why are you trying this");
     }
-
     @Override
-    public Object getPrincipal() {
+    public BBUser getPrincipal() {
         return principal;
     }
 

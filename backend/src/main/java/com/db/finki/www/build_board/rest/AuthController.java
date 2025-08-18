@@ -1,5 +1,6 @@
-package com.db.finki.www.build_board.config.jwt;
+package com.db.finki.www.build_board.rest;
 
+import com.db.finki.www.build_board.config.jwt.JWTUtils;
 import com.db.finki.www.build_board.config.jwt.dtos.BBUserRegisterDTO;
 import com.db.finki.www.build_board.config.jwt.dtos.TokenDTO;
 import com.db.finki.www.build_board.config.jwt.dtos.UserLoginDTO;
@@ -19,13 +20,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-public class JWTController {
+public class AuthController {
     private final BBUserDetailsService bbUserDetailsService;
     private final JWTUtils jwtUtils;
     private final PasswordEncoder passwordEncoder;
     private final ObjectMapper objectMapper;
 
-    public JWTController(BBUserDetailsService bbUserDetailsService, JWTUtils jwtUtils, PasswordEncoder passwordEncoder, ObjectMapper objectMapper) {
+    public AuthController(BBUserDetailsService bbUserDetailsService, JWTUtils jwtUtils, PasswordEncoder passwordEncoder, ObjectMapper objectMapper) {
         this.bbUserDetailsService = bbUserDetailsService;
         this.jwtUtils = jwtUtils;
         this.passwordEncoder = passwordEncoder;
@@ -62,9 +63,7 @@ public class JWTController {
         if (!passwordEncoder.matches(userLoginDTO.getPassword(), user.getPassword())) {
             throw new BadCredentialsException("Username or password incorrect");
         }
-
-        BBUserMinClaimSet userDTO = new BBUserMinClaimSet(user.getUsername(), user.getAuthority());
-        String token = jwtUtils.createJWT(userDTO);
+        String token = jwtUtils.createJWT(user);
         return new ResponseEntity<>(this.objectMapper.writeValueAsString(new TokenDTO(token)), HttpStatus.OK);
     }
 
@@ -72,17 +71,16 @@ public class JWTController {
     public ResponseEntity<TokenDTO> register(
             @RequestBody BBUserRegisterDTO bbUserRegisterDTO
     ) throws JsonProcessingException, JOSEException {
-        BBUser auth = bbUserDetailsService.registerUser(
+        BBUser createdUser = bbUserDetailsService.registerUser(
                 bbUserRegisterDTO.getUsername(),
                 bbUserRegisterDTO.getEmail(),
                 bbUserRegisterDTO.getName(),
                 bbUserRegisterDTO.getPassword(),
                 bbUserRegisterDTO.getDescription(),
                 bbUserRegisterDTO.getSex());
-        BBUserMinClaimSet userDTO = new BBUserMinClaimSet(bbUserRegisterDTO.getUsername(), auth.getAuthority());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(
-                new TokenDTO(jwtUtils.createJWT(userDTO))
+                new TokenDTO(jwtUtils.createJWT(createdUser))
         );
     }
 }

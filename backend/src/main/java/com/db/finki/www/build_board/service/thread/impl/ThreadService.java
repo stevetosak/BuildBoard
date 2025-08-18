@@ -1,7 +1,10 @@
 package com.db.finki.www.build_board.service.thread.impl;
 
+import com.db.finki.www.build_board.entity.thread.BBThread;
 import com.db.finki.www.build_board.entity.thread.ThreadView;
 import com.db.finki.www.build_board.entity.thread.Topic;
+import com.db.finki.www.build_board.entity.thread.discussion_thread.Discussion;
+import com.db.finki.www.build_board.entity.user_type.BBUser;
 import com.db.finki.www.build_board.repository.UserRepository;
 import com.db.finki.www.build_board.repository.thread.BBThreadRepository;
 import com.db.finki.www.build_board.repository.thread.DiscussionRepository;
@@ -56,4 +59,9 @@ public class ThreadService {
         return new ThreadTreeResponse(dtos.get(0),dtos,"discussion");
     }
 
+    public ThreadDto addReply(BBUser principal, ThreadDto threadDto) {
+        BBThread parent =  threadRepository.findById(threadDto.getParentId());
+        BBThread saved = threadRepository.save(new BBThread(threadDto.getContent(),threadDto.getLevel(),parent,"discussion",principal));
+        return ThreadDto.from(saved);
+    }
 }

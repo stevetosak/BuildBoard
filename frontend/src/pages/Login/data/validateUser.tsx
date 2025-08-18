@@ -8,7 +8,7 @@ import { formDataToJson } from "@/shared/form-processing";
 export const invalidCreds= generateErrorAlert("Login unsucessful", "The username or password is incorrect")
 
 const validateUser:ActionFunction = async ({request}) => {
-   const resposne = await fetch(API_ENDPOINTS.auth(), {
+   const response = await fetch(API_ENDPOINTS.auth(), {
        method: 'POST',
        headers: {
            'Content-Type': 'application/json',
@@ -16,14 +16,14 @@ const validateUser:ActionFunction = async ({request}) => {
        body: await formDataToJson(request.formData())
    })
 
-   if(resposne.status === 401){
+   if(response.status === 401){
        return {Element : invalidCreds} satisfies ValidationError
    }
-   if(!resposne.ok){
-       throw new Error("Unknown error" + '\n' + await resposne.json())
+   if(!response.ok){
+       throw new Error("Unknown error" + '\n' + await response.json())
    }
 
-   const {token} = await resposne.json() as JWTResponse 
+   const {token} = await response.json() as JWTResponse
    localStorage.setItem("token", token) 
 
    return redirect('/homepage' );

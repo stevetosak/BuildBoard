@@ -1,7 +1,6 @@
-import SecurityContext from "@/context/security-context";
-import type { UserAuth } from "@shared/security-utils";
+import SecurityContext from "@/context/security-context";;
 import {  type ReactElement } from "react";
-import {useJwt} from 'react-jwt'
+import {parseJwt} from "@lib/utils/jwtUtils.ts";
 
 type SecurityContextProviderProps = { 
     children : ReactElement[] | ReactElement, 
@@ -9,13 +8,14 @@ type SecurityContextProviderProps = {
 }  
 
 const SecurityContextProvider = ({children, token}: SecurityContextProviderProps) => {
-    const {decodedToken} = useJwt<UserAuth>(token ?? "")
+    const userAuth = parseJwt(token)
 
     return (
-        <SecurityContext.Provider value={decodedToken && {
-            username : decodedToken.username ,
-            authorities : decodedToken.authorities
-        }}>{children}</SecurityContext.Provider>
+        <SecurityContext.Provider value={userAuth && {
+            ...userAuth
+        }}>
+            {children}
+        </SecurityContext.Provider>
     )
 }
 

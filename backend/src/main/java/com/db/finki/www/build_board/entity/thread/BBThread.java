@@ -62,4 +62,12 @@ public class BBThread {
         this.user = user;
         this.createdAt = createdAt;
     }
+
+    public BBThread(String content, int level, BBThread parent, String type, BBUser user) {
+        this.content = content;
+        this.level = level;
+        this.parent = parent;
+        this.type = type;
+        this.user = user;
+    }
 }

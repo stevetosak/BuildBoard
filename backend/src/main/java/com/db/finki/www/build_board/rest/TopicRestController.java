@@ -1,5 +1,6 @@
 package com.db.finki.www.build_board.rest;
 
+import com.db.finki.www.build_board.config.jwt.JWTAuthentication;
 import com.db.finki.www.build_board.entity.thread.Topic;
 import com.db.finki.www.build_board.rest.dto.ThreadTreeResponse;
 import com.db.finki.www.build_board.service.thread.impl.ThreadService;

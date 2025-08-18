@@ -15,7 +15,7 @@ export type ThreadData = {
 export type ThreadType = "topic" | "discussion" | "project";
 
 export interface ThreadElement {
-    id: number,
+    id?: number,
     content: string,
     level: number,
     parentId: number,

@@ -21,18 +21,22 @@ public class NamedThreadsController {
 
     public NamedThreadsController(
             SearchService searchService
-                                 ) {
+    ) {
         this.searchService = searchService;
     }
 
-    private String truncateContent(String content){
+    private String truncateContent(String content) {
         double percentageToDisplayOnHomePage = .6;
         int shortDescriptionLength = (int) (content.length() * percentageToDisplayOnHomePage);
         return content.substring(0, shortDescriptionLength);
     }
 
     @GetMapping()
-    public ResponseEntity<Page<NamedThreadDTO>> search(@RequestParam(required = false) String query, @RequestParam(required = false) List<String> filters, @RequestParam(required = false, name = "threadType") String type, @RequestParam(required = false, defaultValue = "0") int page) {
+    public ResponseEntity<Page<NamedThreadDTO>> search(
+            @RequestParam(required = false) String query,
+            @RequestParam(required = false) List<String> filters,
+            @RequestParam(required = false, name = "threadType") String type,
+            @RequestParam(required = false, defaultValue = "0") int page) {
         if (filters == null || filters.isEmpty()) {
             filters = new ArrayList<>();
             filters.add("all");

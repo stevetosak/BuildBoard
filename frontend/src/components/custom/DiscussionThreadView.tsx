@@ -6,19 +6,22 @@ import {
 } from "@/components/ui/card.tsx";
 import {Check, CircleEllipsis, Reply, X} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
-import type { ThreadResponse, ThreadElement} from "@/types.ts";
-import { useState} from "react";
+import type {ThreadResponse, ThreadElement} from "@/types.ts";
+import {useContext, useState} from "react";
 import {AnimatePresence, motion} from "framer-motion";
 import * as React from "react";
 import {MessageInputBox} from "@/components/custom/MessageInputBox.tsx";
 import {api} from "@/services/apiconfig.ts";
 import {type ThreadNode, ThreadTree} from "@/lib/utils.ts";
+import {useJwt} from "react-jwt";
+import {getToken} from "@shared/security-utils.ts";
+import SecurityContext from "@context/security-context.ts";
 
 export const DiscussionThreadView = ({
                                          className,
                                          node,
                                          isRoot = false,
-    handleAddReply,
+                                         handleAddReply,
                                          tree,
                                          updateTree,
                                      }: {
@@ -26,24 +29,36 @@ export const DiscussionThreadView = ({
     node: ThreadNode;
     isRoot?: boolean;
     tree: ThreadTree,
-    handleAddReply: (targetNodeIdx:number, child:ThreadElement) => void
+    handleAddReply: (targetNodeIdx: number, child: ThreadElement) => void
     updateTree: (threadResponse: ThreadResponse) => void
 }) => {
 
 
     const [replying, setReplying] = useState(false);
+    const {username} = useContext(SecurityContext)
     const [displayReplies, setDisplayReplies] = useState<boolean>(true);
     const replies = node.children
     console.log("Replies")
     console.log(replies)
+    
+    // todo refactor security context
 
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         const content = e.currentTarget.value;
         if (e.key === "Enter" && !e.shiftKey && content.trim() !== '') {
+
+            const newThread: ThreadElement = {
+                parentId: node.element.parentId,
+                level: node.element.level + 1,
+                content: content,
+                user: {id: 55, username: "Tosman223", avatarUrl: "nema"},
+                numLikes: 0,
+                numReplies: 0, type: "discussion", createdAt: Date.now()
+            }
+
             e.preventDefault();
-            handleAddReply(node.element.id,{id:9999,parentId:node.element.parentId,level:node.element.level +1,
-                content:content,user: {id:55,username:"Tosman223",avatarUrl:"nema"},numLikes:0,numReplies:0,type:"discussion",createdAt: Date.now()})
+            handleAddReply(node.element.id!, newThread)
             setReplying(false)
         }
     }
@@ -139,7 +154,7 @@ export const DiscussionThreadView = ({
                 </Card>
             </AnimatePresence>
 
-            { node.element.numReplies > 0 &&
+            {node.element.numReplies > 0 &&
                 <div className="flex items-start">
                     <Button
                         size="sm"
@@ -155,16 +170,16 @@ export const DiscussionThreadView = ({
             }
 
 
-
-            { displayReplies &&
+            {displayReplies &&
                 <div className="w-full">
                     {replies?.map((thr, idx) => (
                         <div
                             key={idx}
                             className={`mt-5`}
-                            style={{ paddingLeft: `${thr.element.level}rem` }}
+                            style={{paddingLeft: `${thr.element.level}rem`}}
                         >
-                            <DiscussionThreadView className="gap-1" node={thr} tree={tree} updateTree={updateTree} handleAddReply={handleAddReply}/>
+                            <DiscussionThreadView className="gap-1" node={thr} tree={tree} updateTree={updateTree}
+                                                  handleAddReply={handleAddReply}/>
                         </div>
                     ))}
                 </div>

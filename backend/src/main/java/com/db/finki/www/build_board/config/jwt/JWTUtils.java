@@ -1,18 +1,24 @@
 package com.db.finki.www.build_board.config.jwt;
 
 import com.db.finki.www.build_board.dto.BBUserMinClaimSet;
+import com.db.finki.www.build_board.entity.user_type.BBUser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
+import com.nimbusds.jwt.JWT;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.PlainJWT;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.apache.coyote.BadRequestException;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Service
 public class JWTUtils {
@@ -21,8 +27,10 @@ public class JWTUtils {
     private final JWSSigner signer;
     private final JWSVerifier verifier;
     private final ObjectMapper objectMapper;
+    private final UserDetailsService userDetailsService;
 
-    public JWTUtils(ObjectMapper objectMapper) throws JOSEException {
+    public JWTUtils(ObjectMapper objectMapper, UserDetailsService userDetailsService) throws JOSEException {
+        this.userDetailsService = userDetailsService;
         Dotenv dotenv = Dotenv.load();
         this.secret = dotenv.get("JWT_SECRET");
 
@@ -43,6 +51,23 @@ public class JWTUtils {
         }
     }
 
+    public boolean isValid(String jwtString){
+        if(jwtString==null || jwtString.isEmpty()) return false;
+        try{
+            PlainJWT jwt = PlainJWT.parse(jwtString);
+            JWTClaimsSet claims = jwt.getJWTClaimsSet();
+            System.out.println(jwt);
+            claims.getClaimAsString("username");
+            System.out.println("EXPIRATION: " +  claims.getExpirationTime());
+            System.out.println("NOW: " + new Date());
+            return claims.getExpirationTime().after(new Date());
+        } catch (ParseException e) {
+            System.out.println("ERR occured");
+           return false;
+        }
+
+    }
+
     private BBUserMinClaimSet extractClaimSet(JWSObject jws) throws BadRequestException{
         String jsonPayload = jws.getPayload().toString();
 
@@ -59,20 +84,44 @@ public class JWTUtils {
         }
     }
 
-    public JWTAuthentication extractFromRequest(String jwt) throws BadRequestException {
-        BBUserMinClaimSet jws = extractClaimSet(getJWS(jwt));
+    public JWTAuthentication getAuthentication(PlainJWT jwt){
+        try{
+            String username = jwt.getJWTClaimsSet().getClaimAsString("username");
+            BBUser user = (BBUser) userDetailsService.loadUserByUsername(username);
+            JWTAuthentication authentication = new JWTAuthentication();
+            authentication.setAuthenticated(true);
+            authentication.setPrincipal(user);
 
-        JWTAuthentication jwtAuth = new JWTAuthentication();
+            return authentication;
+        } catch (ParseException e) {
+            return null;
+        }
 
-        jwtAuth.setAuthenticated(true);
-        jwtAuth.setPrincipal(jws);
 
-        return jwtAuth;
+
     }
 
-    public String createJWT(Object object) throws JsonProcessingException, JOSEException {
-        JWSObject jws = new JWSObject(new JWSHeader(JWSAlgorithm.HS256), new Payload(this.objectMapper.writeValueAsString(object)));
-        jws.sign(signer);
-        return jws.serialize();
+    public PlainJWT parseJWT(String jwtString) {
+        try{
+            return PlainJWT.parse(jwtString);
+        } catch (ParseException e) {
+            return null;
+        }
+    }
+
+    public String createJWT(BBUser user) throws JsonProcessingException, JOSEException {
+        Date plsHr = new Date(System.currentTimeMillis() + 3600 * 1000 );
+        System.out.println("plsHr: " + plsHr);
+        JWTClaimsSet claims = new JWTClaimsSet.Builder()
+                .subject(String.valueOf(user.getId()))
+                .claim("username", user.getUsername())
+                .claim("authorities", user.getAuthorities())
+                .expirationTime(plsHr)
+                .issuer("buildboard.backend.com")
+                .issueTime(new Date())
+                .build();
+
+        JWT jwt = new PlainJWT(claims); // zasega ke koristime plain jwt posle ke go adaptirame so potpis salam ili so rsa ili pak so hmac
+        return jwt.serialize();
     }
 }

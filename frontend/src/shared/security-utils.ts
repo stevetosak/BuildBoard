@@ -1,9 +1,11 @@
-export type UserRoles = Uppercase<"ROLE_Project_Owner" | "ROLE_Developer" | "ROLE_User" | "ROLE_MODERATOR">
+export type UserRoles = Uppercase<"ROLE_PROJECT_OWNER" | "ROLE_Developer" | "ROLE_User" | "ROLE_MODERATOR">
 
 
-export type UserAuth = { 
+export type UserAuth = {
+	id: string,
     username : string, 
-    authorities: UserRoles[] 
+    authorities: UserRoles[] ,
+	isAuth: boolean
 } | null 
 
 
@@ -11,15 +13,19 @@ export type JWTResponse = {
     token : string 
 }
 
+export const getToken = () => {
+	return localStorage.getItem("token") || "";
+}
+
 export const getAuthHeader = (): RequestInit => {
-	let user = localStorage.getItem("token") || "";
+	let token = localStorage.getItem("token") || "";
     
-    if(user)
-        user = "Bearer " + user;  
+    if(token)
+        token = "Bearer " + token;
 
 	return {
 		headers: {
-			Authorization: user
+			Authorization: token
 		},
 	};
 };
