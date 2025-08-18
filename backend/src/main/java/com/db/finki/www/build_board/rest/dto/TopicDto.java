@@ -13,8 +13,8 @@ import java.util.List;
 public class TopicDto extends ThreadDto{
     String title;
 
-    public TopicDto(int id, String content, UserDto user, Timestamp createdAt, int level, String type, int numLikes, int numReplies, String title,Integer parentId) {
-        super(id, content, user, createdAt, level, type, numLikes, numReplies,parentId);
+    public TopicDto(int id, String content, UserDto user, Timestamp createdAt, int level, String type, int numLikes, int numReplies, String title,Integer parentId,String status) {
+        super(id, content, user, createdAt, level, type, numLikes, numReplies,parentId,status);
         this.title = title;
     }
 

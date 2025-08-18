@@ -3,7 +3,6 @@ package com.db.finki.www.build_board.service.thread.impl;
 import com.db.finki.www.build_board.entity.thread.BBThread;
 import com.db.finki.www.build_board.entity.thread.ThreadView;
 import com.db.finki.www.build_board.entity.thread.Topic;
-import com.db.finki.www.build_board.entity.thread.discussion_thread.Discussion;
 import com.db.finki.www.build_board.entity.user_type.BBUser;
 import com.db.finki.www.build_board.repository.UserRepository;
 import com.db.finki.www.build_board.repository.thread.BBThreadRepository;
@@ -38,7 +37,7 @@ public class ThreadService {
         return discussionTree.stream().skip(skipNum).map(thread -> new ThreadDto(thread.getId(), thread.getContent(), new UserDto(thread.getUserId(), thread.getUsername(),
                 "todo util funkcija getAvatarUrl ne vo entity"), thread.getCreatedAt(),
                 thread.getLevel(), thread.getType(), thread.getNumLikes(),
-                thread.getNumReplies(),thread.getParentId())).toList();
+                thread.getNumReplies(),thread.getParentId(),thread.getStatus())).toList();
     }
 
     public ThreadTreeResponse getTopicResponse(Topic topic, int page, int size) {
@@ -47,7 +46,7 @@ public class ThreadService {
         TopicDto topicDto = new TopicDto(topicView.getId(), topicView.getContent(), new UserDto(topicView.getUserId(), topicView.getUsername(),
                 "todo util funkcija getAvatarUrl ne vo entity"), topicView.getCreatedAt(),
                 topicView.getLevel(), topicView.getType(), topicView.getNumLikes(),
-                topicView.getNumReplies(),topic.getTitle(),null);
+                topicView.getNumReplies(),topic.getTitle(),null,topicView.getStatus());
 
         List<ThreadDto> dtos = mapToDto(discussionTree,1);
         return new ThreadTreeResponse(topicDto,dtos,"topic");
@@ -60,8 +59,14 @@ public class ThreadService {
     }
 
     public ThreadDto addReply(BBUser principal, ThreadDto threadDto) {
-        BBThread parent =  threadRepository.findById(threadDto.getParentId());
+        BBThread parent = threadDto.getParentId() == null ? null : threadRepository.findById(threadDto.getParentId());
         BBThread saved = threadRepository.save(new BBThread(threadDto.getContent(),threadDto.getLevel(),parent,"discussion",principal));
         return ThreadDto.from(saved);
+    }
+    public void deleteThread(int id){
+        BBThread thread = threadRepository.findById(id);
+        thread.setContent("DELETED");
+        thread.setStatus("deleted");
+        threadRepository.save(thread);
     }
 }

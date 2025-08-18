@@ -1,5 +1,5 @@
 export type ThreadUserDto = {
-    id: number,
+    id: string,
     username: string,
     avatarUrl: string
 }
@@ -13,6 +13,7 @@ export type ThreadData = {
 }
 
 export type ThreadType = "topic" | "discussion" | "project";
+export type ThreadStatus = "active" | "deleted"
 
 export interface ThreadElement {
     id?: number,
@@ -23,7 +24,8 @@ export interface ThreadElement {
     numLikes: number,
     type: string,
     createdAt: number
-    user: ThreadUserDto
+    user: ThreadUserDto,
+    status: ThreadStatus
 }
 
 export interface TopicView extends ThreadElement {

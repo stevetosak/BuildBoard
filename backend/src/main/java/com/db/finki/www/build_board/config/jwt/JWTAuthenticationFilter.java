@@ -43,7 +43,6 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
         if(!jwtUtils.isValid(tokenString)) {
             System.out.println("Invalid jwt: " +  tokenString);
-
             filterChain.doFilter(request, response);
             return;
         }

@@ -55,5 +55,6 @@ public interface ThreadView {
     String getType();
     Integer getNumLikes();
     Integer getNumReplies();
+    String getStatus();
 }
 

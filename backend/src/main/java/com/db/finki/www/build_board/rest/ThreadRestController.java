@@ -32,4 +32,9 @@ public class ThreadRestController {
         ThreadDto saved = threadService.addReply(authentication.getPrincipal(),threadDto);
         return ResponseEntity.ok(saved);
     }
+    @PostMapping("/replies/delete")
+    public ResponseEntity<Void> deleteReply(@RequestParam int id) {
+        threadService.deleteThread(id);
+        return ResponseEntity.ok().build();
+    }
 }

@@ -25,25 +25,44 @@ export class ThreadTree {
         return new ThreadTree(root)
     }
 
-    find = (targetNodeId: number,currentNode: ThreadNode = this.root) : ThreadNode | undefined => {
-        if(targetNodeId === currentNode.element.id) return currentNode
-        for(const child of currentNode.children){
-            const found = this.find(targetNodeId,child)
-            if(found) return found
+    find = (targetNodeId: number, currentNode: ThreadNode = this.root): ThreadNode | undefined => {
+        if (targetNodeId === currentNode.element.id) return currentNode
+        for (const child of currentNode.children) {
+            const found = this.find(targetNodeId, child)
+            if (found) return found
         }
         return undefined;
     }
 
     addChildren = (tree: ThreadTree) => {
-        const node = this.find(tree.root.element.id)
-        if(node){
+        const node = this.find(tree.root.element.id!)
+        if (node) {
             node.children.push(...tree.root.children)
-        }else console.error("Cant find node: ",tree.root)
+        } else console.error("Cant find node: ", tree.root)
     }
-    addChild = (targetNodeId: number,child: ThreadElement) => {
+    //todo: mozit da imat i koga bilo izbirsano ko timestamp da pisit
+    delete = (id: number) => {
+        const found = this.find(id, this.root)
+        if (found) {
+            const element = found.element
+            found.element = {
+                ...element,
+                content: "DELETED",
+                status: "deleted",
+                user: {
+                    id: element.user.id,
+                    username: "hidden",
+                    avatarUrl: "anon"
+                }
+            }
+        }
+    }
+    addChild = (targetNodeId: number, child: ThreadElement) => {
         const target = this.find(targetNodeId);
-        if(target){
-            target.children.push({element:child,parent:target,children:[]})
+        if (target) {
+            target.children = [{element: child, parent: target, children: []},...target.children]
+            // target.children.push({element: child, parent: target, children: []})
+            target.element.numReplies++
         } else console.log("Cant add reply")
     }
 
@@ -57,7 +76,7 @@ export class ThreadTree {
         node.children.forEach((c) => this.logChildren(c))
     }
 
-    private static constructThreadTree = (threadResponse: ThreadResponse,parent: ThreadNode | null = null) => {
+    private static constructThreadTree = (threadResponse: ThreadResponse, parent: ThreadNode | null = null) => {
         const levelMap: Map<number, ThreadElement[]> = getLevelMap(threadResponse.children)
         console.log("LEVEL MAP")
         console.log(levelMap)

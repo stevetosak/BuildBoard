@@ -78,7 +78,8 @@ CREATE TABLE thread
     level int,
     user_id INT REFERENCES users (id) NOT NULL,
     parent_id int references thread(id),
-    type varchar(20) check (type in ('discussion','topic','project'))
+    type varchar(20) check (type in ('discussion','topic','project')),
+    status varchar (20) not null check (status in ('active','deleted')) default 'active'
 );
 create table user_interested_thread
 (

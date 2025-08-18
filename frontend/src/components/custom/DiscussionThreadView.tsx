@@ -4,74 +4,96 @@ import {
     CardFooter,
     CardHeader,
 } from "@/components/ui/card.tsx";
-import {Check, CircleEllipsis, Reply, X} from "lucide-react";
+import {
+    Check,
+    ChevronDown,
+    ChevronDownCircle,
+    ChevronUp,
+    ChevronUpCircle,
+    CircleEllipsis,
+    Reply,
+    X,
+    XCircle
+} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
 import type {ThreadResponse, ThreadElement} from "@/types.ts";
 import {useContext, useState} from "react";
 import {AnimatePresence, motion} from "framer-motion";
 import * as React from "react";
 import {MessageInputBox} from "@/components/custom/MessageInputBox.tsx";
-import {api} from "@/services/apiconfig.ts";
+import {api, apiPostAuthenticated} from "@lib/utils/api.ts";
 import {type ThreadNode, ThreadTree} from "@/lib/utils.ts";
 import {useJwt} from "react-jwt";
 import {getToken} from "@shared/security-utils.ts";
 import SecurityContext from "@context/security-context.ts";
 
-export const DiscussionThreadView = ({
-                                         className,
-                                         node,
-                                         isRoot = false,
-                                         handleAddReply,
-                                         tree,
-                                         updateTree,
-                                     }: {
+export type DiscussionThreadViewProps = {
     className?: string;
     node: ThreadNode;
     isRoot?: boolean;
     tree: ThreadTree,
-    handleAddReply: (targetNodeIdx: number, child: ThreadElement) => void
+    handleReply: (targetNodeIdx: number, child: ThreadElement) => void
     updateTree: (threadResponse: ThreadResponse) => void
-}) => {
+    handleDelete: (id: number) => Promise<void>
+}
+
+export const DiscussionThreadView = ({
+                                         className,
+                                         node,
+                                         handleReply,
+                                         updateTree,
+                                         tree,
+                                         isRoot,
+                                         handleDelete
+                                     }: DiscussionThreadViewProps) => {
 
 
     const [replying, setReplying] = useState(false);
-    const {username} = useContext(SecurityContext)
+    const userAuthContext = useContext(SecurityContext)
     const [displayReplies, setDisplayReplies] = useState<boolean>(true);
+    const [collapseChildren, setCollapseChildren] = useState(false)
     const replies = node.children
+    const remainingReplies = node.element.numReplies - replies.length
     console.log("Replies")
     console.log(replies)
-    
+
     // todo refactor security context
 
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         const content = e.currentTarget.value;
         if (e.key === "Enter" && !e.shiftKey && content.trim() !== '') {
+            console.log("CONTEXT")
+            console.log(userAuthContext)
 
             const newThread: ThreadElement = {
-                parentId: node.element.parentId,
+                parentId: node.element.id!,
                 level: node.element.level + 1,
                 content: content,
-                user: {id: 55, username: "Tosman223", avatarUrl: "nema"},
+                user: {id: userAuthContext!.id, username: userAuthContext!.username, avatarUrl: "nema"},
                 numLikes: 0,
-                numReplies: 0, type: "discussion", createdAt: Date.now()
+                numReplies: 0, type: "discussion", createdAt: Date.now(),
+                status: "active",
             }
 
             e.preventDefault();
-            handleAddReply(node.element.id!, newThread)
+            handleReply(node.element.id!, newThread)
             setReplying(false)
         }
     }
 
 
     const handleDisplayReplies = async () => {
-        if (!replies || replies.length === 0) {
-            await loadReplies()
+        if(remainingReplies > 0){
+            await handleLoadReplies()
+        }else {
+            setDisplayReplies(prevState => !prevState)
         }
-        setDisplayReplies(prevState => !prevState)
+
     }
 
-    const loadReplies = async () => {
+
+    const handleLoadReplies = async () => {
         const response = await api.get<ThreadResponse>(`/replies?threadId=${node.element.id}`)
         console.log("LOADING REPLIES FOR CURRENT NODE >>>")
         console.log(node)
@@ -80,16 +102,27 @@ export const DiscussionThreadView = ({
         updateTree(response.data)
     }
 
+    const styles = {
+        deleted: {
+            card: "border-red-600 opacity-70"
+        },
+        active: {
+            card: "border-accent-2"
+        }
+    }
+
+    console.log("STYLES active: ", node.element.status)
+
 
     return (
         <div
             className={`${
                 displayReplies ? "border-l-2 border-gray-800 pl-3" : ""
-            } m-5 flex flex-col max-w-2xl gap-2`}
+            } m-5 flex flex-col max-w-2xl gap-2 w-full`}
         >
             <AnimatePresence>
                 <Card
-                    className={`border-0 border-l-4 border-accent-2 rounded-xl bg-background-card text-[#eaeaea] ${className}`}
+                    className={`border-0 border-l-4 rounded-xl bg-background-card text-[#eaeaea] ${className} ${styles[`${node.element.status}`].card}`}
                 >
                     <CardHeader className="flex justify-between items-start gap-2">
                         <div className="flex gap-3 items-center">
@@ -129,45 +162,52 @@ export const DiscussionThreadView = ({
                             </Button>
                         </div>
 
-                        <Button
-                            size="icon"
-                            className="hover:-translate-y-0.5 hover:bg-gray-900 transition bg-background-card"
-                            onClick={() => setReplying((prev) => !prev)}
-                        >
-                            <Reply/>
-                        </Button>
+                        {node.element.status === "active" && <div>
+                            <Button
+                                size="icon"
+                                className="hover:-translate-y-0.5 hover:bg-gray-900 transition bg-background-card"
+                                onClick={() => setReplying((prev) => !prev)}
+                            >
+                                <Reply/>
+                            </Button>
+                            {node.element.user.id == userAuthContext?.id && (
+                                <Button
+                                    size="icon"
+                                    className="hover:-translate-y-0.5 hover:bg-gray-900 transition bg-background-card"
+                                    onClick={() => handleDelete(node.element.id!)}
+                                >
+                                    <XCircle/>
+                                </Button>
+                            )}
+                        </div>}
+
                     </CardFooter>
 
 
-                    {replying && (
-                        <motion.div
-                            initial={{x: "100%", opacity: 0}}
-                            animate={{x: 0, opacity: 1}}
-                            exit={{x: "100%", opacity: 0}}
-                            transition={{type: "spring", stiffness: 300, damping: 30}}
-                            className="px-4 mt-2"
-                        >
-                            <MessageInputBox handleKeyDown={handleKeyDown}/>
-                        </motion.div>
+                    {replying && ( <div className={"px-4 mt-2"}>
+                        <MessageInputBox handleKeyDown={handleKeyDown}/>
+                        </div>
                     )}
 
                 </Card>
             </AnimatePresence>
 
-            {node.element.numReplies > 0 &&
-                <div className="flex items-start">
-                    <Button
-                        size="sm"
-                        className="hover:bg-gray-900 hover:-translate-y-0.5 hover:translate-x-0.5 transition bg-background-main"
-                        onClick={() => handleDisplayReplies()}
-                    >
-                        <CircleEllipsis className="mr-2" size={16}/>
-                        {node.element.numReplies - replies.length > 0
-                            ? `View ${node.element.numReplies} more replies`
-                            : "Hide"}
-                    </Button>
+            <div className={"flex flex-row items-center"}>
+                {node.element.numReplies > 0 &&
+                    <div className="flex items-start">
+                        <Button
+                            size="sm"
+                            className="hover:bg-gray-900 hover:-translate-y-0.5 hover:translate-x-0.5 transition bg-background-main rounded-3xl"
+                            onClick={() => handleDisplayReplies()}
+                        >
+                            {displayReplies && remainingReplies <= 0 ? <ChevronUpCircle /> : <ChevronDownCircle/>}
+                        </Button>
+                    </div>
+                }
+                <div>
+                    <span className={"text-primary-foreground"}>{remainingReplies > 0 && displayReplies &&  `${remainingReplies} more replies`}</span>
                 </div>
-            }
+            </div>
 
 
             {displayReplies &&
@@ -179,7 +219,7 @@ export const DiscussionThreadView = ({
                             style={{paddingLeft: `${thr.element.level}rem`}}
                         >
                             <DiscussionThreadView className="gap-1" node={thr} tree={tree} updateTree={updateTree}
-                                                  handleAddReply={handleAddReply}/>
+                                                  handleReply={handleReply} handleDelete={handleDelete}/>
                         </div>
                     ))}
                 </div>

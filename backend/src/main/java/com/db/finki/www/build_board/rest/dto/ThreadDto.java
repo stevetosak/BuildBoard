@@ -37,8 +37,10 @@ public class ThreadDto {
     int numReplies;
     @JsonProperty
     Integer parentId;
+    @JsonProperty
+    String status;
 
-    public ThreadDto(int id, String content, UserDto user, Timestamp createdAt, int level, String type, int numLikes, int numReplies, Integer parentId) {
+    public ThreadDto(int id, String content, UserDto user, Timestamp createdAt, int level, String type, int numLikes, int numReplies, Integer parentId, String status) {
         this.id = id;
         this.content = content;
         this.user = user;
@@ -48,6 +50,7 @@ public class ThreadDto {
         this.numLikes = numLikes;
         this.numReplies = numReplies;
         this.parentId = parentId;
+        this.status = status;
     }
 
     public ThreadDto(ThreadDto threadDto) {
@@ -60,18 +63,21 @@ public class ThreadDto {
         this.numLikes = threadDto.numLikes;
         this.numReplies = threadDto.numReplies;
         this.parentId = threadDto.parentId;
+        this.status = threadDto.status;
     }
 
     public static ThreadDto from(BBThread thread) {
+        Integer parentId = thread.getParent() == null ? null : thread.getParent().getId();
+
         return new ThreadDto(
                 thread.getId(),
                 thread.getContent(),
                 new UserDto(thread.getUser().getId(),
                         thread.getUser().getUsername(),
                         thread.getUser().getAvatarUrl()),
-                Timestamp.from(thread.getCreatedAt().toInstant(ZoneOffset.of("UTC+2"))),
+                Timestamp.from(thread.getCreatedAt().toInstant(ZoneOffset.of("+2"))),
                 thread.getLevel(), thread.getType(), 0, 0,
-                thread.getParent().getId());
+                parentId, thread.getStatus());
     }
 
 

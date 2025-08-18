@@ -26,6 +26,7 @@ public class BBThread {
     @JoinColumn(name = "parent_id")
     protected BBThread parent;
     protected String type;
+    protected String status = "active";
 
     @ManyToOne
     @JoinColumn(name="user_id")

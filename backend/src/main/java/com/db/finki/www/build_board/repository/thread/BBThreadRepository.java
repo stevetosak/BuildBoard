@@ -13,13 +13,13 @@ public interface BBThreadRepository extends JpaRepository<BBThread, Long> {
     BBThread findById(long id);
     @Query(value = """
             WITH RECURSIVE tree AS (
-                        SELECT id,content,created_at,level,parent_id,user_id,type
+                        SELECT id,content,created_at,level,parent_id,user_id,type,status
                         FROM thread
                         WHERE id = :rootId
             
                         UNION ALL
             
-                        SELECT child.id,child.content,child.created_at,child.level,child.parent_id,child.user_id,child.type
+                        SELECT child.id,child.content,child.created_at,child.level,child.parent_id,child.user_id,child.type,child.status
                         FROM thread child
                                  JOIN tree parent ON child.parent_id = parent.id
                     ),
@@ -30,7 +30,7 @@ public interface BBThreadRepository extends JpaRepository<BBThread, Long> {
                             (SELECT COUNT(*) FROM likes l WHERE l.thread_id = tc.id) AS numLikes
                         FROM tree tc join users u on u.id = tc.user_id
                     )
-                    SELECT id,content,created_at as createdAt,level,parent_id as parentId,type,userId,username,numReplies,numLikes
+                    SELECT id,content,created_at as createdAt,level,parent_id as parentId,type,userId,username,numReplies,numLikes,status
                     FROM thread_data td
                     ORDER BY
                         CASE WHEN parent_id IS NULL THEN 0 ELSE 1 END,

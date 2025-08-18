@@ -58,8 +58,6 @@ public class JWTUtils {
             JWTClaimsSet claims = jwt.getJWTClaimsSet();
             System.out.println(jwt);
             claims.getClaimAsString("username");
-            System.out.println("EXPIRATION: " +  claims.getExpirationTime());
-            System.out.println("NOW: " + new Date());
             return claims.getExpirationTime().after(new Date());
         } catch (ParseException e) {
             System.out.println("ERR occured");
@@ -96,9 +94,6 @@ public class JWTUtils {
         } catch (ParseException e) {
             return null;
         }
-
-
-
     }
 
     public PlainJWT parseJWT(String jwtString) {
@@ -109,7 +104,7 @@ public class JWTUtils {
         }
     }
 
-    public String createJWT(BBUser user) throws JsonProcessingException, JOSEException {
+    public String createJWT(BBUser user) {
         Date plsHr = new Date(System.currentTimeMillis() + 3600 * 1000 );
         System.out.println("plsHr: " + plsHr);
         JWTClaimsSet claims = new JWTClaimsSet.Builder()
