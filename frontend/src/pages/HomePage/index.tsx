@@ -7,8 +7,7 @@ import { Collapsible, CollapsibleTrigger } from "@components/ui/collapsible";
 import { useContext, type JSX } from "react";
 import { CollapsibleContent } from "@radix-ui/react-collapsible";
 import CustomSidebar from "@components/shared/CustomSidebar";
-import UserInfo from "@pages/HomePage/ui/UserInfo";
-import FriendsPopUp from "@pages/HomePage/ui/FriendsPopUp";
+import UserInfo from "@pages/shared/UserInfo";
 import ThreadsComponent from "@pages/HomePage/ui/ThreadsComponent";
 import SecurityContext from "@/context/security-context";
 import { useQuery } from "@tanstack/react-query";
@@ -19,6 +18,10 @@ import {
 } from "@shared/url-generation";
 import DisplayDataIfLoaded from "./ui/DisplayDataIfLoaded";
 import { Link } from "react-router-dom";
+import LogoLeftSidebar from "@pages/shared/LogoLeftSidebar";
+import RightPopUp from "@pages/shared/RightPopup";
+import UserLogo from "@components/shared/UserLogo";
+import OneActiveAtTime from "@components/shared/OneActiveAtTime";
 
 export type SingleColorCtx = {
 	registered: [boolean];
@@ -48,6 +51,20 @@ const LogoComponentIfUserUndefined = () => (
 	</section>
 );
 
+const LoginLogoutButtons = () => (
+	<OneActiveAtTime
+		activeCls="text-accent"
+		nonActiveCls="text-white"
+	>
+		<Button variant={"outline"}>
+			<Link to="/register">Register</Link>
+		</Button>
+		<Button variant={"outline"}>
+			<Link to="/login">Login</Link>
+		</Button>
+	</OneActiveAtTime>
+);
+
 const HomePage = () => {
 	const user = useContext(SecurityContext);
 	const { data: userProfile } = useQuery({
@@ -56,7 +73,7 @@ const HomePage = () => {
 	});
 
 	return (
-		<main className="w-full grid bg-bg-1 px-0 h-[100vh] pb-3 grid-cols-[1fr_3fr_1fr]">
+		<main className="layout">
 			<DisplayDataIfLoaded
 				data={userProfile}
 				dataUndefinedComponent={<LogoComponentIfUserUndefined />}
@@ -64,15 +81,7 @@ const HomePage = () => {
 				{(user) => (
 					<CustomSidebar
 						side="left"
-						headerContent={
-							<div className="w-1/2 h-full">
-								<img
-									src={iconUrl}
-									alt="Buildboard logo"
-									className="w-full h-full"
-								/>
-							</div>
-						}
+						headerContent={<LogoLeftSidebar />}
 						bodyContent={(
 							Object.keys(user.interested) as InterestedHeaders[]
 						).map((threadType) => (
@@ -96,7 +105,11 @@ const HomePage = () => {
 													className="self-start text-lg cursor-pointer"
 													variant="link"
 												>
-													<Link to={'/' + getUrlForThread(threadName, threadType)}>{threadName}</Link>
+													<Link
+														to={"/" + getUrlForThread(threadName, threadType)}
+													>
+														{threadName}
+													</Link>
 												</Button>
 											),
 										)}
@@ -110,7 +123,12 @@ const HomePage = () => {
 			<ThreadsComponent />
 			<section className="pt-4 flex flex-col gap-2">
 				<div className="w-full gap-2 flex justify-center items-center">
-					<UserInfo user={userProfile} />
+					<DisplayDataIfLoaded
+						data={userProfile}
+						dataUndefinedComponent={<LoginLogoutButtons/>}
+					>
+						{(user) => <UserInfo username={user.username}/>}
+					</DisplayDataIfLoaded>
 				</div>
 				<DisplayDataIfLoaded
 					data={userProfile}
@@ -118,7 +136,25 @@ const HomePage = () => {
 				>
 					{(user) => (
 						<div className="flex-grow-1 grid justify-end pt-[20%]">
-							<FriendsPopUp user={user} />
+							<RightPopUp title="Friends">
+								{user.friends.map((friend) => (
+									<Button
+										variant="link"
+										key={friend.username}
+										className="p-0 gap-2"
+									>
+										<div className="border-2 rounded p-0.5">
+											<UserLogo
+												url={friend.logo}
+												alt={`${friend.username} logo`}
+											/>
+										</div>
+										<Link to={"/profile/" + friend.username}>
+											{friend.username}
+										</Link>
+									</Button>
+								))}
+							</RightPopUp>
 						</div>
 					)}
 				</DisplayDataIfLoaded>

@@ -1,15 +1,13 @@
-import type { UserProfile } from "@shared/api-utils";
 import { Button } from "@components/ui/button";
-import UserLogo from "@components/shared/UserLogo";
 import { PanelLeftIcon } from "lucide-react";
-import { Link } from "react-router-dom";
 import { useState } from "react";
 
-type FriendsPopUpProps = {
-	user: NonNullable<UserProfile>;
-};
+type RightPopUpProps = { 
+    title:string, 
+    children: React.ReactNode
+}
 
-const FriendsPopUp = ({ user }: FriendsPopUpProps) => {
+const RightPopUp = ({title,children} : RightPopUpProps) => {
 	const [expanded, setExpanded] = useState<boolean>(false);
 
 	return (
@@ -26,20 +24,13 @@ const FriendsPopUp = ({ user }: FriendsPopUpProps) => {
 				<span className="sr-only">Toggle Sidebar</span>
 			</Button>
 
-			<h3 className="justify-self-center">Friends</h3>
+			<h3 className="justify-self-center">{title}</h3>
 
 			<div className="overflow-scroll flex flex-col gap-1 items-start p-2">
-				{user.friends.map((friend) => (
-					<Button variant="link" key={friend.username} className="p-0 gap-2">
-						<div className="border-2 rounded p-0.5">
-							<UserLogo url={friend.logo} alt={`${friend.username} logo`} />
-						</div>
-						<Link to={"/profile/" + friend.username}>{friend.username}</Link>
-					</Button>
-				))}
+                {children}
 			</div>
 		</div>
-	)
+	);
 };
 
-export default FriendsPopUp;
+export default RightPopUp;

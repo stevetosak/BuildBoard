@@ -10,5 +10,4 @@ export const parseJwt = (jwtString?: string | null) : UserAuth => {
         authorities: payload["authorities"] as UserRoles[],
         isAuth: true
     }
-
 }
