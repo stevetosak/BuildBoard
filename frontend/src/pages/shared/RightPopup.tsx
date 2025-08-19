@@ -2,12 +2,12 @@ import { Button } from "@components/ui/button";
 import { PanelLeftIcon } from "lucide-react";
 import { useState } from "react";
 
-type RightPopUpProps = { 
-    title:string, 
-    children: React.ReactNode
-}
+type RightPopUpProps = {
+	title: string;
+	children: React.ReactNode;
+};
 
-const RightPopUp = ({title,children} : RightPopUpProps) => {
+const RightPopUp = ({ title, children }: RightPopUpProps) => {
 	const [expanded, setExpanded] = useState<boolean>(false);
 
 	return (
@@ -18,7 +18,7 @@ const RightPopUp = ({title,children} : RightPopUpProps) => {
 			<Button
 				size="icon"
 				onClick={() => setExpanded((e) => !e)}
-				className="justify-self-end hover:bg-accent hover:text-white group-data-[expanded=true]:-translate-x-[13em] duration-300 "
+				className="justify-self-end hover:bg-accent hover:text-white group-data-[expanded=true]:-translate-x-[13em] duration-300 hover:translate-none"
 			>
 				<PanelLeftIcon />
 				<span className="sr-only">Toggle Sidebar</span>
@@ -27,7 +27,7 @@ const RightPopUp = ({title,children} : RightPopUpProps) => {
 			<h3 className="justify-self-center">{title}</h3>
 
 			<div className="overflow-scroll flex flex-col gap-1 items-start p-2">
-                {children}
+				{children}
 			</div>
 		</div>
 	);
