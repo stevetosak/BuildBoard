@@ -15,12 +15,13 @@ import {
 	SidebarMenuButton,
 	SidebarMenuItem,
 } from "@components/ui/sidebar";
+import { uppercaseFirstLetter } from "@shared/string-utils";
 
 type ProjectPathRouteParams = {
 	projectName: string;
 };
 
-const links = ["topics", "channels", "cescription", "manamgnet"];
+const links = ["topics", "channels", "description", "manamgnet"];
 
 const ProjectPage = () => {
 	const userProfile = useGetUserProfile();
@@ -37,12 +38,12 @@ const ProjectPage = () => {
 					<LogoLeftSidebar />
 				</LeftSidebar.HeaderInsideData>
 				<LeftSidebar.BodyInsideData>
-					<SidebarMenu>
+					<SidebarMenu className="gap-5">
 						{links.map((linkName) => (
 							<SidebarMenuItem key={linkName}>
 								<SidebarMenuButton asChild>
-									<Link to={`/projects/${linkName}/${projectName}`}>
-										{linkName}
+									<Link className="text-[2rem]" to={`/projects/${linkName}/${linkName}`}>
+										{uppercaseFirstLetter(linkName)}
 									</Link>
 								</SidebarMenuButton>
 							</SidebarMenuItem>
@@ -50,7 +51,7 @@ const ProjectPage = () => {
 					</SidebarMenu>
 				</LeftSidebar.BodyInsideData>
 			</LeftSidebar.Wrapper>
-			<Outlet />
+			<Outlet context={project}/>
 			<RightSidebar.Wrapper data={userProfile}>
 				<RightSidebar.Header componentIfDataNullable={<LoginLogoutButtons />}>
 					{(user: UserProfile) => <UserInfo username={user.username} />}

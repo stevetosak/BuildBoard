@@ -10,7 +10,7 @@ const PlaceHolderNoValue=  ({children, componentIfDataNullable } : PlaceHolderPr
     const data = useDataContext() as unknown|undefined|null
     if(!data) {
         if(!componentIfDataNullable)
-            return <div></div>
+            return <aside></aside>
         return componentIfDataNullable
     }
     return <>{children}</>
