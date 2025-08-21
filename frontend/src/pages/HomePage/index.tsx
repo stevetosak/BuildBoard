@@ -1,15 +1,11 @@
 import { Button } from "@/components/ui/button.tsx";
-import iconUrl from "@assets/Icon.jpg";
-import { fetchUsers } from "@pages/HomePage/data/fetchUser";
 import { FolderDot, Rss, ChevronDown } from "lucide-react";
 import { SidebarGroup, SidebarGroupLabel } from "@components/ui/sidebar";
 import { Collapsible, CollapsibleTrigger } from "@components/ui/collapsible";
-import { useContext, type JSX } from "react";
+import { type JSX } from "react";
 import { CollapsibleContent } from "@radix-ui/react-collapsible";
 import UserInfo from "@pages/shared/UserInfo";
 import ThreadsComponent from "@pages/HomePage/ui/ThreadsComponent";
-import SecurityContext from "@/context/security-context";
-import { useQuery } from "@tanstack/react-query";
 import type { UserProfile } from "@shared/api-utils";
 import {
 	getUrlForThread,
@@ -18,10 +14,11 @@ import {
 import { Link } from "react-router-dom";
 import LogoLeftSidebar from "@pages/shared/LogoLeftSidebar";
 import RightPopUp from "@pages/shared/RightPopup";
-import UserLogo from "@components/shared/UserLogo";
-import OneActiveAtTime from "@components/shared/OneActiveAtTime";
-import RightSidebar from "@pages/shared/right-sidebar";
+import useGetUserProfile from "@pages/shared/use-get-user-profile";
+import LoginLogoutButtons from "@pages/shared/login-logout-buttons";
+import UserShortRow from "@pages/shared/user-short-row";
 import LeftSidebar from "@pages/shared/left-sidebar";
+import RightSidebar from "@pages/shared/right-sidebar";
 
 export type SingleColorCtx = {
 	registered: [boolean];
@@ -39,26 +36,8 @@ const iconsForHeading = {
 	topics: <Rss size={"1em"} />,
 } as Record<keyof UserProfile["interested"], JSX.Element>;
 
-const LoginLogoutButtons = () => (
-	<OneActiveAtTime
-		activeCls="text-accent"
-		nonActiveCls="text-white"
-	>
-		<Button variant={"outline"}>
-			<Link to="/register">Register</Link>
-		</Button>
-		<Button variant={"outline"}>
-			<Link to="/login">Login</Link>
-		</Button>
-	</OneActiveAtTime>
-);
-
 const HomePage = () => {
-	const user = useContext(SecurityContext);
-	const { data: userProfile } = useQuery({
-		queryKey: [user?.username],
-		queryFn: fetchUsers,
-	});
+	const userProfile = useGetUserProfile();
 
 	return (
 		<main className="layout overflow-x-hidden">
@@ -66,7 +45,7 @@ const HomePage = () => {
 				data={userProfile}
 				side="left"
 			>
-				<LeftSidebar.Header componentIfDataNullable={<LogoLeftSidebar/>}>
+				<LeftSidebar.Header componentIfDataNullable={<LogoLeftSidebar />}>
 					<LogoLeftSidebar />
 				</LeftSidebar.Header>
 				<LeftSidebar.Body>
@@ -122,21 +101,11 @@ const HomePage = () => {
 					{(user: UserProfile) => (
 						<RightPopUp title="Friends">
 							{user.friends.map((friend) => (
-								<Button
-									variant="link"
+								<UserShortRow
 									key={friend.username}
-									className="p-0 gap-2"
-								>
-									<div className="border-2 rounded p-0.5">
-										<UserLogo
-											url={friend.logo}
-											alt={`${friend.username} logo`}
-										/>
-									</div>
-									<Link to={"/profile/" + friend.username}>
-										{friend.username}
-									</Link>
-								</Button>
+									username={friend.username}
+									logo={friend.logo}
+								/>
 							))}
 						</RightPopUp>
 					)}

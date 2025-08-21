@@ -1,10 +1,10 @@
 import type { InterestedHeaders } from "./url-generation";
 
-export type Channel = {
+export type ChannelEssentials = {
 	name: string;
 };
 
-export type Projects = {
+export type ProjectEssentials = {
 	name: string;
 };
 
@@ -12,7 +12,7 @@ export type Topic = {
 	name: string;
 };
 
-export type Friend = {
+export type ShortUserProfile = {
 	username: string;
 	logo: URL;
 };
@@ -20,10 +20,10 @@ export type Friend = {
 export type UserProfile = {
 	username: string;
 	interested: {
-		projects: Projects[];
+		projects: ProjectEssentials[];
 		topics: Topic[];
 	};
-	friends: Friend[];
+	friends: ShortUserProfile[];
 };
 
 
@@ -42,10 +42,7 @@ export type Page<T> = {
 
 export type NamedThread = {
 	createdAt: string;
-	creator: {
-		username: string;
-		logo: string;
-	};
+	creator: ShortUserProfile;
 	content: {
 		title: string;
 		content: string;
@@ -53,6 +50,12 @@ export type NamedThread = {
 	};
 	threadType : InterestedHeaders
 };
+
+type ShortUserProfileWithRoles = ShortUserProfile & {roles: string[]}
+
+export type Project = { 
+	members : ShortUserProfileWithRoles[]
+}
 
 export const debounceGenerator = <T,>(f:(...args:T[]) => unknown, delay:number) => {
 	let timeoutId: number | undefined;

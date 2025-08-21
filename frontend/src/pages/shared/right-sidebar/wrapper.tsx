@@ -1,5 +1,5 @@
 import { Children, type ReactNode } from "react"
-import { DataContext } from "@pages/shared/placeholders/use-data"
+import DataContextProvider from "../placeholders/data-context-provider"
 
 export type RightSidebarProps<T> = { 
     children : ReactNode,
@@ -13,7 +13,7 @@ const Sidebar = <T,>({children, data}:RightSidebarProps<T>) => {
     const [header, body] = Children.toArray(children)
 
     return ( 
-        <DataContext.Provider value={data}>
+        <DataContextProvider value={data}>
             <section className="pt-4 flex flex-col gap-2">
 				<div className="w-full gap-2 flex justify-center items-center">
                     {header}
@@ -22,7 +22,7 @@ const Sidebar = <T,>({children, data}:RightSidebarProps<T>) => {
                     {body}
                 </div>
 			</section>
-        </DataContext.Provider>
+        </DataContextProvider>
     )
 }
 
