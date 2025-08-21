@@ -7,15 +7,15 @@ export type PlaceHolderProps<T> = {
 }
 
 const PlaceHolderWithValue=  <T,>({children, componentIfDataNullable } : PlaceHolderProps<T>) => { 
-    const contextData = useDataContext() as T|undefined|null
+    const data = useDataContext() as T|undefined|null
 
-    if(contextData===null || contextData===undefined) {
+    if(!data) {
         if(!componentIfDataNullable)
             return <div></div>
         return componentIfDataNullable
     }
 
-    return <>{children(contextData)}</>
+    return <>{children(data)}</>
 }
 
 export default PlaceHolderWithValue

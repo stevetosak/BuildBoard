@@ -20,7 +20,7 @@ const RightPopUp = ({ title, children }: RightPopUpProps) => {
 				onClick={() => setExpanded((e) => !e)}
 				className="justify-self-end hover:bg-accent hover:text-white group-data-[expanded=true]:-translate-x-[13em] duration-300"
 			>
-				<PanelLeftIcon className="hover:translate-0"/>
+				<PanelLeftIcon className="hover:translate-x-0" />
 				<span className="sr-only">Toggle Sidebar</span>
 			</Button>
 

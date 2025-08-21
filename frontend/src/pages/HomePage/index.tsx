@@ -43,12 +43,11 @@ const HomePage = () => {
 		<main className="layout overflow-x-hidden">
 			<LeftSidebar.Wrapper
 				data={userProfile}
-				side="left"
 			>
-				<LeftSidebar.Header componentIfDataNullable={<LogoLeftSidebar />}>
+				<LeftSidebar.HeaderInsideData componentIfDataNullable={<LogoLeftSidebar />}>
 					<LogoLeftSidebar />
-				</LeftSidebar.Header>
-				<LeftSidebar.Body>
+				</LeftSidebar.HeaderInsideData>
+				<LeftSidebar.BodyOutsideData>
 					{(user: UserProfile) => (
 						<>
 							{(Object.keys(user.interested) as InterestedHeaders[]).map(
@@ -90,7 +89,7 @@ const HomePage = () => {
 							)}
 						</>
 					)}
-				</LeftSidebar.Body>
+				</LeftSidebar.BodyOutsideData>
 			</LeftSidebar.Wrapper>
 			<ThreadsComponent />
 			<RightSidebar.Wrapper data={userProfile}>

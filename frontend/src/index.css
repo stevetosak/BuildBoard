@@ -103,9 +103,9 @@ h1 {
 /*  transition: border-color 0.25s;*/
 /*}*/
 
-button:hover {
+/* button:hover {
 	translate: 0 -2px;
-}
+} */
 button:focus,
 button:focus-visible {
 	outline: 4px auto -webkit-focus-ring-color;

@@ -4,10 +4,12 @@ import PlaceHolderNoValue from "../placeholders/placeholder";
 import DataContextProvider from "../placeholders/data-context-provider";
 
 const LeftSidebar = { 
-    Wrapper: Wrapper,
-    Header: PlaceHolderNoValue,
-    Body :PlaceHolderWithValue,
-    ContextOverrider: DataContextProvider
+    Wrapper:Wrapper,
+    HeaderInsideData: PlaceHolderNoValue,
+    BodyInsideData:PlaceHolderNoValue,
+    BodyOutsideData:PlaceHolderWithValue,   
+    HeaderOutsideData:PlaceHolderWithValue,
+    ContextOverrider:DataContextProvider
 }
 
 export default LeftSidebar

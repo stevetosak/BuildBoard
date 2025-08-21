@@ -9,11 +9,10 @@ import {
 import { DataContext } from "../placeholders/use-data";
 
 type WrapperProps<T> = {
-	side: "left" | "right";
 	children: ReactNode;
-	data: T|null|undefined;
+	data?: T|null;
 };
-const Wrapper = <T,>({ side, children, data }: WrapperProps<T>) => {
+const Wrapper = <T,>({  children, data }: WrapperProps<T>) => {
 	if (Children.count(children) !== 2)
 		throw new Error("Accepts only 2 children");
 
@@ -22,11 +21,11 @@ const Wrapper = <T,>({ side, children, data }: WrapperProps<T>) => {
 	return (
 		<DataContext.Provider value={data}>
 			<SidebarProvider
-				className={`${side == "right" ? "flex-row-reverse" : "flex-row"} `}
+				className={`flex-row`}
 			>
 				<Sidebar
 					className=" bg-sidebar-bg"
-					side={side}
+					side={'left'}
 				>
 					<SidebarHeader>
 						<div className="w-full flex justify-center">{header}</div>
