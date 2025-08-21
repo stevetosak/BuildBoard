@@ -42,7 +42,7 @@ const ProjectPage = () => {
 						{links.map((linkName) => (
 							<SidebarMenuItem key={linkName}>
 								<SidebarMenuButton asChild>
-									<Link className="text-[2rem]" to={`/projects/${linkName}/${linkName}`}>
+									<Link className="text-[2rem]" to={`/projects/${linkName}/${projectName}`}>
 										{uppercaseFirstLetter(linkName)}
 									</Link>
 								</SidebarMenuButton>
