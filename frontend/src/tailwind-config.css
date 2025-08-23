@@ -11,6 +11,7 @@
     --color-bg-2: #070715;
     --color-background-card: #031023;
     --color-accent-2: #3fb786;
+    --color-accent-green-subtle: rgba(59, 173, 126, 0.42);
     --color-foreground-gray: var(--color-gray-700);
     --color-background-gray: var(--color-gray-900);
 }

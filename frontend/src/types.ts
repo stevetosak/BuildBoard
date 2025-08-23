@@ -28,19 +28,22 @@ export interface ThreadElement {
     status: ThreadStatus
 }
 
-export type ChannelMessage = {
-    channelName: string,
+export type ChannelMessageDisplay = {
     content: string,
-    senderUsername:string,
+    senderUsername: string,
     sentAt: string,
-    projectName: string,
     avatarUrl: string
 }
-export type SendChannelMessageDto = {
+
+export interface ChannelMessageKey {
     channelName: string,
-    content: string,
-    senderUsername:string,
+    sentAt: string, //
+    senderUsername: string,
     projectName: string,
+}
+
+export interface ChannelMessageDto extends ChannelMessageKey{
+    content: string,
 }
 
 export interface TopicView extends ThreadElement {
@@ -52,4 +55,12 @@ export type ThreadResponse = {
     children: ThreadElement[],
     type: string
 }
+
+export type ChannelMessageEventType = "SEND" | "EDIT" | "DELETE" | "TYPE_START" | "TYPE_END"
+
+export type ChannelMessageEvent = {
+    type: ChannelMessageEventType,
+    payload: ChannelMessageDto
+}
+
 

@@ -1,17 +1,15 @@
 import type {ThreadData, ThreadResponse, ThreadElement} from "@/types.ts";
 import {DiscussionThreadView} from "@/components/custom/DiscussionThreadView.tsx";
-import  {type SetStateAction} from "react";
-import * as React from "react";
-import type {ThreadNode, ThreadTree} from "@/lib/utils.ts";
+import type {ThreadNode, ThreadTree} from "@lib/thread-tree/thread-tree.ts";
 
-export const Replies = ({ replies,tree,updateTree }:
+export const Replies = ({ replies,tree,updateTree,handleReply,handleDelete }:
                         {
                             replies?: ThreadNode[],
-                            // threadLevelMap: Map<number,ThreadView[]>
                             tree: ThreadTree,
                             updateTree: (threadResponse: ThreadResponse) => void,
                             className?: string,
-                            // setThreadLevelMap:React.Dispatch<SetStateAction<Map<number,ThreadView[]>>>
+                            handleReply: (targetNodeIdx: number, child: ThreadElement) => void
+                            handleDelete: (id: number) => Promise<void>
                         }
 ) => {
     return (
@@ -22,7 +20,7 @@ export const Replies = ({ replies,tree,updateTree }:
                     className={`mt-5`}
                     style={{ paddingLeft: `${thr.element.level * 1.5}rem` }}
                 >
-                    <DiscussionThreadView className="gap-1" node={thr} tree={tree} updateTree={updateTree} />
+                    <DiscussionThreadView className="gap-1" node={thr} tree={tree} updateTree={updateTree} handleDelete={handleDelete} handleReply={handleReply} />
                 </div>
             ))}
         </div>

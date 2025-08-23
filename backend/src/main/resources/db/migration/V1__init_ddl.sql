@@ -235,7 +235,7 @@ CREATE TABLE channel
 );
 CREATE TABLE messages
 (
-    sent_at      TIMESTAMP,
+    sent_at      timestamptz,
     content      VARCHAR(200) NOT NULL,
     sent_by      INT REFERENCES developer(id),
     project_id   INT,

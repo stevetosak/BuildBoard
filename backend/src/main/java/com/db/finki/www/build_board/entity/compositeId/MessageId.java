@@ -1,18 +1,23 @@
 package com.db.finki.www.build_board.entity.compositeId;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class MessageId {
    private String name;
    private int project;
    private int sentBy;
-   private LocalDateTime sentAt;
+   private Instant sentAt;
 
     @Override
     public boolean equals(Object o) {

@@ -22,10 +22,8 @@ import {AnimatePresence, motion} from "framer-motion";
 import * as React from "react";
 import {MessageInputBox} from "@/components/custom/MessageInputBox.tsx";
 import {api, apiPostAuthenticated} from "@lib/utils/api.ts";
-import {type ThreadNode, ThreadTree} from "@/lib/utils.ts";
-import {useJwt} from "react-jwt";
-import {getToken} from "@shared/security-utils.ts";
 import SecurityContext from "@context/security-context.ts";
+import type {ThreadNode, ThreadTree} from "@lib/thread-tree/thread-tree.ts";
 
 export type DiscussionThreadViewProps = {
     className?: string;
@@ -33,8 +31,8 @@ export type DiscussionThreadViewProps = {
     isRoot?: boolean;
     tree: ThreadTree,
     handleReply: (targetNodeIdx: number, child: ThreadElement) => void
-    updateTree: (threadResponse: ThreadResponse) => void
     handleDelete: (id: number) => Promise<void>
+    updateTree: (threadResponse: ThreadResponse) => void
 }
 
 export const DiscussionThreadView = ({

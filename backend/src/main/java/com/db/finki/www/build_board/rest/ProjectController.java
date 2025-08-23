@@ -26,6 +26,6 @@ public class ProjectController {
     @GetMapping("{id}/channels/{channelName}")
     public void getChannel(@PathVariable Long id, @PathVariable String channelName) {
         Project project = projectService.getById(id);
-        Channel channel = channelService.getByNameAndProject(channelName, project);
+        Channel channel = channelService.getByNameAndProject(channelName, project.getTitle());
     }
 }

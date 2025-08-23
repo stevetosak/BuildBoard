@@ -13,6 +13,7 @@ import registerUser from "@pages/Register/data/registerUser.tsx";
 import SecurityOutlet from "./components/auth/security-context-outlet";
 import {topicLoader} from "@pages/TopicPage/data/loader.ts";
 import {ChannelPage} from "@pages/ChannelPage/ChannelPage.tsx";
+import {channelLoader} from "@pages/ChannelPage/data/loader.ts";
 
 export const router = createBrowserRouter(
     createRoutesFromElements(
@@ -28,7 +29,7 @@ export const router = createBrowserRouter(
             <Route loader={topicLoader}
                 path={"topics/:topicName"} element={<TopicPage/>}></Route>
             <Route path={"projects/:projectName/"}>
-                <Route path={"channels/:channelName"} element={<ChannelPage/>}></Route>
+                <Route path={"channels/:channelName"} loader={channelLoader} element={<ChannelPage/>}></Route>
                 <Route  path={"requests"}></Route>
             </Route>
             <Route path={":username/profile"}></Route>

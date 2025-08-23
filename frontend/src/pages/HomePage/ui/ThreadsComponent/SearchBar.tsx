@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@lib/utils/utils.ts";
 import { SearchIcon } from "lucide-react";
 import React, { useMemo, useState } from "react";
 import type { SearchOptions } from ".";
