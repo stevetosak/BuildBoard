@@ -19,6 +19,7 @@ import LoginLogoutButtons from "@pages/shared/login-logout-buttons";
 import UserShortRow from "@pages/shared/user-short-row";
 import LeftSidebar from "@pages/shared/left-sidebar";
 import RightSidebar from "@pages/shared/right-sidebar";
+import { fetchThreads } from "./data/fetchThreads";
 
 export type SingleColorCtx = {
 	registered: [boolean];
@@ -91,7 +92,7 @@ const HomePage = () => {
 					)}
 				</LeftSidebar.BodyOutsideData>
 			</LeftSidebar.Wrapper>
-			<ThreadsComponent />
+			<ThreadsComponent fetchTopics={fetchThreads}/>
 			<RightSidebar.Wrapper data={userProfile}>
 				<RightSidebar.Header componentIfDataNullable={<LoginLogoutButtons />}>
 					{(user: UserProfile) => <UserInfo username={user.username} />}

@@ -1,9 +1,7 @@
-package com.db.finki.www.build_board.rest;
+package com.db.finki.www.build_board.namedThread;
 
-import com.db.finki.www.build_board.dto.NamedThreadDTO;
 import com.db.finki.www.build_board.entity.thread.Tag;
 import com.db.finki.www.build_board.entity.thread.itf.NamedThread;
-import com.db.finki.www.build_board.service.search.SearchService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
@@ -15,20 +13,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/threads")
+@RequestMapping("api/threads")
 public class NamedThreadsController {
     private final SearchService searchService;
 
     public NamedThreadsController(
             SearchService searchService
-    ) {
+                                 ) {
         this.searchService = searchService;
     }
 
     private String truncateContent(String content) {
         double percentageToDisplayOnHomePage = .6;
         int shortDescriptionLength = (int) (content.length() * percentageToDisplayOnHomePage);
-        return content.substring(0, shortDescriptionLength);
+        return content.substring(0,
+                shortDescriptionLength);
     }
 
     @GetMapping()
@@ -36,12 +35,15 @@ public class NamedThreadsController {
             @RequestParam(required = false) String query,
             @RequestParam(required = false) List<String> filters,
             @RequestParam(required = false, name = "threadType") String type,
-            @RequestParam(required = false, defaultValue = "0") int page) {
+            @RequestParam(required = false, defaultValue = "0") int page,
+            @RequestParam(required = false) List<String> tag
+                                                      ) {
         if (filters == null || filters.isEmpty()) {
             filters = new ArrayList<>();
             filters.add("all");
         }
-        query = URLDecoder.decode(query, StandardCharsets.UTF_8);
+        query = URLDecoder.decode(query,
+                StandardCharsets.UTF_8);
 
         Page<NamedThread> namedThreads = searchService.search(query,
                 filters,

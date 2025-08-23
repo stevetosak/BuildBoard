@@ -20,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping("api")
 public class AuthController {
     private final BBUserDetailsService bbUserDetailsService;
     private final JWTUtils jwtUtils;
@@ -55,7 +56,7 @@ public class AuthController {
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,"Data integrity violation");
     }
 
-    @PostMapping("/login")
+    @PostMapping("login")
     public ResponseEntity<String> login(
             @RequestBody UserLoginDTO userLoginDTO
     ) throws JsonProcessingException, JOSEException {
@@ -67,7 +68,7 @@ public class AuthController {
         return new ResponseEntity<>(this.objectMapper.writeValueAsString(new TokenDTO(token)), HttpStatus.OK);
     }
 
-    @PostMapping("/register")
+    @PostMapping("register")
     public ResponseEntity<TokenDTO> register(
             @RequestBody BBUserRegisterDTO bbUserRegisterDTO
     ) throws JsonProcessingException, JOSEException {

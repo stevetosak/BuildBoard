@@ -1,7 +1,7 @@
 package com.db.finki.www.build_board.converter;
 
 import com.db.finki.www.build_board.entity.thread.Project;
-import com.db.finki.www.build_board.service.thread.impl.ProjectService;
+import com.db.finki.www.build_board.project.ProjectService;
 import lombok.NonNull;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;

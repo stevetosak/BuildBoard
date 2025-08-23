@@ -1,13 +1,12 @@
-package com.db.finki.www.build_board.service.search;
+package com.db.finki.www.build_board.namedThread;
 
 import com.db.finki.www.build_board.entity.thread.Project;
 import com.db.finki.www.build_board.entity.thread.Topic;
 import com.db.finki.www.build_board.entity.thread.itf.NamedThread;
-import com.db.finki.www.build_board.repository.thread.ProjectRepository;
+import com.db.finki.www.build_board.project.ProjectRepository;
 import com.db.finki.www.build_board.repository.thread.TopicRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -17,13 +16,13 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
-public class SearchServiceImpl implements SearchService {
+public class SearchService {
     private final TopicRepository topicRepository;
     private final FilterMap<Topic> topicFilterMap;
     private final FilterMap<Project> projectFilterMap;
     private final ProjectRepository projectRepository;
 
-    public SearchServiceImpl(TopicRepository topicRepository, FilterMap<Topic> TopicFilterMap, FilterMap<Project> ProjectFilterMap, ProjectRepository projectRepository) {
+    public SearchService(TopicRepository topicRepository, FilterMap<Topic> TopicFilterMap, FilterMap<Project> ProjectFilterMap, ProjectRepository projectRepository) {
         this.topicRepository = topicRepository;
         this.topicFilterMap = TopicFilterMap;
         this.projectFilterMap = ProjectFilterMap;

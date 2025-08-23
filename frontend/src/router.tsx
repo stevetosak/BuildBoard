@@ -17,6 +17,7 @@ import {default as ProjectDescription} from "@pages/ProjectPage/ui/description";
 import {default as ProjectChannels} from "@pages/ProjectPage/ui/channels";
 import {default as ProjectManagment} from "@pages/ProjectPage/ui/managment";
 import ProjectPage from "@pages/ProjectPage";
+import { ChannelPage } from "@pages/ChannelPage/ChannelPage";
 
 export const router = createBrowserRouter(
     createRoutesFromElements(
@@ -41,7 +42,7 @@ export const router = createBrowserRouter(
                 {/* <Route  path={"requests"}></Route> */}
             </Route>
             <Route path={":username/profile"}></Route>
-
+            <Route path="channel" element={<ChannelPage/>}/>
             <Route path={"login"} element={<LoginPage/>} action={validateUser} />
             <Route path={'register'} element={<Register/>} action={registerUser} />
         </Route>,

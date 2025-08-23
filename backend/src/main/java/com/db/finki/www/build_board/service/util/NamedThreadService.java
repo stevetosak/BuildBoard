@@ -1,7 +1,7 @@
 package com.db.finki.www.build_board.service.util;
 
 import com.db.finki.www.build_board.entity.thread.itf.NamedThread;
-import com.db.finki.www.build_board.service.thread.impl.ProjectService;
+import com.db.finki.www.build_board.project.ProjectService;
 import com.db.finki.www.build_board.service.thread.impl.TopicServiceImpl;
 import com.db.finki.www.build_board.service.thread.itf.TopicService;
 import org.springframework.stereotype.Service;

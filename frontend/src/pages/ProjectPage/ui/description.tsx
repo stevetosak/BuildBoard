@@ -65,12 +65,6 @@ const Description = () => {
 				</div>
 			</div>
 			<div className="justify-self-end ">
-				<Button
-					variant={"outline"}
-					className="mr-3"
-				>
-					<Link to="/register">View dev team</Link>
-				</Button>
 				<Button variant={"outline"}>
 					<Link to="/login">Send request</Link>
 				</Button>

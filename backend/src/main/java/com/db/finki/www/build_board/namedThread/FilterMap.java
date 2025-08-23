@@ -1,9 +1,6 @@
-package com.db.finki.www.build_board.service.search;
+package com.db.finki.www.build_board.namedThread;
 
-import com.db.finki.www.build_board.entity.thread.BBThread;
-import com.db.finki.www.build_board.entity.thread.Tag;
 import com.db.finki.www.build_board.entity.thread.itf.NamedThread;
-import jakarta.persistence.criteria.Join;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 

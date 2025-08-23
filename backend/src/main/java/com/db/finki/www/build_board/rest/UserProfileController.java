@@ -16,7 +16,7 @@ import java.util.List;
 
 
 @Controller
-@RequestMapping("users")
+@RequestMapping("api/users")
 public class UserProfileController {
     private final BBUserDetailsService userService;
     private final FileUploadService fileUploadService;

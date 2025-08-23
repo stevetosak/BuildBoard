@@ -1,4 +1,4 @@
-package com.db.finki.www.build_board.service.search;
+package com.db.finki.www.build_board.namedThread;
 
 import com.db.finki.www.build_board.entity.thread.Project;
 import com.db.finki.www.build_board.entity.thread.Topic;

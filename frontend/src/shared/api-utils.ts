@@ -1,3 +1,4 @@
+import type { SearchOptions } from "@pages/shared/ThreadsComponent";
 import type { InterestedHeaders } from "./url-generation";
 
 export type ChannelEssentials = {
@@ -50,9 +51,10 @@ export type NamedThread = {
 	};
 	threadType : InterestedHeaders
 };
+export type FetchNamedTopics = (pageNumber:number, queryKey:SearchOptions) => Promise<Page<NamedThread[]>>
 
 
-type ShortUserProfileWithRoles = ShortUserProfile & {roles: string[]}
+type ShortUserProfileWithRoles = ShortUserProfile & {roles: string[], permissions:string[]}
 
 export const getNextPage = <T,>(lastPage:Page<T>) => 
 			lastPage.pageable.pageNumber + 1 < lastPage.totalPages
@@ -74,4 +76,20 @@ export const debounceGenerator = <T,>(f:(...args:T[]) => unknown, delay:number) 
 			f(...args);
 		}, delay);
 	}
+};
+
+export const createPageURL = (page: number, searchOptions:SearchOptions, apiUrl:string) => {
+    const url = new URL(apiUrl);
+    url.searchParams.set("page", page.toString());
+    
+    for(const option in searchOptions){
+        if(option=='tags') continue
+        url.searchParams.set(option, searchOptions[option as keyof Omit<SearchOptions,'tags'>]);
+    }
+
+    searchOptions.tags.forEach((tag) => {
+        url.searchParams.append("tags", tag);
+    })
+
+    return url;
 };

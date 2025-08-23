@@ -1,4 +1,3 @@
-import type { SearchOptions } from "@pages/shared/ThreadsComponent";
 import type { Project } from "@shared/api-utils";
 
 const fetchProject = async (_projectName: string): Promise<Project> => ({
@@ -6,7 +5,7 @@ const fetchProject = async (_projectName: string): Promise<Project> => ({
 		{
 			username: "viki",
 			logo: new URL("http://localhost:5432/matura.jpg"),
-			roles: ["CREATOR"],
+			roles: ["ADMIN"]
 		},
 		{
 			username: "stefan",

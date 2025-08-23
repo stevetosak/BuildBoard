@@ -1,4 +1,4 @@
-package com.db.finki.www.build_board.dto;
+package com.db.finki.www.build_board.namedThread;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;

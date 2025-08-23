@@ -5,7 +5,7 @@ import com.db.finki.www.build_board.entity.channel.Message;
 import com.db.finki.www.build_board.entity.thread.Project;
 import com.db.finki.www.build_board.entity.user_type.Developer;
 import com.db.finki.www.build_board.repository.DeveloperRepository;
-import com.db.finki.www.build_board.service.thread.impl.ProjectService;
+import com.db.finki.www.build_board.project.ProjectService;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

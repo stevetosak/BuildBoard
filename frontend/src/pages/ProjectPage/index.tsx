@@ -32,7 +32,10 @@ const ProjectPage = () => {
 	});
 
 	return (
-		<main className="layout p-0 min-h-[min-content]" style={{padding:0}}>
+		<main
+			className="layout p-0 min-h-[min-content]"
+			style={{ padding: 0 }}
+		>
 			<LeftSidebar.Wrapper data={"placeholder"}>
 				<LeftSidebar.HeaderInsideData>
 					<LogoLeftSidebar />
@@ -42,7 +45,10 @@ const ProjectPage = () => {
 						{links.map((linkName) => (
 							<SidebarMenuItem key={linkName}>
 								<SidebarMenuButton asChild>
-									<Link className="text-[2rem]" to={`/projects/${linkName}/${projectName}`}>
+									<Link
+										className="text-[2rem]"
+										to={`/projects/${linkName}/${projectName}`}
+									>
 										{uppercaseFirstLetter(linkName)}
 									</Link>
 								</SidebarMenuButton>
@@ -51,7 +57,7 @@ const ProjectPage = () => {
 					</SidebarMenu>
 				</LeftSidebar.BodyInsideData>
 			</LeftSidebar.Wrapper>
-			<Outlet context={project}/>
+			<Outlet context={project} />
 			<RightSidebar.Wrapper data={userProfile}>
 				<RightSidebar.Header componentIfDataNullable={<LoginLogoutButtons />}>
 					{(user: UserProfile) => <UserInfo username={user.username} />}
@@ -61,11 +67,16 @@ const ProjectPage = () => {
 						{(project: Project) => (
 							<RightPopUp title="Members">
 								{project.members.map((member) => (
-									<UserShortRow
-										key={member.username}
-										username={member.username}
-										logo={member.logo}
-									/>
+									<div>
+										<UserShortRow
+											key={member.username}
+											username={member.username}
+											logo={member.logo}
+										/>
+										<div className="w-full overflow-x-scroll">
+										{member.roles.map(role => <p className="p-1 rounded-xl bg-accent text-[0.7rem]">{role}</p>)}
+										</div>
+									</div>
 								))}
 							</RightPopUp>
 						)}

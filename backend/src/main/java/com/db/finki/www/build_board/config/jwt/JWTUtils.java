@@ -13,7 +13,6 @@ import com.nimbusds.jwt.PlainJWT;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.apache.coyote.BadRequestException;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;

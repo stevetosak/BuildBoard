@@ -3,7 +3,7 @@ package com.db.finki.www.build_board.service.user;
 import com.db.finki.www.build_board.entity.thread.Project;
 import com.db.finki.www.build_board.entity.user_type.BBUser;
 import com.db.finki.www.build_board.repository.UserRepository;
-import com.db.finki.www.build_board.repository.thread.ProjectRepository;
+import com.db.finki.www.build_board.project.ProjectRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

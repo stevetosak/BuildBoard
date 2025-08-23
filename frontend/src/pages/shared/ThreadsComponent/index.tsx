@@ -1,6 +1,5 @@
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery} from "@tanstack/react-query";
 import LoadingBlock from "./LoadingBlock";
-import { fetchThreads } from "@pages/HomePage/data/fetchThreads";
 import { Fragment, useState } from "react";
 import {
 	Card,
@@ -13,7 +12,7 @@ import DisplayDataIfLoaded from "../../HomePage/ui/DisplayDataIfLoaded";
 import { useNavigate } from "react-router-dom";
 import { getUrlForThread } from "@shared/url-generation";
 import { useRef, type RefObject } from "react";
-import { debounceGenerator, type NamedThread } from "@shared/api-utils";
+import { debounceGenerator, type FetchNamedTopics, type NamedThread } from "@shared/api-utils";
 
 
 export type SearchOptions = { 
@@ -21,6 +20,10 @@ export type SearchOptions = {
 	tags: string[];
 	threadType: string;
 	filters:"title"|"content"|"all"
+}
+
+export type ThreadsComponentProps = { 
+	fetchTopics: FetchNamedTopics,
 }
 
 const LoadingBlocks = () => {
@@ -64,7 +67,8 @@ const handleRegistrationOfObserver = (
 
 const createKeyForNamedThread = (namedThread: NamedThread) => namedThread.content.title  + '-' +  namedThread.threadType
 
-const ThreadsComponent = () => {
+//TODO: napraj nekoj datata da mu ja davat 
+const ThreadsComponent = ({fetchTopics}: ThreadsComponentProps) => {
 	const [searchOptions, setSearchOptions] = useState<SearchOptions>({query:"", tags: [], threadType: "", filters:'all'});
 	const {
 		data: namedThreads,
@@ -73,7 +77,7 @@ const ThreadsComponent = () => {
 		isFetchingNextPage,
 	} = useInfiniteQuery({
 		queryKey: ["namedThreads", searchOptions],
-		queryFn: ({ pageParam, queryKey }) => fetchThreads(pageParam, queryKey[1] as SearchOptions),
+		queryFn: ({ pageParam, queryKey }) => fetchTopics(pageParam,queryKey[1] as SearchOptions), 
 		initialPageParam: 0,
 		getNextPageParam: (lastPage) =>
 			lastPage.pageable.pageNumber + 1 < lastPage.totalPages

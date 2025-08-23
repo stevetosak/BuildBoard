@@ -1,4 +1,4 @@
-package com.db.finki.www.build_board.service.thread.impl;
+package com.db.finki.www.build_board.project;
 
 import java.util.List;
 
@@ -7,7 +7,8 @@ import com.db.finki.www.build_board.entity.thread.Topic;
 import com.db.finki.www.build_board.entity.user_type.BBUser;
 import com.db.finki.www.build_board.entity.thread.Project;
 import com.db.finki.www.build_board.repository.UserRepository;
-import com.db.finki.www.build_board.repository.thread.ProjectRepository;
+import com.db.finki.www.build_board.service.thread.impl.TagServiceImpl;
+import com.db.finki.www.build_board.service.thread.impl.TopicServiceImpl;
 import com.db.finki.www.build_board.service.user.BBUserDetailsService;
 import com.db.finki.www.build_board.service.thread.itf.TagService;
 import com.db.finki.www.build_board.service.thread.itf.TopicService;
