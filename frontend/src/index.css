@@ -214,3 +214,47 @@ button:focus-visible {
 	padding-bottom: 3em;
 	grid-template-columns: 1fr 3fr 1fr;
 }
+
+.project-desc h1,
+.project-desc h2,
+.project-desc h3,
+.project-desc h4,
+.project-desc h5,
+.project-desc h6 {
+  margin-bottom: 1rem;
+  margin-top:1rem;
+}
+
+.project-desc h1,
+.project-desc h2,
+.project-desc h3,
+.project-desc h4,
+.project-desc h5,
+.project-desc h6 {
+  margin-bottom: 1rem;
+  margin-top:1rem;
+}
+
+.project-desc h1 {
+  font-size: 2.5rem;
+}
+
+.project-desc h2 {
+  font-size: 2rem;
+}
+
+.project-desc h3 {
+  font-size: 1.75rem;
+}
+
+.project-desc h4 {
+  font-size: 1.5rem;
+}
+
+.project-desc h5 {
+  font-size: 1.25rem;
+}
+
+.project-desc h6 {
+  font-size: 1rem;
+}

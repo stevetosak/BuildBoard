@@ -9,7 +9,7 @@ import {
 	CardHeader,
 } from "@/components/ui/card";
 import SearchBar from "./SearchBar";
-import DisplayDataIfLoaded from "../DisplayDataIfLoaded";
+import DisplayDataIfLoaded from "../../HomePage/ui/DisplayDataIfLoaded";
 import { useNavigate } from "react-router-dom";
 import { getUrlForThread } from "@shared/url-generation";
 import { useRef, type RefObject } from "react";
@@ -23,7 +23,6 @@ export type SearchOptions = {
 	filters:"title"|"content"|"all"
 }
 
-//TODO: add page count to thread response
 const LoadingBlocks = () => {
 	return (
 		<>

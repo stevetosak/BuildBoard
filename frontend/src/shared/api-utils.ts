@@ -51,10 +51,19 @@ export type NamedThread = {
 	threadType : InterestedHeaders
 };
 
+
 type ShortUserProfileWithRoles = ShortUserProfile & {roles: string[]}
 
+export const getNextPage = <T,>(lastPage:Page<T>) => 
+			lastPage.pageable.pageNumber + 1 < lastPage.totalPages
+				? lastPage.pageable.pageNumber + 1
+				: undefined 
+
 export type Project = { 
+	name:string 
 	members : ShortUserProfileWithRoles[]
+	logo: string,
+	description: string  
 }
 
 export const debounceGenerator = <T,>(f:(...args:T[]) => unknown, delay:number) => {

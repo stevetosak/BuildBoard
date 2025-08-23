@@ -1,3 +1,4 @@
+import type { SearchOptions } from "@pages/shared/ThreadsComponent";
 import type { Project } from "@shared/api-utils";
 
 const fetchProject = async (_projectName: string): Promise<Project> => ({

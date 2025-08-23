@@ -5,7 +5,7 @@ import { Collapsible, CollapsibleTrigger } from "@components/ui/collapsible";
 import { type JSX } from "react";
 import { CollapsibleContent } from "@radix-ui/react-collapsible";
 import UserInfo from "@pages/shared/UserInfo";
-import ThreadsComponent from "@pages/HomePage/ui/ThreadsComponent";
+import ThreadsComponent from "@pages/shared/ThreadsComponent";
 import type { UserProfile } from "@shared/api-utils";
 import {
 	getUrlForThread,

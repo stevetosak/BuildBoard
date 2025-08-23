@@ -21,7 +21,7 @@ const Wrapper = <T,>({  children, data }: WrapperProps<T>) => {
 	return (
 		<DataContext.Provider value={data}>
 			<SidebarProvider
-				className={`flex-row`}
+				className={`flex-row h-full`}
 			>
 				<Sidebar
 					className=" bg-sidebar-bg"

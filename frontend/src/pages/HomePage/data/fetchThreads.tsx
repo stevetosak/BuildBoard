@@ -1,7 +1,7 @@
 import API_ENDPOINTS from "@constants/api-endpoints.ts";
 import {type Page, type NamedThread } from "@shared/api-utils";
 import { getAuthHeader } from "@shared/security-utils";
-import type { SearchOptions } from "../ui/ThreadsComponent";
+import type { SearchOptions } from "../../shared/ThreadsComponent";
 
 
 const createPageURL = (page: number, searchOptions:SearchOptions) => {

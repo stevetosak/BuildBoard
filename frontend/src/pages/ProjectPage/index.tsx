@@ -32,7 +32,7 @@ const ProjectPage = () => {
 	});
 
 	return (
-		<main className="layout p-0">
+		<main className="layout p-0 min-h-[min-content]" style={{padding:0}}>
 			<LeftSidebar.Wrapper data={"placeholder"}>
 				<LeftSidebar.HeaderInsideData>
 					<LogoLeftSidebar />
