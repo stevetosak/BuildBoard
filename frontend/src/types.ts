@@ -28,6 +28,21 @@ export interface ThreadElement {
     status: ThreadStatus
 }
 
+export type ChannelMessage = {
+    channelName: string,
+    content: string,
+    senderUsername:string,
+    sentAt: string,
+    projectName: string,
+    avatarUrl: string
+}
+export type SendChannelMessageDto = {
+    channelName: string,
+    content: string,
+    senderUsername:string,
+    projectName: string,
+}
+
 export interface TopicView extends ThreadElement {
     title: string
 }

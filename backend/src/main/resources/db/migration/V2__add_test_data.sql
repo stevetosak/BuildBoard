@@ -9,10 +9,10 @@ VALUES
 
 INSERT INTO users (username, is_activate, password, description, registered_at, sex, name, email)
 VALUES
-    -- Password: user6pass
-    ('user6', true, '$2a$12$jB9g/.KP95fsYYOTy0pwZ.kFrwA/G2cMvPvFLzGtCk8jJ2qO3O.3u', 'Sixth user', NOW(), 'M', 'marko', 'marko@gmail.com'),
+    -- Password: pass6
+    ('user6', true, '$2a$12$IyRDqLm0ObTAW/szIPSRQ.8ZBMFADXifJOIWJTklYCUZO1QsZWoc2', 'Sixth user', NOW(), 'M', 'marko', 'marko@gmail.com'),
     -- Password: user7pass
-    ('user7', true, '$2a$12$KRxRufuMscrlQOLKGw4fBehNLWaP7Zu.M964G2JedKVM4o4wTiJaG', 'Seventh user', NOW(), 'F', 'jana', 'jana@gmail.com'),
+    ('user7', true, '$2a$12$Iknl42ft53ur8hgM4PGRQOC8m8ThuTjRS0P3v0ON3kiJdHwvt/noG', 'Seventh user', NOW(), 'F', 'jana', 'jana@gmail.com'),
     -- Password: user8pass
     ('user8', true, '$2a$12$SCqlK.Rl72tFT0kIUNP6KuSy6BYzfdb9sKJPSWbIK8/uk7y8U7hgS', 'Eighth user', NOW(), 'M', 'nikola', 'nikola@gmail.com'),
     -- Password: user9pass

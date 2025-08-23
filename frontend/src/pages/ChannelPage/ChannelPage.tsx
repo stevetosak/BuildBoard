@@ -2,8 +2,13 @@ import {MessagesContainer} from "@components/custom/MessagesContainer.tsx"
 import {Card, CardContent, CardFooter, CardHeader} from "@components/ui/card.tsx"
 import "../../fonts.css"
 import * as React from "react";
-import {useEffect, useRef, useState} from "react";
+import {useContext, useEffect, useRef, useState} from "react";
 import {MessageInputBox} from "@components/custom/MessageInputBox.tsx";
+import {useWebSocketService} from "@lib/web-socket-impl.ts";
+import {useParams, useSearchParams} from "react-router-dom";
+import SecurityContext from "@context/security-context.ts";
+import type {ChannelMessage, SendChannelMessageDto} from "@/types.ts";
+import type {UserAuth} from "@shared/security-utils.ts";
 
 const messageData = [
     {
@@ -22,14 +27,47 @@ const messageData = [
     {user: "stevetosak", content: "messageasdasddasd ", date: "2025/07/01", userImage: "../public/vite.svg"},
 ]
 
-export const ChannelPage = () => {
+const webSocketUrl = "http://localhost:8080/channel-websocket"
 
+export const ChannelPage = () => {
+    const {projectName, channelName} = useParams()
+    const {username} : UserAuth = useContext(SecurityContext)
+    const topicPath = `/topic/${projectName}/${channelName}`
     const [messages, setMessages] = useState<{
         user: string,
         content: string,
         date: string,
         userImage: string
     }[]>(messageData)
+
+
+    const {connect, subscribe, send, unsubscribe, disconnect} = useWebSocketService(
+        webSocketUrl,
+        () => {
+            console.log('Connected!')
+            console.log("Subscribing to topic: " + topicPath)
+            subscribe(topicPath, (message: ChannelMessage) => {
+                console.log("RECIEVED MESSAGE")
+                setMessages((prevMessages) =>
+                    [...prevMessages, {
+                        user: message.senderUsername,
+                        content: message.content,
+                        userImage: message.avatarUrl,
+                        date: message.sentAt
+                    }]);
+            })
+        },
+        (error) => console.log('WebSocket Error:', error)
+    );
+
+
+    useEffect(() => {
+        connect();
+        return () => {
+            unsubscribe(topicPath);
+            disconnect();
+        };
+    }, [])
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         const content = e.currentTarget.value;
@@ -41,8 +79,16 @@ export const ChannelPage = () => {
     }
 
     const handleSendMessage = (messageContent: string) => {
+
+        const message: SendChannelMessageDto = {
+            senderUsername: username,
+            content: messageContent,
+            channelName: channelName!,
+            projectName: projectName!,
+        }
+        send("/app/chat", message)
         setMessages(prevMessages => [...prevMessages, {
-            user: "newMessageSender",
+            user: username,
             content: messageContent,
             date: new Date().toDateString(),
             userImage: ""

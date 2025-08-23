@@ -1,5 +1,8 @@
 package com.db.finki.www.build_board.dto.channel;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,11 +14,18 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Getter
 @Setter
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class MessageDTO {
+    @JsonProperty
     private String channelName;
+    @JsonProperty
     private String content;
+    @JsonProperty
     private String senderUsername;
-    private LocalDateTime sentAt;
-    private Integer projectId;
+    @JsonProperty(required = false)
+    private LocalDateTime sentAt = LocalDateTime.now();
+    @JsonProperty
+    private String projectName;
+    @JsonProperty(required = false)
     private String avatarUrl;
 }

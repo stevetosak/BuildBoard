@@ -83,7 +83,7 @@ CREATE TABLE thread
 );
 create table user_interested_thread
 (
-    user_id   int references users (id) on delete cascade ,
+    user_id int references users (id) on delete cascade,
     thread_id int references thread (id) on delete cascade,
     PRIMARY KEY (user_id,
                  thread_id)

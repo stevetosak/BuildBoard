@@ -24,20 +24,20 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/projects");
-        config.setApplicationDestinationPrefixes("/projects");
+        config.enableSimpleBroker("/topic","/queue");
+        config.setApplicationDestinationPrefixes("/app");
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/channel-websocket");
+        registry.addEndpoint("/channel-websocket").setAllowedOrigins("http://localhost:5173").withSockJS();
     }
 
     @Override
     public boolean configureMessageConverters(List<MessageConverter> messageConverters) {
         MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
-        converter.setObjectMapper(objectMapper); // Use the configured ObjectMapper
+        converter.setObjectMapper(objectMapper);
         messageConverters.add(converter);
-        return false; // Disable default converters
+        return false;
     }
 }

@@ -11,6 +11,7 @@ const endpoints = {
 		 "/threads" + `?page=${page}`,
     auth: () => '/login',
     register: () => "/register",
+	web_socket: () => "/channel-websocket"
 };
 const endpointsKeys = Object.keys(endpoints)
 
