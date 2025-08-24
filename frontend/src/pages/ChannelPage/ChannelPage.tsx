@@ -2,7 +2,7 @@ import {MessagesContainer} from "@components/custom/MessagesContainer.tsx"
 import {Card, CardContent, CardFooter, CardHeader} from "@components/ui/card.tsx"
 import "../../fonts.css"
 import * as React from "react";
-import {useContext, useEffect, useRef, useState} from "react";
+import {useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
 import {MessageInputBox} from "@components/custom/MessageInputBox.tsx";
 import {useWebSocketService} from "@lib/ws/web-socket-impl.ts";
 import {useLoaderData, useParams} from "react-router-dom";
@@ -11,6 +11,7 @@ import type {ChannelMessageDisplay, ChannelMessageDto, ChannelMessageEvent} from
 import type {UserAuth} from "@shared/security-utils.ts";
 import {MessageContext} from "@pages/ChannelPage/data/MessageContext.ts";
 import {useMessageService} from "@pages/ChannelPage/data/useMessageService.ts";
+import lodash from "lodash"
 
 const webSocketUrl = "http://localhost:8080/channel-websocket"
 
@@ -19,7 +20,7 @@ export const ChannelPage = () => {
     const messageData = useLoaderData<ChannelMessageDisplay[]>()
     const {username}: UserAuth = useContext(SecurityContext)
 
-    const {messages, messageEventHandler,currentlyTyping} = useMessageService(messageData)
+    const {messages, messageEventHandler, currentlyTyping} = useMessageService(messageData)
 
     const topicPath = `/topic/${projectName}/${channelName}`
     const {connect, subscribe, send, unsubscribe, disconnect} = useWebSocketService(
@@ -41,16 +42,23 @@ export const ChannelPage = () => {
         };
     }, [])
 
-    const handleTyping = () => {
-        const dto : ChannelMessageDto = {
-            senderUsername: username,
-            sentAt: "",
-            channelName:channelName!,
-            projectName:projectName!,
-            content: ""
-        }
-        send("/app/chat/type",dto)
-    }
+
+
+    const handleTyping = useMemo(
+        () =>
+            lodash.debounce(() => {
+                const dto: ChannelMessageDto = {
+                    senderUsername: username,
+                    sentAt: "",
+                    channelName: channelName!,
+                    projectName: projectName!,
+                    content: ""
+                };
+                send("/app/chat/type", dto);
+            }, 150),
+        []
+    );
+
 
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -98,7 +106,8 @@ export const ChannelPage = () => {
                     </CardContent>
                 </div>
                 <div className={"text-end"}>
-                    {currentlyTyping !== "" && currentlyTyping !== username && <div>{currentlyTyping} is typing...</div>}
+                    {currentlyTyping !== "" && currentlyTyping !== username &&
+                        <div>{currentlyTyping} is typing...</div>}
                 </div>
                 <CardFooter className="p-4 border-t border-gray-800 bg-background-main">
                     <div className="flex w-full items-center space-x-2">
