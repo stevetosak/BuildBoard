@@ -6,7 +6,7 @@ import {
 	SidebarProvider,
 	SidebarTrigger,
 } from "@components/ui/sidebar";
-import { DataContext } from "../placeholders/use-data";
+import { DataContext } from "../../placeholders/use-data";
 
 type WrapperProps<T> = {
 	children: ReactNode;

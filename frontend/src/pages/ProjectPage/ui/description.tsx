@@ -48,7 +48,6 @@ And another one with some description:
 //TODO: add description and logo into projects 
 const Description = () => {
 	// const project = useOutletContext<Project>();
-
 	return (
 		<section
 			className="grid px-[10%]"

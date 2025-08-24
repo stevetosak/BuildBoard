@@ -1,5 +1,5 @@
 import { Children, type ReactNode } from "react"
-import DataContextProvider from "../placeholders/data-context-provider"
+import DataContextProvider from "../../placeholders/data-context-provider"
 
 export type RightSidebarProps<T> = { 
     children : ReactNode,

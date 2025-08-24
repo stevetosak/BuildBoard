@@ -17,8 +17,8 @@ import RightPopUp from "@pages/shared/RightPopup";
 import useGetUserProfile from "@pages/shared/use-get-user-profile";
 import LoginLogoutButtons from "@pages/shared/login-logout-buttons";
 import UserShortRow from "@pages/shared/user-short-row";
-import LeftSidebar from "@pages/shared/left-sidebar";
-import RightSidebar from "@pages/shared/right-sidebar";
+import LeftSidebarBuilder from "@pages/shared/left-sidebar/left-sidebar-helpers";
+import RightSidebarBuilder from "@pages/shared/right-sidebar/right-sidebar-helpers";
 import { fetchThreads } from "./data/fetchThreads";
 
 export type SingleColorCtx = {
@@ -42,13 +42,13 @@ const HomePage = () => {
 
 	return (
 		<main className="layout overflow-x-hidden">
-			<LeftSidebar.Wrapper
+			<LeftSidebarBuilder.Wrapper
 				data={userProfile}
 			>
-				<LeftSidebar.HeaderInsideData componentIfDataNullable={<LogoLeftSidebar />}>
+				<LeftSidebarBuilder.HeaderInsideData componentIfDataNullable={<LogoLeftSidebar />}>
 					<LogoLeftSidebar />
-				</LeftSidebar.HeaderInsideData>
-				<LeftSidebar.BodyOutsideData>
+				</LeftSidebarBuilder.HeaderInsideData>
+				<LeftSidebarBuilder.BodyOutsideData>
 					{(user: UserProfile) => (
 						<>
 							{(Object.keys(user.interested) as InterestedHeaders[]).map(
@@ -90,14 +90,14 @@ const HomePage = () => {
 							)}
 						</>
 					)}
-				</LeftSidebar.BodyOutsideData>
-			</LeftSidebar.Wrapper>
+				</LeftSidebarBuilder.BodyOutsideData>
+			</LeftSidebarBuilder.Wrapper>
 			<ThreadsComponent fetchTopics={fetchThreads}/>
-			<RightSidebar.Wrapper data={userProfile}>
-				<RightSidebar.Header componentIfDataNullable={<LoginLogoutButtons />}>
+			<RightSidebarBuilder.Wrapper data={userProfile}>
+				<RightSidebarBuilder.Header componentIfDataNullable={<LoginLogoutButtons />}>
 					{(user: UserProfile) => <UserInfo username={user.username} />}
-				</RightSidebar.Header>
-				<RightSidebar.Body>
+				</RightSidebarBuilder.Header>
+				<RightSidebarBuilder.BodyOutsideData>
 					{(user: UserProfile) => (
 						<RightPopUp title="Friends">
 							{user.friends.map((friend) => (
@@ -109,8 +109,8 @@ const HomePage = () => {
 							))}
 						</RightPopUp>
 					)}
-				</RightSidebar.Body>
-			</RightSidebar.Wrapper>
+				</RightSidebarBuilder.BodyOutsideData>
+			</RightSidebarBuilder.Wrapper>
 		</main>
 	);
 };

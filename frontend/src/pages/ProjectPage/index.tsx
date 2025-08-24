@@ -1,21 +1,13 @@
-import LoginLogoutButtons from "@pages/shared/login-logout-buttons";
-import RightSidebar from "@pages/shared/right-sidebar";
 import useGetUserProfile from "@pages/shared/use-get-user-profile";
-import UserInfo from "@pages/shared/UserInfo";
-import type { Project, UserProfile } from "@shared/api-utils";
 import { useQuery } from "@tanstack/react-query";
 import { Link, Outlet, useParams } from "react-router-dom";
 import fetchProject from "./data/fetchProject";
-import UserShortRow from "@pages/shared/user-short-row";
-import RightPopUp from "@pages/shared/RightPopup";
-import LeftSidebar from "@pages/shared/left-sidebar";
-import LogoLeftSidebar from "@pages/shared/LogoLeftSidebar";
-import {
-	SidebarMenu,
-	SidebarMenuButton,
-	SidebarMenuItem,
-} from "@components/ui/sidebar";
+import { SidebarMenuButton, SidebarMenuItem } from "@components/ui/sidebar";
 import { uppercaseFirstLetter } from "@shared/string-utils";
+import LeftSidebar from "@pages/shared/left-sidebar/sidebar-without-data";
+import RightSidebar from "@pages/shared/right-sidebar/sidebar-with-data";
+import type { Project } from "@shared/api-utils";
+import UserShortRow from "@pages/shared/user-short-row";
 
 type ProjectPathRouteParams = {
 	projectName: string;
@@ -36,53 +28,45 @@ const ProjectPage = () => {
 			className="layout p-0 min-h-[min-content]"
 			style={{ padding: 0 }}
 		>
-			<LeftSidebar.Wrapper data={"placeholder"}>
-				<LeftSidebar.HeaderInsideData>
-					<LogoLeftSidebar />
-				</LeftSidebar.HeaderInsideData>
-				<LeftSidebar.BodyInsideData>
-					<SidebarMenu className="gap-5">
-						{links.map((linkName) => (
-							<SidebarMenuItem key={linkName}>
-								<SidebarMenuButton asChild>
-									<Link
-										className="text-[2rem]"
-										to={`/projects/${linkName}/${projectName}`}
-									>
-										{uppercaseFirstLetter(linkName)}
-									</Link>
-								</SidebarMenuButton>
-							</SidebarMenuItem>
-						))}
-					</SidebarMenu>
-				</LeftSidebar.BodyInsideData>
-			</LeftSidebar.Wrapper>
+			<LeftSidebar>
+				{links.map((linkName) => (
+					<SidebarMenuItem key={linkName}>
+						<SidebarMenuButton asChild>
+							<Link
+								className="text-[2rem]"
+								to={`/projects/${linkName}/${projectName}`}
+							>
+								{uppercaseFirstLetter(linkName)}
+							</Link>
+						</SidebarMenuButton>
+					</SidebarMenuItem>
+				))}
+			</LeftSidebar>
 			<Outlet context={project} />
-			<RightSidebar.Wrapper data={userProfile}>
-				<RightSidebar.Header componentIfDataNullable={<LoginLogoutButtons />}>
-					{(user: UserProfile) => <UserInfo username={user.username} />}
-				</RightSidebar.Header>
-				<RightSidebar.ContextOverrider value={project}>
-					<RightSidebar.Body>
-						{(project: Project) => (
-							<RightPopUp title="Members">
-								{project.members.map((member) => (
-									<div>
-										<UserShortRow
-											key={member.username}
-											username={member.username}
-											logo={member.logo}
-										/>
-										<div className="w-full overflow-x-scroll">
-										{member.roles.map(role => <p className="p-1 rounded-xl bg-accent text-[0.7rem]">{role}</p>)}
-										</div>
-									</div>
+			<RightSidebar
+				userProfile={userProfile}
+				data={project}
+				title="Members"
+			>
+				{(project: Project) =>
+					project.members.map((member) => (
+						<div>
+							<UserShortRow
+								key={member.username}
+								username={member.username}
+								logo={member.logo}
+							/>
+							<div className="w-full overflow-x-scroll">
+								{member.roles.map((role) => (
+									<p className="p-1 rounded-xl bg-accent text-[0.7rem]">
+										{role}
+									</p>
 								))}
-							</RightPopUp>
-						)}
-					</RightSidebar.Body>
-				</RightSidebar.ContextOverrider>
-			</RightSidebar.Wrapper>
+							</div>
+						</div>
+					))
+				}
+			</RightSidebar>
 		</main>
 	);
 };

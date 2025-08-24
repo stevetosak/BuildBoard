@@ -54,6 +54,7 @@ export type NamedThread = {
 export type FetchNamedTopics = (pageNumber:number, queryKey:SearchOptions) => Promise<Page<NamedThread[]>>
 
 
+//Sekogash userot sho go pret requestot e prv vo listata 
 type ShortUserProfileWithRoles = ShortUserProfile & {roles: string[], permissions:string[]}
 
 export const getNextPage = <T,>(lastPage:Page<T>) => 
@@ -65,7 +66,8 @@ export type Project = {
 	name:string 
 	members : ShortUserProfileWithRoles[]
 	logo: string,
-	description: string  
+	description: string,
+	repoURL:string   
 }
 
 export const debounceGenerator = <T,>(f:(...args:T[]) => unknown, delay:number) => {
