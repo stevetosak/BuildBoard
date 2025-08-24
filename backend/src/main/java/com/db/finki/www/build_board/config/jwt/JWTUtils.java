@@ -1,6 +1,5 @@
 package com.db.finki.www.build_board.config.jwt;
 
-import com.db.finki.www.build_board.dto.BBUserMinClaimSet;
 import com.db.finki.www.build_board.entity.user_type.BBUser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

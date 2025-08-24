@@ -1,10 +1,8 @@
-package com.db.finki.www.build_board.rest;
+package com.db.finki.www.build_board.config.jwt;
 
-import com.db.finki.www.build_board.config.jwt.JWTUtils;
 import com.db.finki.www.build_board.config.jwt.dtos.BBUserRegisterDTO;
 import com.db.finki.www.build_board.config.jwt.dtos.TokenDTO;
 import com.db.finki.www.build_board.config.jwt.dtos.UserLoginDTO;
-import com.db.finki.www.build_board.dto.BBUserMinClaimSet;
 import com.db.finki.www.build_board.entity.user_type.BBUser;
 import com.db.finki.www.build_board.service.user.BBUserDetailsService;
 import com.fasterxml.jackson.core.JsonProcessingException;

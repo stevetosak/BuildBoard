@@ -1,4 +1,4 @@
-package com.db.finki.www.build_board.dto;
+package com.db.finki.www.build_board.bb_users;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

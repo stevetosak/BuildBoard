@@ -59,8 +59,8 @@ public class WebSecurityConfig {
                                                 "*.ico",
                                                 "*.jpg",
                                                 "*.png",
-                                                "/register",
-                                                "/login",
+                                                "/api/register",
+                                                "/api/login",
                                                 "/css/**",
                                                 "/js/**"
                                                         )

@@ -188,7 +188,7 @@ CREATE TABLE users_project_roles
 );
 CREATE TABLE project_roles_permissions
 (
-    permission_name VARCHAR(32) REFERENCES permissions (name),
+    permission_name VARCHAR(32) REFERENCES permissions (name) on delete cascade ,
     role_name       VARCHAR(32),
     project_id      INT,
     FOREIGN KEY (role_name, project_id)
@@ -549,3 +549,6 @@ execute function fn_aa_rm_orphan_dics();
 -- on discussion_thread
 -- for each row
 -- execute function fn_remove_thread();
+
+-- PREDEFINED VALUES
+insert into permissions values ('TOPIC_MANAGER'),('CHANNEL_MANAGER'),('MEMBERS_MANAGER')

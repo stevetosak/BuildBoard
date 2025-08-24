@@ -22,14 +22,17 @@ public class Message {
     @Id
     @Column(name = "channel_name")
     private String name;
+
     @Id
     @ManyToOne
     @JoinColumn(name = "project_id",referencedColumnName = "id",nullable = false)
     private Project project;
+
     @Id
     @ManyToOne
     @JoinColumn(name = "sent_by",referencedColumnName = "id",nullable = false)
     private Developer sentBy;
+
     @Id
     @Column(name = "sent_at")
     private LocalDateTime sentAt;

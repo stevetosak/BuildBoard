@@ -4,6 +4,9 @@ import com.db.finki.www.build_board.entity.request.ProjectRequests;
 import com.db.finki.www.build_board.entity.channel.Channel;
 import com.db.finki.www.build_board.entity.user_type.BBUser;
 import com.db.finki.www.build_board.entity.thread.itf.NamedThread;
+import com.db.finki.www.build_board.entity.user_type.Developer;
+import com.db.finki.www.build_board.project.ProjectDTO;
+import com.db.finki.www.build_board.project.associated_entities.custom_role.CustomRole;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -34,7 +37,7 @@ public class Project extends BBThread implements NamedThread {
             joinColumns = @JoinColumn(name = "project_id"),
             inverseJoinColumns = @JoinColumn(name = "developer_id")
     )
-    private Set<BBUser> developers = new HashSet<>(); // NE GO KORISTI GETTEROT OVDE
+    private Set<Developer> developers = new HashSet<>(); // NE GO KORISTI GETTEROT OVDE
 
     @OneToMany(mappedBy = "project")
     private Set<ProjectRequests> requests = new HashSet<>();
@@ -42,6 +45,10 @@ public class Project extends BBThread implements NamedThread {
     @OneToMany(mappedBy = "project")
     @OrderBy("name")
     private Set<Channel> channels;
+
+    @OneToMany
+    @JoinColumn(name = "project_id")
+    private List<CustomRole> customRoles;
 
     public Project(String title, String repoUrl, String description, BBUser user) {
         setTitle(title);
@@ -58,4 +65,7 @@ public class Project extends BBThread implements NamedThread {
     public String getDescription() {return content;}
     public void setDescription(String description) {this.content = description;}
 
+    public String getLogoURL(){
+        return "";
+    }
 }

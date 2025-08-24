@@ -6,7 +6,6 @@ VALUES
     ('user4', true, '$2a$12$dF5SXcNhMulgU3Qre3nh1e.aatRiJZsnfoBSqReGnXe9rIbHYVWhe', 'Fourth user', NOW(), 'F','andrej', 'andrej@gmail.com'),
     ('user5', true, '$2a$12$zHrloz8WG2zo5S6MTf1C0ez1raMlmDJdB8OOa2I1S2pVy9oI76YTa', 'Fifth user', NOW(), 'M','ramche', 'ramche@gmail.com');
 
-
 INSERT INTO users (username, is_activate, password, description, registered_at, sex, name, email)
 VALUES
     -- Password: user6pass
@@ -28,8 +27,6 @@ VALUES
     (8), -- user8
     (9), -- user9
     (10); -- user10
-
-
 
 -- Original threads with parent_id moved here
 INSERT INTO thread (content, user_id, level, parent_id)
@@ -197,9 +194,6 @@ SELECT id FROM thread
 WHERE parent_id IS NOT NULL AND id NOT IN (SELECT id FROM discussion_thread);
 
 
-
-
-
 INSERT INTO likes (user_id, thread_id)
 VALUES
     (1, 3),
@@ -220,26 +214,24 @@ VALUES
     (1, 2, 1, NOW(), NOW() + INTERVAL '7 days', 'Spamming'),
     (2, 3, 2, NOW(), NOW() + INTERVAL '3 days', 'Offensive language');
 
-INSERT INTO permissions (name)
-VALUES
-    ('Create Thread'),
-    ('Delete Thread');
 
 INSERT INTO project_roles (name, project_id, description)
 VALUES
-    ('Admin', 5, 'Admin role for the project'),
-    ('Developer', 5, 'Developer role for the project');
+    ('Manager', 5, 'Admin role for the project'),
+    ('RequestManager', 5, 'Developer role for the project');
 
 
 INSERT INTO users_project_roles (user_id, project_id, role_name)
 VALUES
-    (3, 5, 'Admin'),
-    (5, 5, 'Developer');
+    (3, 5, 'Manager'),
+    (3, 5, 'RequestManager');
 
 INSERT INTO project_roles_permissions (permission_name, role_name, project_id)
 VALUES
-    ('Create Thread', 'Admin', 5),
-    ('Delete Thread', 'Admin', 5);
+    ('TOPIC_MANAGER', 'Manager', 5),
+    ('CHANNEL_MANAGER', 'Manager', 5),
+    ('MEMBERS_MANAGER', 'RequestManager', 5);
+
 
 insert into submission(created_by,status,description)
 values

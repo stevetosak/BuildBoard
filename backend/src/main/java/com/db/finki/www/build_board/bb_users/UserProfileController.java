@@ -1,6 +1,5 @@
-package com.db.finki.www.build_board.rest;
+package com.db.finki.www.build_board.bb_users;
 
-import com.db.finki.www.build_board.dto.BBUserProfile;
 import com.db.finki.www.build_board.entity.thread.Project;
 import com.db.finki.www.build_board.entity.thread.Topic;
 import com.db.finki.www.build_board.entity.user_type.BBUser;
