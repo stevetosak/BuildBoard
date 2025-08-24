@@ -3,7 +3,6 @@ package com.db.finki.www.build_board.entity.thread;
 import com.db.finki.www.build_board.entity.request.ProjectRequests;
 import com.db.finki.www.build_board.entity.channel.Channel;
 import com.db.finki.www.build_board.bb_users.BBUser;
-import com.db.finki.www.build_board.entity.thread.itf.NamedThread;
 import com.db.finki.www.build_board.bb_users.types.Developer;
 import com.db.finki.www.build_board.project.associated_entities.custom_role.CustomRole;
 import jakarta.persistence.*;
@@ -20,7 +19,7 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = false)
 @Entity
 @Table(name = "project_thread")
-public class Project extends BBThread implements NamedThread {
+public class Project extends BBThread {
 
     private String title;
 
@@ -54,11 +53,6 @@ public class Project extends BBThread implements NamedThread {
         setRepoUrl(repoUrl);
         setDescription(description);
         setUser(user);
-    }
-
-    @Override
-    public String getTypeName() {
-        return "projects";
     }
 
     public String getDescription() {return content;}

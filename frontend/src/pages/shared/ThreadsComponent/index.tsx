@@ -8,18 +8,18 @@ import {
 	CardHeader,
 } from "@/components/ui/card";
 import SearchBar from "./SearchBar";
-import ConditionalDisplay from "../../HomePage/ui/ConditionalDsipaly.tsx";
 import { useNavigate } from "react-router-dom";
 import { getUrlForThread } from "@shared/url-generation";
 import { useRef, type RefObject } from "react";
 import { debounceGenerator, type FetchNamedTopics, type NamedThread } from "@shared/api-utils";
+import DisplayIfLoaded from "@pages/shared/display-if-loaded.tsx";
 
 
 export type SearchOptions = { 
-	query: string;
 	tags: string[];
 	threadType: string;
-	filters:"title"|"content"|"all"
+	title:string,
+	content:string
 }
 
 export type ThreadsComponentProps = { 
@@ -69,7 +69,7 @@ const createKeyForNamedThread = (namedThread: NamedThread) => namedThread.conten
 
 //TODO: napraj nekoj datata da mu ja davat 
 const ThreadsComponent = ({fetchTopics}: ThreadsComponentProps) => {
-	const [searchOptions, setSearchOptions] = useState<SearchOptions>({query:"", tags: [], threadType: "", filters:'all'});
+	const [searchOptions, setSearchOptions] = useState<SearchOptions>({tags: [], threadType: "", title:"",content:""});
 	const {
 		data: namedThreads,
 		hasNextPage,
@@ -97,9 +97,9 @@ const ThreadsComponent = ({fetchTopics}: ThreadsComponentProps) => {
 		>
 			<SearchBar triggerFetch={setSearchOptions} className=""/>
 			<div className="flex flex-col gap-5 p-5 row-start-2 items-center">
-				<ConditionalDisplay
+				<DisplayIfLoaded
 					data={namedThreads}
-					dataLoadingComponent={<LoadingBlocks />}
+					componentIfNotLoaded={<LoadingBlocks />}
 				>
 					{(namedThreads) =>
 						namedThreads.pages.map((page, i) => {
@@ -172,7 +172,7 @@ const ThreadsComponent = ({fetchTopics}: ThreadsComponentProps) => {
 							);
 						})
 					}
-				</ConditionalDisplay>
+				</DisplayIfLoaded>
 			</div>
 		</section>
 	);

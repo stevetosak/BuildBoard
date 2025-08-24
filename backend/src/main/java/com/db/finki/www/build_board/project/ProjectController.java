@@ -1,7 +1,7 @@
 package com.db.finki.www.build_board.project;
 
 import com.db.finki.www.build_board.entity.thread.Project;
-import com.db.finki.www.build_board.entity.thread.itf.NamedThread;
+import com.db.finki.www.build_board.namedThread.NamedThread;
 import com.db.finki.www.build_board.project.associated_entities.custom_role.CustomRole;
 import com.db.finki.www.build_board.project.associated_entities.permissions.Permissions;
 import org.apache.coyote.BadRequestException;

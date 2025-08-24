@@ -1,20 +1,19 @@
-import type { ApiError } from "@shared/api-utils.ts";
 import type { UseQueryResult } from "@tanstack/react-query";
 import type { ComponentType , ReactNode } from "react";
 
-type DisplayIfUserExistsProps<T> = {
+type DisplayIfUserExistsProps<T,V> = {
 	dataLoadingComponent?: ReactNode ;
-	ErrorComponent?:ComponentType<{error:ApiError}>,
-	query: UseQueryResult<T,ApiError>,
+	ErrorComponent?:ComponentType<{error:V}>,
+	query: UseQueryResult<T,V>,
 	children: (data: T) => ReactNode;
 };
 
-const ConditionalDisplay = <T,>({
+const ConditionalDisplay = <T,V>({
 	children,
 	dataLoadingComponent,
 	ErrorComponent,
 	query
-}: DisplayIfUserExistsProps<T>) => {
+}: DisplayIfUserExistsProps<T,V>) => {
 	const {
 		error,
 		isError,

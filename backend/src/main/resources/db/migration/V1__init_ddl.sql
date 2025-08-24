@@ -264,6 +264,43 @@ SELECT users.id, username, is_activate, password, description, registered_at, se
 FROM moderator
          JOIN users ON moderator.id = users.id;
 
+create or replace view v_named_threads as
+with topics_projects as (select id, title, 'project' as "type"
+                         from project_thread pr
+                         union
+                         select id, title, 'topic' as "type"
+                         from topic_thread)
+   , topics_projects_threads as (
+    select t.id         as "id",
+           t.content    as "content",
+           t.type as "type",
+           tp.title     as "title",
+           u.username   as "username",
+           u.id as "user_id",
+           t.created_at as "created_at",
+           t.parent_id as "parent"
+    from thread t
+             join users u
+                  on u.id = t.user_id
+             join topics_projects tp
+                  on tp.id = t.id)
+select tpt.id                  as "id",
+       tpt.content             as "content",
+       tpt.title               as "title",
+       tpt.type as "type",
+       tpt.username            as "username",
+       tpt.user_id as "user_id",
+       tpt.created_at          as "created_at",
+       tpt.parent as "parent",
+       tag_agg.tags as "tags"
+from topics_projects_threads tpt
+         join LATERAL (select tt.thread_id           as "id",
+                              array_agg(tt.tag_name) as "tags"
+                       from tag_threads tt
+                       where tt.thread_id = tpt.id
+                       group by tt.thread_id) as tag_agg
+              on tag_agg.id = tpt.id;
+
 -------------------------- FUNCTIONS ----------------------
 CREATE OR REPLACE FUNCTION fn_validate_topic_title()
     RETURNS TRIGGER
