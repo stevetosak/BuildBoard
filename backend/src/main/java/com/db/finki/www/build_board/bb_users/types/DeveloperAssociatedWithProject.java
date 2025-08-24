@@ -1,5 +1,6 @@
-package com.db.finki.www.build_board.entity.user_type;
+package com.db.finki.www.build_board.bb_users.types;
 
+import com.db.finki.www.build_board.bb_users.BBUser;
 import com.db.finki.www.build_board.entity.compositeId.DeveloperAssociatedWithProjectId;
 import com.db.finki.www.build_board.entity.thread.Project;
 import jakarta.persistence.*;

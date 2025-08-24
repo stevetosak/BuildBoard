@@ -1,4 +1,4 @@
-package com.db.finki.www.build_board.entity.user_type;
+package com.db.finki.www.build_board.bb_users;
 
 import com.db.finki.www.build_board.entity.thread.BBThread;
 import com.db.finki.www.build_board.entity.thread.Project;

@@ -1,4 +1,4 @@
-package com.db.finki.www.build_board.entity.user_type;
+package com.db.finki.www.build_board.bb_users.types;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;

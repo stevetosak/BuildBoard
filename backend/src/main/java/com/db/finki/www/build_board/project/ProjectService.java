@@ -4,12 +4,12 @@ import java.util.List;
 
 import com.db.finki.www.build_board.entity.thread.Tag;
 import com.db.finki.www.build_board.entity.thread.Topic;
-import com.db.finki.www.build_board.entity.user_type.BBUser;
+import com.db.finki.www.build_board.bb_users.BBUser;
 import com.db.finki.www.build_board.entity.thread.Project;
-import com.db.finki.www.build_board.repository.UserRepository;
+import com.db.finki.www.build_board.bb_users.types.repos.UserRepository;
 import com.db.finki.www.build_board.service.thread.impl.TagServiceImpl;
 import com.db.finki.www.build_board.service.thread.impl.TopicServiceImpl;
-import com.db.finki.www.build_board.service.user.BBUserDetailsService;
+import com.db.finki.www.build_board.bb_users.BBUserDetailsService;
 import com.db.finki.www.build_board.service.thread.itf.TagService;
 import com.db.finki.www.build_board.service.thread.itf.TopicService;
 import jakarta.transaction.Transactional;

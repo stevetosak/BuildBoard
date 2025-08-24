@@ -31,18 +31,11 @@ export const router = createBrowserRouter(
             />
             <Route loader={topicLoader}
                 path={"topics/:topicName"} element={<TopicPage/>}></Route>
-            <Route path={"projects"} element={<ProjectPage/>}>
-                <Route path={":projectName"}>
+            <Route path={"projects/:projectName"} element={<ProjectPage/>}>
                     <Route path="topics" element={<ProjectTopic/>}/>
                     <Route path="description" element={<ProjectDescription/>}/>
-                    {/* <Route path="channels" element={<ProjectChannels/>}/> */}
                     <Route path={"channels/:channelName"} element={<ChannelPage/>}></Route>
                     <Route path="manamgnet/:projectName" element={<ProjectManagment />}/>
-                </Route>
-
-                {/* TODO: ova ke ojt vo secure route /}
-                                {/ <Route path={"channels/:channelName"} element={<ChannelPage/>}></Route> /}
-                {/ <Route  path={"requests"}></Route> */}
             </Route>
             <Route path={":username/profile"}></Route>
             <Route path={"login"} element={<LoginPage/>} action={validateUser} />

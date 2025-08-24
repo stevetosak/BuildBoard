@@ -1,54 +1,16 @@
 import iconUrl from "@assets/Icon.jpg";
 import { Button } from "@components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useOutletContext } from "react-router-dom";
 import Markdown from "react-markdown";
+import type { Project } from "@shared/api-utils.ts";
+import DisplayDataIfLoaded from "@pages/HomePage/ui/DisplayDataIfLoaded.tsx";
 
-const markdown = `
-# Sample Markdown Document  
 
-This is a simple example of **Markdown** with text, images, lists, and links.  
-
----
-
-## 📌 Introduction  
-
-Markdown is a lightweight markup language that you can use to format plain text.  
-It’s widely used for documentation, README files, and even blog posts.  
-
----
-
-## ✅ Features  
-
-- Easy to write  
-- Easy to read  
-- Supports **bold**, *italic*, and inline code  
-- Can display links, lists, tables, and images  
-
----
-
-## 🔗 Links  
-
-Here’s a link to [Markdown Guide](https://www.markdownguide.org) if you want to learn more.  
-
----
-
-## 🖼 Images  
-
-Here’s an example of an image:  
-
-![Markdown Logo](https://upload.wikimedia.org/wikipedia/commons/4/48/Markdown-mark.svg)  
-
-And another one with some description:  
-
-![GitHub Octocat](https://github.githubassets.com/images/modules/logos_page/Octocat.png)  
-
-`;
-
-//TODO: vidi dali mozish aspect ratio da zadrzish na slikata
-//TODO: add description and logo into projects 
 const Description = () => {
-	// const project = useOutletContext<Project>();
+	const project = useOutletContext<Project|undefined>();
 	return (
+		<DisplayDataIfLoaded data={project}>
+			{({description}) => (
 		<section
 			className="grid px-[10%]"
 			style={{
@@ -71,11 +33,12 @@ const Description = () => {
 			<div className="h-full overflow-scroll relative">
 				<div className="w-full mt-5 text-lg absolute text-left justify-self-center">
 					<div className="p-[2em] pt-[1em] bg-sidebar-bg rounded-xl w-full h-full  project-desc">
-						<Markdown>{markdown}</Markdown>
+						<Markdown>{description}</Markdown>
 					</div>
 				</div>
 			</div>
-		</section>
+		</section>)}
+		</DisplayDataIfLoaded>
 	);
 };
 

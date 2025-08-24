@@ -34,7 +34,7 @@ const ProjectPage = () => {
 						<SidebarMenuButton asChild>
 							<Link
 								className="text-[2rem]"
-								to={`/projects/${linkName}/${projectName}`}
+								to={`/projects/${projectName}/${linkName}`}
 							>
 								{uppercaseFirstLetter(linkName)}
 							</Link>
@@ -50,15 +50,15 @@ const ProjectPage = () => {
 			>
 				{(project: Project) =>
 					project.members.map((member) => (
-						<div>
+						<div className={'w-full'}>
 							<UserShortRow
 								key={member.username}
 								username={member.username}
 								logo={member.logo}
 							/>
-							<div className="w-full overflow-x-scroll">
+							<div className="w-full overflow-x-scroll flex flex-row gap-2 mt-2">
 								{member.roles.map((role) => (
-									<p className="p-1 rounded-xl bg-accent text-[0.7rem]">
+									<p className="p-[0.5em] rounded-xl bg-accent text-[0.7rem]">
 										{role}
 									</p>
 								))}

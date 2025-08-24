@@ -1,6 +1,6 @@
 package com.db.finki.www.build_board.config.jwt;
 
-import com.db.finki.www.build_board.entity.user_type.BBUser;
+import com.db.finki.www.build_board.bb_users.BBUser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.*;

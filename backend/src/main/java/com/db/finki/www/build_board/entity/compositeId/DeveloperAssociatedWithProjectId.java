@@ -1,7 +1,7 @@
 package com.db.finki.www.build_board.entity.compositeId;
 
 import com.db.finki.www.build_board.entity.thread.Project;
-import com.db.finki.www.build_board.entity.user_type.BBUser;
+import com.db.finki.www.build_board.bb_users.BBUser;
 import lombok.Getter;
 import lombok.Setter;
 

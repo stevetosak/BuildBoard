@@ -11,7 +11,8 @@ const endpoints = {
 		 "/threads" + `?page=${page}`,
     auth: () => '/login',
     register: () => "/register", 
-	projectThread: (projectName:string) => `/projects/${projectName}/topics`
+	projectThread: (projectName:string) => `/projects/${projectName}/threads`,
+	projectDescription: (projectName:string) => `/projects/${projectName}`,
 };
 const endpointsKeys = Object.keys(endpoints)
 

@@ -8,7 +8,7 @@ import java.util.List;
 
 
 @Builder
-public class BBUserProfile {
+public class BBUserProfileDTO {
     public String username;
     public Interested interested;
     public List<BBUserMinProfile> friends;

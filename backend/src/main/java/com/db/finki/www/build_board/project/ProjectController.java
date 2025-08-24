@@ -4,11 +4,13 @@ import com.db.finki.www.build_board.entity.thread.Project;
 import com.db.finki.www.build_board.entity.thread.itf.NamedThread;
 import com.db.finki.www.build_board.project.associated_entities.custom_role.CustomRole;
 import com.db.finki.www.build_board.project.associated_entities.permissions.Permissions;
+import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,9 +38,13 @@ public class ProjectController {
     }
 
     @GetMapping("{projectTitle}")
-    public ProjectDTO getProject(@PathVariable String projectTitle) throws UnsupportedEncodingException {
-        projectTitle= URLDecoder.decode(projectTitle,"UTF-8");
+    public ProjectDTO getProject(@PathVariable String projectTitle) throws UnsupportedEncodingException, BadRequestException {
+        projectTitle= URLDecoder.decode(projectTitle,
+                StandardCharsets.UTF_8);
         Project project = projectService.getByTitle(projectTitle);
+
+        if(project==null)
+            throw new BadRequestException(String.format("Project with title:%s Found", projectTitle));
 
         return this.projectDTOBuilder
                 .name(project.getTitle())

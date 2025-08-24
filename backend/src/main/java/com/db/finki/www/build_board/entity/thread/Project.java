@@ -2,10 +2,9 @@ package com.db.finki.www.build_board.entity.thread;
 
 import com.db.finki.www.build_board.entity.request.ProjectRequests;
 import com.db.finki.www.build_board.entity.channel.Channel;
-import com.db.finki.www.build_board.entity.user_type.BBUser;
+import com.db.finki.www.build_board.bb_users.BBUser;
 import com.db.finki.www.build_board.entity.thread.itf.NamedThread;
-import com.db.finki.www.build_board.entity.user_type.Developer;
-import com.db.finki.www.build_board.project.ProjectDTO;
+import com.db.finki.www.build_board.bb_users.types.Developer;
 import com.db.finki.www.build_board.project.associated_entities.custom_role.CustomRole;
 import jakarta.persistence.*;
 import lombok.*;

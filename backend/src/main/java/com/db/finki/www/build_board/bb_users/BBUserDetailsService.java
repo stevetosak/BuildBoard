@@ -1,9 +1,6 @@
-package com.db.finki.www.build_board.service.user;
+package com.db.finki.www.build_board.bb_users;
 
-import com.db.finki.www.build_board.entity.user_type.BBUser;
-import com.db.finki.www.build_board.repository.UserRepository;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
+import com.db.finki.www.build_board.bb_users.types.repos.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

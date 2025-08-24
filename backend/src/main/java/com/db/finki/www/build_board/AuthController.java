@@ -1,10 +1,11 @@
-package com.db.finki.www.build_board.config.jwt;
+package com.db.finki.www.build_board;
 
+import com.db.finki.www.build_board.config.jwt.JWTUtils;
 import com.db.finki.www.build_board.config.jwt.dtos.BBUserRegisterDTO;
 import com.db.finki.www.build_board.config.jwt.dtos.TokenDTO;
 import com.db.finki.www.build_board.config.jwt.dtos.UserLoginDTO;
-import com.db.finki.www.build_board.entity.user_type.BBUser;
-import com.db.finki.www.build_board.service.user.BBUserDetailsService;
+import com.db.finki.www.build_board.bb_users.BBUser;
+import com.db.finki.www.build_board.bb_users.BBUserDetailsService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;

@@ -1,18 +1,16 @@
 package com.db.finki.www.build_board.config.jwt;
 
-import com.db.finki.www.build_board.service.user.BBUserDetailsService;
+import com.db.finki.www.build_board.bb_users.BBUserDetailsService;
 import com.nimbusds.jwt.PlainJWT;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.WebAuthenticationDetails;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.text.ParseException;
 
 @Component
 public class JWTAuthenticationFilter extends OncePerRequestFilter {
@@ -44,8 +42,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         if(!jwtUtils.isValid(tokenString)) {
             System.out.println("Invalid jwt: " +  tokenString);
 
-            filterChain.doFilter(request, response);
-            return;
+            throw new BadCredentialsException("Invalid jwt");
         }
 
         PlainJWT jwt = jwtUtils.parseJWT(tokenString);

@@ -1,6 +1,6 @@
 package com.db.finki.www.build_board.entity.thread;
 
-import com.db.finki.www.build_board.entity.user_type.BBUser;
+import com.db.finki.www.build_board.bb_users.BBUser;
 import jakarta.persistence.*;
 import lombok.*;
 

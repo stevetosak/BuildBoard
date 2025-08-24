@@ -2,8 +2,6 @@ package com.db.finki.www.build_board.bb_users;
 
 import com.db.finki.www.build_board.entity.thread.Project;
 import com.db.finki.www.build_board.entity.thread.Topic;
-import com.db.finki.www.build_board.entity.user_type.BBUser;
-import com.db.finki.www.build_board.service.user.BBUserDetailsService;
 import com.db.finki.www.build_board.service.request.ProjectRequestService;
 import com.db.finki.www.build_board.service.util.FileUploadService;
 import org.springframework.http.ResponseEntity;
@@ -20,35 +18,35 @@ public class UserProfileController {
     private final BBUserDetailsService userService;
     private final FileUploadService fileUploadService;
     private final ProjectRequestService projectRequestService;
-    private final BBUserProfile.BBUserProfileBuilder bbUserProfileBuilder;
+    private final BBUserProfileDTO.BBUserProfileDTOBuilder bbUserProfileBuilder;
 
     public UserProfileController(BBUserDetailsService userService, FileUploadService fileUploadService, ProjectRequestService projectRequestService) {
         this.userService = userService;
         this.fileUploadService = fileUploadService;
         this.projectRequestService = projectRequestService;
-        this.bbUserProfileBuilder = BBUserProfile.builder();
+        this.bbUserProfileBuilder = BBUserProfileDTO.builder();
     }
 
     @GetMapping("{username}")
-    public ResponseEntity<BBUserProfile> getUserProfile(@PathVariable("username") String username) {
+    public ResponseEntity<BBUserProfileDTO> getUserProfile(@PathVariable("username") String username) {
         BBUser user = (BBUser) userService.loadUserByUsername(username);
-        List<BBUserProfile.ProjectDto> projectDtos = new ArrayList<>();
-        List<BBUserProfile.TopicDto> topicDtos = new ArrayList<>();
+        List<BBUserProfileDTO.ProjectDto> projectDtos = new ArrayList<>();
+        List<BBUserProfileDTO.TopicDto> topicDtos = new ArrayList<>();
 
         user.getInterested().forEach(interested -> {
             if (interested.getClass().equals(Topic.class)) {
                 Topic topic = (Topic) interested;
-                topicDtos.add(new BBUserProfile.TopicDto(topic.getTitle()));
+                topicDtos.add(new BBUserProfileDTO.TopicDto(topic.getTitle()));
             } else if (interested.getClass().equals(Project.class)) {
                 Project project = (Project) interested;
-                projectDtos.add(new BBUserProfile.ProjectDto(project.getTitle()));
+                projectDtos.add(new BBUserProfileDTO.ProjectDto(project.getTitle()));
             }
         });
 
         return ResponseEntity.ok(
                 bbUserProfileBuilder.username(user.getUsername()).interested(
-                        new BBUserProfile.Interested(topicDtos, projectDtos)
-                                                                            ).friends(user.getFriends().stream().map(f -> new BBUserProfile.BBUserMinProfile(f.getUsername(), f.getAvatarUrl())).toList()).build()
+                        new BBUserProfileDTO.Interested(topicDtos, projectDtos)
+                                                                            ).friends(user.getFriends().stream().map(f -> new BBUserProfileDTO.BBUserMinProfile(f.getUsername(), f.getAvatarUrl())).toList()).build()
                                 );
     }
 }

@@ -1,5 +1,6 @@
-package com.db.finki.www.build_board.entity.user_type;
+package com.db.finki.www.build_board.bb_users.types;
 
+import com.db.finki.www.build_board.bb_users.BBUser;
 import com.db.finki.www.build_board.project.associated_entities.custom_role.CustomRole;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -15,7 +16,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Developer extends BBUser{
+public class Developer extends BBUser {
 
     @ManyToMany
     @JoinTable(

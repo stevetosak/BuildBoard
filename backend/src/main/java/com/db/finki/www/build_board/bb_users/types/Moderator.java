@@ -1,5 +1,6 @@
-package com.db.finki.www.build_board.entity.user_type;
+package com.db.finki.www.build_board.bb_users.types;
 
+import com.db.finki.www.build_board.bb_users.BBUser;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Getter;

@@ -4,7 +4,7 @@ import com.db.finki.www.build_board.entity.entity_enum.FeedbackFor;
 import com.db.finki.www.build_board.entity.entity_enum.Status;
 import com.db.finki.www.build_board.entity.request.ProjectRequests;
 import com.db.finki.www.build_board.entity.thread.Project;
-import com.db.finki.www.build_board.entity.user_type.BBUser;
+import com.db.finki.www.build_board.bb_users.BBUser;
 import com.db.finki.www.build_board.repository.request.ProjectRequestRepo;
 import com.db.finki.www.build_board.project.ProjectService;
 import jakarta.transaction.Transactional;

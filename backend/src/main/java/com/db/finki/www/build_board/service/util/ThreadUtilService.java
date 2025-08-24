@@ -1,8 +1,8 @@
 package com.db.finki.www.build_board.service.util;
 
 import com.db.finki.www.build_board.entity.thread.BBThread;
-import com.db.finki.www.build_board.entity.user_type.BBUser;
-import com.db.finki.www.build_board.repository.UserRepository;
+import com.db.finki.www.build_board.bb_users.BBUser;
+import com.db.finki.www.build_board.bb_users.types.repos.UserRepository;
 import com.db.finki.www.build_board.repository.thread.BBThreadRepository;
 import org.springframework.stereotype.Service;
 
