@@ -1,6 +1,7 @@
 package com.db.finki.www.build_board.project;
 
 import com.db.finki.www.build_board.entity.thread.Project;
+import com.db.finki.www.build_board.entity.thread.itf.NamedThread;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
