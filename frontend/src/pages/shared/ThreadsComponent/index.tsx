@@ -8,7 +8,7 @@ import {
 	CardHeader,
 } from "@/components/ui/card";
 import SearchBar from "./SearchBar";
-import DisplayDataIfLoaded from "../../HomePage/ui/DisplayDataIfLoaded";
+import ConditionalDisplay from "../../HomePage/ui/ConditionalDsipaly.tsx";
 import { useNavigate } from "react-router-dom";
 import { getUrlForThread } from "@shared/url-generation";
 import { useRef, type RefObject } from "react";
@@ -97,9 +97,9 @@ const ThreadsComponent = ({fetchTopics}: ThreadsComponentProps) => {
 		>
 			<SearchBar triggerFetch={setSearchOptions} className=""/>
 			<div className="flex flex-col gap-5 p-5 row-start-2 items-center">
-				<DisplayDataIfLoaded
+				<ConditionalDisplay
 					data={namedThreads}
-					dataUndefinedComponent={<LoadingBlocks />}
+					dataLoadingComponent={<LoadingBlocks />}
 				>
 					{(namedThreads) =>
 						namedThreads.pages.map((page, i) => {
@@ -172,7 +172,7 @@ const ThreadsComponent = ({fetchTopics}: ThreadsComponentProps) => {
 							);
 						})
 					}
-				</DisplayDataIfLoaded>
+				</ConditionalDisplay>
 			</div>
 		</section>
 	);

@@ -6,8 +6,10 @@ import { SidebarMenuButton, SidebarMenuItem } from "@components/ui/sidebar";
 import { uppercaseFirstLetter } from "@shared/string-utils";
 import LeftSidebar from "@pages/shared/left-sidebar/sidebar-without-data";
 import RightSidebar from "@pages/shared/right-sidebar/sidebar-with-data";
-import type { Project } from "@shared/api-utils";
+import type { ApiError, Project } from "@shared/api-utils";
 import UserShortRow from "@pages/shared/user-short-row";
+import DisplayApiError from "@pages/ProjectPage/ui/display-api-error.tsx";
+import ConditionalDisplay from "@pages/HomePage/ui/ConditionalDsipaly.tsx";
 
 type ProjectPathRouteParams = {
 	projectName: string;
@@ -18,7 +20,7 @@ const links = ["topics", "channels", "description", "manamgnet"];
 const ProjectPage = () => {
 	const userProfile = useGetUserProfile();
 	const { projectName } = useParams<ProjectPathRouteParams>();
-	const { data: project } = useQuery({
+	const query= useQuery<Project, ApiError>({
 		queryKey: [projectName],
 		queryFn: ({ queryKey }) => fetchProject(queryKey[0] as string),
 	});
@@ -42,15 +44,20 @@ const ProjectPage = () => {
 					</SidebarMenuItem>
 				))}
 			</LeftSidebar>
-			<Outlet context={project} />
+			<ConditionalDisplay
+				query={query}
+				ErrorComponent={DisplayApiError}
+			>
+				{(project:Project) => <Outlet context={project} />}
+			</ConditionalDisplay>
 			<RightSidebar
 				userProfile={userProfile}
-				data={project}
+				data={query.data}
 				title="Members"
 			>
 				{(project: Project) =>
 					project.members.map((member) => (
-						<div className={'w-full'}>
+						<div className={"w-full"}>
 							<UserShortRow
 								key={member.username}
 								username={member.username}

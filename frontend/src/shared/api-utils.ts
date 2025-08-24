@@ -70,6 +70,12 @@ export type Project = {
 	repoURL:string   
 }
 
+export type ApiError = {
+	title: string ,
+	status:number,
+	detail:string
+}
+
 export const debounceGenerator = <T,>(f:(...args:T[]) => unknown, delay:number) => {
 	let timeoutId: number | undefined;
 	return (...args:T[]) => {

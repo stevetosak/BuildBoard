@@ -8,7 +8,6 @@ import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -38,13 +37,14 @@ public class ProjectController {
     }
 
     @GetMapping("{projectTitle}")
-    public ProjectDTO getProject(@PathVariable String projectTitle) throws UnsupportedEncodingException, BadRequestException {
+    public ProjectDTO getProject(@PathVariable String projectTitle) throws BadRequestException {
         projectTitle= URLDecoder.decode(projectTitle,
                 StandardCharsets.UTF_8);
         Project project = projectService.getByTitle(projectTitle);
 
         if(project==null)
-            throw new BadRequestException(String.format("Project with title:%s Found", projectTitle));
+            throw new BadRequestException(String.format("Project with title:%s not found",
+                    projectTitle));
 
         return this.projectDTOBuilder
                 .name(project.getTitle())

@@ -33,28 +33,6 @@ public class AuthController {
         this.objectMapper = objectMapper;
     }
 
-    @ExceptionHandler({JOSEException.class})
-    public ProblemDetail handleJOSEException(JOSEException e) {
-         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,"Sorry the server cannot verify that JOSE header");
-    }
-
-    @ExceptionHandler({JsonProcessingException.class})
-    public ProblemDetail handleJsonProcessingException(JsonProcessingException e) {
-        return ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR,"The server failed to generate JSON");
-    }
-
-    @ExceptionHandler({BadCredentialsException.class, UsernameNotFoundException.class})
-    public ProblemDetail handleBadCredentialsException(BadCredentialsException e) {
-        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,"The username or password provided isn't correct");
-    }
-
-    @ExceptionHandler({DataIntegrityViolationException.class})
-    public ProblemDetail handleDataIntegrityViolationException(DataIntegrityViolationException e) {
-        if(e.getMessage().contains("duplicate key"))
-            return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,"The username already exists");
-        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,"Data integrity violation");
-    }
-
     @PostMapping("login")
     public ResponseEntity<String> login(
             @RequestBody UserLoginDTO userLoginDTO

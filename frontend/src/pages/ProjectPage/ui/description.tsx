@@ -3,13 +3,13 @@ import { Button } from "@components/ui/button";
 import { Link, useOutletContext } from "react-router-dom";
 import Markdown from "react-markdown";
 import type { Project } from "@shared/api-utils.ts";
-import DisplayDataIfLoaded from "@pages/HomePage/ui/DisplayDataIfLoaded.tsx";
+import ConditionalDisplay from "@pages/HomePage/ui/ConditionalDsipaly.tsx";
 
 
 const Description = () => {
 	const project = useOutletContext<Project|undefined>();
 	return (
-		<DisplayDataIfLoaded data={project}>
+		<ConditionalDisplay data={project}>
 			{({description}) => (
 		<section
 			className="grid px-[10%]"
@@ -38,7 +38,7 @@ const Description = () => {
 				</div>
 			</div>
 		</section>)}
-		</DisplayDataIfLoaded>
+		</ConditionalDisplay>
 	);
 };
 
