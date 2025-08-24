@@ -1,10 +1,4 @@
-import {clsx, type ClassValue} from "clsx";
-import {twMerge} from "tailwind-merge";
-import type {ThreadResponse, ThreadElement} from "@/types.ts";
-
-export function cn(...inputs: ClassValue[]) {
-    return twMerge(clsx(inputs));
-}
+import type {ThreadElement, ThreadResponse} from "@/types.ts";
 
 export type ThreadNode = {
     parent: ThreadNode | null,
@@ -112,5 +106,3 @@ export const getLevelMap = (threads: ThreadElement[]) => {
     })
     return map
 }
-
-

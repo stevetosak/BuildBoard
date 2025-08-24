@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @NoArgsConstructor
@@ -22,10 +23,10 @@ public class MessageDTO {
     private String content;
     @JsonProperty
     private String senderUsername;
-    @JsonProperty(required = false)
-    private LocalDateTime sentAt = LocalDateTime.now();
+    @JsonProperty
+    private Instant sentAt;
     @JsonProperty
     private String projectName;
-    @JsonProperty(required = false)
+    @JsonProperty
     private String avatarUrl;
 }

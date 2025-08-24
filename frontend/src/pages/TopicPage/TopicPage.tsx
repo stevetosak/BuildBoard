@@ -2,11 +2,10 @@ import type { ThreadElement, ThreadResponse} from "@/types.ts";
 import "../../fonts.css"
 import {useLoaderData} from "react-router-dom";
 import {DiscussionThreadView} from "@components/custom/DiscussionThreadView.tsx";
-import {useContext, useState} from "react";
-import { ThreadTree} from "@lib/utils.ts";
+
 import {api, apiPostAuthenticated} from "@lib/utils/api.ts";
-import {getAuthHeader, getToken} from "@shared/security-utils.ts";
-import SecurityContext from "@context/security-context.ts";
+import {useState} from "react";
+import { ThreadTree } from "@lib/thread-tree/thread-tree";
 
 
 

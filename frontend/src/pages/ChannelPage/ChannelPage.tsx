@@ -2,60 +2,33 @@ import {MessagesContainer} from "@components/custom/MessagesContainer.tsx"
 import {Card, CardContent, CardFooter, CardHeader} from "@components/ui/card.tsx"
 import "../../fonts.css"
 import * as React from "react";
-import {useContext, useEffect, useRef, useState} from "react";
+import {useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
 import {MessageInputBox} from "@components/custom/MessageInputBox.tsx";
-import {useWebSocketService} from "@lib/web-socket-impl.ts";
-import {useParams, useSearchParams} from "react-router-dom";
+import {useWebSocketService} from "@lib/ws/web-socket-impl.ts";
+import {useLoaderData, useParams} from "react-router-dom";
 import SecurityContext from "@context/security-context.ts";
-import type {ChannelMessage, SendChannelMessageDto} from "@/types.ts";
+import type {ChannelMessageDisplay, ChannelMessageDto, ChannelMessageEvent} from "@/types.ts";
 import type {UserAuth} from "@shared/security-utils.ts";
-
-const messageData = [
-    {
-        user: "stevetosak",
-        content: "\"Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi ar",
-        date: "2025/07/01",
-        userImage: "../public/vite.svg"
-    },
-    {user: "ivan", content: "message content herer as sa", date: "2025/07/01", userImage: "../public/vite.svg"},
-    {user: "peco", content: "message content herer as sa", date: "2025/07/01", userImage: "../public/vite.svg"},
-    {user: "trajan", content: "message content herer as sa", date: "2025/07/01", userImage: "../public/vite.svg"},
-    {user: "stevetosak", content: "messageasdasddasd ", date: "2025/07/01", userImage: "../public/vite.svg"},
-    {user: "stevetosak", content: "messageasdasddasd ", date: "2025/07/01", userImage: "../public/vite.svg"},
-    {user: "stevetosak", content: "messageasdasddasd ", date: "2025/07/01", userImage: "../public/vite.svg"},
-    {user: "stevetosak", content: "messageasdasddasd ", date: "2025/07/01", userImage: "../public/vite.svg"},
-    {user: "stevetosak", content: "messageasdasddasd ", date: "2025/07/01", userImage: "../public/vite.svg"},
-]
+import {MessageContext} from "@pages/ChannelPage/data/MessageContext.ts";
+import {useMessageService} from "@pages/ChannelPage/data/useMessageService.ts";
+import lodash from "lodash"
 
 const webSocketUrl = "http://localhost:8080/channel-websocket"
 
 export const ChannelPage = () => {
     const {projectName, channelName} = useParams()
-    const {username} : UserAuth = useContext(SecurityContext)
+    const messageData = useLoaderData<ChannelMessageDisplay[]>()
+    const {username}: UserAuth = useContext(SecurityContext)
+
+    const {messages, messageEventHandler, currentlyTyping} = useMessageService(messageData)
+
     const topicPath = `/topic/${projectName}/${channelName}`
-    const [messages, setMessages] = useState<{
-        user: string,
-        content: string,
-        date: string,
-        userImage: string
-    }[]>(messageData)
-
-
     const {connect, subscribe, send, unsubscribe, disconnect} = useWebSocketService(
         webSocketUrl,
         () => {
             console.log('Connected!')
             console.log("Subscribing to topic: " + topicPath)
-            subscribe(topicPath, (message: ChannelMessage) => {
-                console.log("RECIEVED MESSAGE")
-                setMessages((prevMessages) =>
-                    [...prevMessages, {
-                        user: message.senderUsername,
-                        content: message.content,
-                        userImage: message.avatarUrl,
-                        date: message.sentAt
-                    }]);
-            })
+            subscribe(topicPath, messageEventHandler)
         },
         (error) => console.log('WebSocket Error:', error)
     );
@@ -69,6 +42,25 @@ export const ChannelPage = () => {
         };
     }, [])
 
+
+
+    const handleTyping = useMemo(
+        () =>
+            lodash.debounce(() => {
+                const dto: ChannelMessageDto = {
+                    senderUsername: username,
+                    sentAt: "",
+                    channelName: channelName!,
+                    projectName: projectName!,
+                    content: ""
+                };
+                send("/app/chat/type", dto);
+            }, 150),
+        []
+    );
+
+
+
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
         const content = e.currentTarget.value;
         if (e.key === "Enter" && !e.shiftKey && content.trim() !== '') {
@@ -78,22 +70,17 @@ export const ChannelPage = () => {
         }
     }
 
-    const handleSendMessage = (messageContent: string) => {
-
-        const message: SendChannelMessageDto = {
+    const handleSendMessage = (content: string) => {
+        const messageDto: ChannelMessageDto = {
             senderUsername: username,
-            content: messageContent,
-            channelName: channelName!,
+            sentAt: new Date().toISOString(),
+            content: content,
             projectName: projectName!,
+            channelName: channelName!
         }
-        send("/app/chat", message)
-        setMessages(prevMessages => [...prevMessages, {
-            user: username,
-            content: messageContent,
-            date: new Date().toDateString(),
-            userImage: ""
-        }])
+        send("/app/chat/send", messageDto)
     }
+
 
     const cardContainerRef = useRef<HTMLDivElement>(null)
 
@@ -104,30 +91,30 @@ export const ChannelPage = () => {
     }, [messages])
 
     return (
-        <main className={"flex kanit-light border-none"}>
-            <div className={"w-[300px] h-[600px]"}>
-                sidebar here
-            </div>
-            <Card className={"bg-background-main border-none p-2"}>
+        <main className={"flex justify-center items-center kanit-light border-none w-full"}>
+            <Card className={"bg-background-main border-none p-2 max-w-7xl min-w-2xl w-5/7"}>
                 <CardHeader className={"border-b-1 border-gray-800 mx-2 flex items-center"}>
                     <h1 className={"p-2"}>General</h1>
                 </CardHeader>
                 <div ref={cardContainerRef} className={"max-h-[50vh] overflow-y-auto"}>
                     <CardContent>
-                        <MessagesContainer messages={messages}></MessagesContainer>
+                        <MessageContext value={{
+                            dispatchMessage: send
+                        }}>
+                            <MessagesContainer messages={messages}></MessagesContainer>
+                        </MessageContext>
                     </CardContent>
+                </div>
+                <div className={"text-end"}>
+                    {currentlyTyping !== "" && currentlyTyping !== username &&
+                        <div>{currentlyTyping} is typing...</div>}
                 </div>
                 <CardFooter className="p-4 border-t border-gray-800 bg-background-main">
                     <div className="flex w-full items-center space-x-2">
-                        <MessageInputBox handleKeyDown={handleKeyDown}/>
+                        <MessageInputBox handleKeyDown={handleKeyDown} handleTyping={handleTyping}/>
                     </div>
                 </CardFooter>
-
-
             </Card>
-            <div className={"w-[300px] h-[600px]"}>
-                sidebar here
-            </div>
         </main>
     )
 }

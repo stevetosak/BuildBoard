@@ -7,6 +7,7 @@ import com.db.finki.www.build_board.entity.user_type.BBUser;
 import com.db.finki.www.build_board.entity.user_type.Developer;
 import com.db.finki.www.build_board.repository.DeveloperRepository;
 import com.db.finki.www.build_board.repository.channel.ChannelRepository;
+import com.db.finki.www.build_board.service.thread.impl.ProjectService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,14 +18,16 @@ public class ChannelService {
     private final DeveloperRepository developerRepository;
 
     private final String INVALID_INPUT_REGEX = "(^/|/$|[\\#?])";
+    private final ProjectService projectService;
 
     private boolean isInvalidInput(String input) {
         return input.matches(INVALID_INPUT_REGEX);
     }
 
-    public ChannelService(ChannelRepository channelRepository, DeveloperRepository developerRepository) {
+    public ChannelService(ChannelRepository channelRepository, DeveloperRepository developerRepository, ProjectService projectService) {
         this.channelRepository = channelRepository;
         this.developerRepository = developerRepository;
+        this.projectService = projectService;
     }
 
     public List<Channel> getAllChannelsForProject(Project project) {
@@ -44,7 +47,8 @@ public class ChannelService {
         Channel channel = new Channel(channelName,project,description,developer);
         return channelRepository.save(channel);
     }
-    public Channel getByNameAndProject(String channelName, Project project){
+    public Channel getByNameAndProject(String channelName, String projectName){
+        Project project = projectService.getByTitle(projectName);
         return channelRepository.findByProjectTitleAndNameOrderByNameAsc(project.getTitle(), channelName);
     }
     public void deleteChannel(String channelName,Project project){

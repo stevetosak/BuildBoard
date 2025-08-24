@@ -1,13 +1,15 @@
 import {Textarea} from "@/components/ui/textarea.tsx";
 import * as React from "react";
 
-export const MessageInputBox = ({handleKeyDown, className}: {
+export const MessageInputBox = ({handleKeyDown, className, handleTyping}: {
     handleKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void,
-    className?: string
+    className?: string,
+    handleTyping?: () => void
 }) => {
     return (
         <Textarea
             onKeyDown={handleKeyDown}
+            onChange={handleTyping}
             placeholder="Type your message..."
             className={`flex-1 resize-none rounded-xl border border-background-gray bg-background-card
                      text-white px-4 py-2 text-sm shadow-sm placeholder:text-foreground-gray
