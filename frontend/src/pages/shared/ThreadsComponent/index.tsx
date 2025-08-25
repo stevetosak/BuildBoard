@@ -93,7 +93,7 @@ const ThreadsComponent = ({fetchTopics, projectId}: ThreadsComponentProps) => {
 
 	return (
 		<section
-			className="grid grid-rows-[8em_auto] h-screen overflow-scroll"
+			className="grid grid-rows-[8em_auto] h-full overflow-scroll"
 			style={{ scrollbarWidth: "none" }}
 		>
 			<SearchBar triggerFetch={setSearchOptions} className=""/>
