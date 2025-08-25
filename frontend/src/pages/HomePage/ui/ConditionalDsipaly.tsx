@@ -1,7 +1,7 @@
 import type { UseQueryResult } from "@tanstack/react-query";
 import type { ComponentType , ReactNode } from "react";
 
-type DisplayIfUserExistsProps<T,V> = {
+type ConditionalDisplayProps<T,V> = {
 	dataLoadingComponent?: ReactNode ;
 	ErrorComponent?:ComponentType<{error:V}>,
 	query: UseQueryResult<T,V>,
@@ -13,7 +13,7 @@ const ConditionalDisplay = <T,V>({
 	dataLoadingComponent,
 	ErrorComponent,
 	query
-}: DisplayIfUserExistsProps<T,V>) => {
+}: ConditionalDisplayProps<T,V>) => {
 	const {
 		error,
 		isError,

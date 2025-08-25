@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { SearchIcon } from "lucide-react";
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, type Dispatch, type SetStateAction } from "react";
 import type { SearchOptions } from ".";
 import { debounceGenerator } from "@shared/api-utils";
 
@@ -9,13 +9,10 @@ type SearchBarProp = {
 	triggerFetch: React.Dispatch<React.SetStateAction<SearchOptions>>;
 };
 
-const isFiltersInputCorrect = (filters:string| SearchOptions['filters']):filters is SearchOptions['filters'] => { 
-	return filters == 'all' || filters == 'title' || filters == 'content' 
-}
 
 const parseInput = (
 	userInput: string,
-	setOptions: (options: SearchOptions) => void,
+	setOptions: Dispatch<SetStateAction<SearchOptions>>
 ) => {
 	if (userInput.match(/(type:\w+).*?(type:\w+)|type:(?!project|topic)\w+|(filters:\w+).*?(filters:\w+)/))
 		return;
@@ -25,23 +22,20 @@ const parseInput = (
 			if (word.startsWith("type:")) {
 				acc.threadType = word.split(":")[1];
 			} else if (word.startsWith("tag:")) {
-				acc.tags.push(word.split(":")[1]);
+				acc.tag.push(word.split(":")[1]);
 			}
-			else if(word.startsWith("filters:")){
-				const potentialFilter = word.split(":")[1]
-				if(isFiltersInputCorrect(potentialFilter))
-					acc.filters = potentialFilter 
+			else if (word.startsWith("title:")){
+				 acc.title = word.split(":")[1];
+			}else if(word.startsWith("content:")){
+				acc.content = word.split(":")[1];
 			}
-			else {
-				if (acc.query.length == 0) acc.query = word;
-				else acc.query += " " + word;
-			}
+
 			return acc;
 		},
-		{ query: "", tags: [] as string[], threadType: "", filters:'all' } as SearchOptions,
+		{  tag: [] as string[], threadType: "", title:'',content:'' } as SearchOptions,
 	);
 
-	setOptions(searchOptions);
+	setOptions((options:SearchOptions) => ({...searchOptions, projectId : options.projectId}));
 };
 
 const SearchBar = ({ className, triggerFetch }: SearchBarProp) => {

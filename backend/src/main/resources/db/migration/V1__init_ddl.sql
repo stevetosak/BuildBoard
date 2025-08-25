@@ -265,41 +265,44 @@ FROM moderator
          JOIN users ON moderator.id = users.id;
 
 create or replace view v_named_threads as
-with topics_projects as (select id, title, 'project' as "type"
-                         from project_thread pr
-                         union
-                         select id, title, 'topic' as "type"
-                         from topic_thread)
-   , topics_projects_threads as (
-    select t.id         as "id",
-           t.content    as "content",
-           t.type as "type",
-           tp.title     as "title",
-           u.username   as "username",
-           u.id as "user_id",
-           t.created_at as "created_at",
-           t.parent_id as "parent"
-    from thread t
-             join users u
-                  on u.id = t.user_id
-             join topics_projects tp
-                  on tp.id = t.id)
-select tpt.id                  as "id",
-       tpt.content             as "content",
-       tpt.title               as "title",
-       tpt.type as "type",
-       tpt.username            as "username",
-       tpt.user_id as "user_id",
-       tpt.created_at          as "created_at",
-       tpt.parent as "parent",
-       tag_agg.tags as "tags"
-from topics_projects_threads tpt
-         join LATERAL (select tt.thread_id           as "id",
-                              array_agg(tt.tag_name) as "tags"
-                       from tag_threads tt
-                       where tt.thread_id = tpt.id
-                       group by tt.thread_id) as tag_agg
-              on tag_agg.id = tpt.id;
+WITH topics_projects AS (SELECT pr.id,
+                                pr.title,
+                                'project'::text AS "type"
+                         FROM project_thread pr
+                         UNION
+                         SELECT topic_thread.id,
+                                topic_thread.title,
+                                'topic'::text AS "type"
+                         FROM topic_thread),
+     topics_projects_threads AS (SELECT t.id,
+                                        t.content,
+                                        tp.type,
+                                        tp.title,
+                                        u.username,
+                                        u.id        AS user_id,
+                                        t.created_at,
+                                        t.parent_id AS parent
+                                 FROM thread t
+                                          JOIN users u ON u.id = t.user_id
+                                          JOIN topics_projects tp ON tp.id = t.id)
+        ,
+     named_threads_tags as (select tt.thread_id           as "id",
+                                   array_agg(tt.tag_name) as "tags"
+                            from tag_threads tt
+                            where tt.thread_id in (select id from topics_projects_threads)
+                            group by tt.thread_id)
+SELECT tpt.id,
+       tpt.content,
+       tpt.title,
+       tpt.type,
+       tpt.username,
+       tpt.user_id,
+       tpt.created_at,
+       tpt.parent,
+       coalesce((select ntt.tags as "tags"
+                 from named_threads_tags ntt
+                 where ntt.id = tpt.id),'{}') as "tags"
+FROM topics_projects_threads tpt;;
 
 -------------------------- FUNCTIONS ----------------------
 CREATE OR REPLACE FUNCTION fn_validate_topic_title()

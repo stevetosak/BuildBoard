@@ -8,6 +8,7 @@ import java.util.List;
 
 @Builder
 public class ProjectDTO {
+    public Integer id;
     public String name;
     public String logo;
     public String repoURL;

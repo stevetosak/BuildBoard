@@ -63,6 +63,7 @@ export const getNextPage = <T,>(lastPage:Page<T>) =>
 				: undefined 
 
 export type Project = { 
+	id:string, 
 	name:string 
 	members : ShortUserProfileWithRoles[]
 	logo: string,
@@ -91,12 +92,15 @@ export const createPageURL = (page: number, searchOptions:SearchOptions, apiUrl:
     url.searchParams.set("page", page.toString());
     
     for(const option in searchOptions){
-        if(option=='tags') continue
-        url.searchParams.set(option, searchOptions[option as keyof Omit<SearchOptions,'tags'>]);
+        if(option=='tags' || option=='projectId') continue
+        url.searchParams.set(option, searchOptions[option as keyof Omit<SearchOptions,'tag'|"projectId">]);
     }
 
-    searchOptions.tags.forEach((tag) => {
-        url.searchParams.append("tags", tag);
+	if(searchOptions['projectId'])
+		url.searchParams.set("projectId",searchOptions['projectId'])
+
+    searchOptions.tag.forEach((tag) => {
+        url.searchParams.append("tag", tag);
     })
 
     return url;

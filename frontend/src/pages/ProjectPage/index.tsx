@@ -20,7 +20,7 @@ const links = ["topics", "channels", "description", "manamgnet"];
 const ProjectPage = () => {
 	const userProfile = useGetUserProfile();
 	const { projectName } = useParams<ProjectPathRouteParams>();
-	const query= useQuery<Project, ApiError>({
+	const query = useQuery<Project, ApiError>({
 		queryKey: [projectName],
 		queryFn: ({ queryKey }) => fetchProject(queryKey[0] as string),
 	});

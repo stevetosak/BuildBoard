@@ -17,7 +17,7 @@ const Topics = () => {
 					/>
 				</div>
 			</div>
-			<ThreadsComponent fetchTopics={fetchTopicsForProject(project.name)}/>
+			<ThreadsComponent fetchTopics={fetchTopicsForProject(project.name)} projectId={project.id}/>
 		</section>
 	);
 };

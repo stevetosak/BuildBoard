@@ -23,6 +23,7 @@ import java.util.List;
 public class NamedThread {
     @Id
     private Integer id;
+    private Integer parent;
     private String content;
     private String title;
     private String username;
@@ -30,10 +31,6 @@ public class NamedThread {
     private LocalDateTime createdAt;
     private String type;
     private List<String> tags;
-
-    public void setTags(String tag){
-        tags = Arrays.asList(tag.split(","));
-    }
 
     public String getUsersAvatarUrl() {
         Path path =

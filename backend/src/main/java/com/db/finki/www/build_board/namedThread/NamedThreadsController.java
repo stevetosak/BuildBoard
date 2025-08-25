@@ -1,5 +1,6 @@
 package com.db.finki.www.build_board.namedThread;
 
+import com.db.finki.www.build_board.utils.named_threads.NamedThreadsDTOMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
@@ -13,19 +14,16 @@ import java.util.List;
 @RequestMapping("api/threads")
 public class NamedThreadsController {
     private final SearchService searchService;
+    private final NamedThreadsDTOMapper  namedThreadsDTOMapper;
 
     public NamedThreadsController(
-            SearchService searchService
+            SearchService searchService, NamedThreadsDTOMapper namedThreadsDTOMapper
                                  ) {
         this.searchService = searchService;
+        this.namedThreadsDTOMapper = namedThreadsDTOMapper;
     }
 
-    private String truncateContent(String content) {
-        double percentageToDisplayOnHomePage = .6;
-        int shortDescriptionLength = (int) (content.length() * percentageToDisplayOnHomePage);
-        return content.substring(0,
-                shortDescriptionLength);
-    }
+
 
     @GetMapping()
     public ResponseEntity<Page<NamedThreadDTO>> search(
@@ -36,8 +34,10 @@ public class NamedThreadsController {
             @RequestParam(required = false, defaultValue = "0") int page
                                                       ) {
 
-        title=URLDecoder.decode(title, StandardCharsets.UTF_8);
-        content=URLDecoder.decode(content, StandardCharsets.UTF_8);
+        if(title!=null)
+            title=URLDecoder.decode(title, StandardCharsets.UTF_8);
+        if(content!=null)
+            content=URLDecoder.decode(content, StandardCharsets.UTF_8);
 
         Page<NamedThread> namedThreads = searchService.search(
                title,
@@ -47,19 +47,6 @@ public class NamedThreadsController {
                 PageRequest.of(page,
                         5),null
                                                              );
-        NamedThreadDTO.NamedThreadDTOBuilder builder = NamedThreadDTO.builder();
-
-        return ResponseEntity.ok(
-                namedThreads.map(namedThread -> builder
-                        .createdAt(namedThread.getCreatedAt())
-                        .threadType(namedThread.getType())
-                        .creator(new NamedThreadDTO.Creator(
-                                namedThread.getUsername(),
-                                namedThread.getUsersAvatarUrl()
-                        ))
-                        .content(new NamedThreadDTO.Content(namedThread.getTitle(),
-                                truncateContent(namedThread.getContent()),
-                                 namedThread.getTags()
-                        )).build()));
+        return ResponseEntity.ok(namedThreadsDTOMapper.map(namedThreads));
     }
 }

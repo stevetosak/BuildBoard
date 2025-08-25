@@ -16,14 +16,16 @@ import DisplayIfLoaded from "@pages/shared/display-if-loaded.tsx";
 
 
 export type SearchOptions = { 
-	tags: string[];
+	tag: string[];
 	threadType: string;
 	title:string,
-	content:string
+	content:string,
+	projectId?:string 
 }
 
 export type ThreadsComponentProps = { 
 	fetchTopics: FetchNamedTopics,
+	projectId?:string 
 }
 
 const LoadingBlocks = () => {
@@ -67,9 +69,8 @@ const handleRegistrationOfObserver = (
 
 const createKeyForNamedThread = (namedThread: NamedThread) => namedThread.content.title  + '-' +  namedThread.threadType
 
-//TODO: napraj nekoj datata da mu ja davat 
-const ThreadsComponent = ({fetchTopics}: ThreadsComponentProps) => {
-	const [searchOptions, setSearchOptions] = useState<SearchOptions>({tags: [], threadType: "", title:"",content:""});
+const ThreadsComponent = ({fetchTopics, projectId}: ThreadsComponentProps) => {
+	const [searchOptions, setSearchOptions] = useState<SearchOptions>({tag: [], threadType: "", title:"",content:"", projectId});
 	const {
 		data: namedThreads,
 		hasNextPage,

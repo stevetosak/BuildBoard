@@ -18,16 +18,17 @@ public class SearchService {
             String content,
             String type,
             List<String> tagList,
-                                   Pageable pageable,
+            Pageable pageable,
             Integer parentId) {
+       String tag = tagList == null || tagList.isEmpty() ? null : String.join(",",tagList);
+
        return namedThreadRepository.findAll(
                pageable,
                title,
                type,
                content,
-               tagList,
+               tag,
                parentId
-
         ) ;
     }
 }

@@ -1,7 +1,9 @@
-import type { FetchNamedTopics, NamedThread, Page } from "@shared/api-utils";
+import type { ApiError, FetchNamedTopics, NamedThread, Page } from "@shared/api-utils";
 import { getAuthHeader } from "@shared/security-utils";
 import API_ENDPOINTS from "@constants/api-endpoints.ts";
 import { createPageURL } from "@shared/api-utils";
+
+const isErrorPageResponse = <T,>(response:Response,data:ApiError|T): data is ApiError => !response.ok 
 
 export const fetchTopicsForProject = (projectName: string): FetchNamedTopics => {
 	return async (pageNumber, searchOptions) => {
@@ -11,9 +13,11 @@ export const fetchTopicsForProject = (projectName: string): FetchNamedTopics => 
 			createPageURL(pageNumber, searchOptions,API_ENDPOINTS.projectThread(projectName)),
 			getAuthHeader(),
 		);
-		if (!response.ok) throw new Error("Can't fetch threads");
+		const pageResponse = (await response.json()) as Page<NamedThread[]> | ApiError;
 
-		const pageResponse = (await response.json()) as Page<NamedThread[]>;
+		if(isErrorPageResponse(response,pageResponse)) 
+			throw new Error(pageResponse.detail)
+
 		return pageResponse;
 	};
 };

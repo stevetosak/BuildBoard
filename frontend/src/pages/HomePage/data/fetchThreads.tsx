@@ -5,7 +5,6 @@ import type { SearchOptions } from "../../shared/ThreadsComponent";
 import { createPageURL } from "@shared/api-utils";
 
 export const fetchThreads = async (pageNumber:number, searchOptions:SearchOptions) : Promise<Page<NamedThread[]>> => {
-	console.log(searchOptions.query)
 	if (pageNumber < 0) throw new Error("The requested page must be > 0");
 
 	const response = await fetch(createPageURL(pageNumber,searchOptions,API_ENDPOINTS.threads()), getAuthHeader());
