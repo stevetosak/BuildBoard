@@ -57,9 +57,8 @@ const ProjectPage = () => {
 			>
 				{(project: Project) =>
 					project.members.map((member) => (
-						<div className={"w-full"}>
+						<div className={"w-full"} key={member.username}>
 							<UserShortRow
-								key={member.username}
 								username={member.username}
 								logo={member.logo}
 							/>
