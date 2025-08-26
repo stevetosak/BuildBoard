@@ -6,11 +6,8 @@ import {
 } from "@/components/ui/card.tsx";
 import {
     Check,
-    ChevronDown,
     ChevronDownCircle,
-    ChevronUp,
     ChevronUpCircle,
-    CircleEllipsis,
     Reply,
     X,
     XCircle
@@ -18,10 +15,10 @@ import {
 import {Button} from "@/components/ui/button.tsx";
 import type {ThreadResponse, ThreadElement} from "@/types.ts";
 import {useContext, useState} from "react";
-import {AnimatePresence, motion} from "framer-motion";
+import {AnimatePresence } from "framer-motion";
 import * as React from "react";
 import {MessageInputBox} from "@/components/custom/MessageInputBox.tsx";
-import {api, apiPostAuthenticated} from "@lib/utils/api.ts";
+import {api} from "@lib/utils/api.ts";
 import SecurityContext from "@context/security-context.ts";
 import type {ThreadNode, ThreadTree} from "@lib/thread-tree/thread-tree.ts";
 
@@ -49,7 +46,6 @@ export const DiscussionThreadView = ({
     const [replying, setReplying] = useState(false);
     const userAuthContext = useContext(SecurityContext)
     const [displayReplies, setDisplayReplies] = useState<boolean>(true);
-    const [collapseChildren, setCollapseChildren] = useState(false)
     const replies = node.children
     const remainingReplies = node.element.numReplies - replies.length
     console.log("Replies")

@@ -5,6 +5,8 @@ import com.db.finki.www.build_board.entity.thread.ThreadView;
 import com.db.finki.www.build_board.entity.thread.Topic;
 import com.db.finki.www.build_board.entity.user_type.BBUser;
 import com.db.finki.www.build_board.repository.UserRepository;
+import com.db.finki.www.build_board.bb_users.BBUser;
+import com.db.finki.www.build_board.bb_users.types.repos.UserRepository;
 import com.db.finki.www.build_board.repository.thread.BBThreadRepository;
 import com.db.finki.www.build_board.repository.thread.DiscussionRepository;
 import com.db.finki.www.build_board.repository.thread.TopicRepository;
@@ -12,7 +14,7 @@ import com.db.finki.www.build_board.rest.dto.ThreadDto;
 import com.db.finki.www.build_board.rest.dto.TopicDto;
 import com.db.finki.www.build_board.rest.dto.ThreadTreeResponse;
 import com.db.finki.www.build_board.rest.dto.UserDto;
-import com.db.finki.www.build_board.service.user.BBUserDetailsService;
+import com.db.finki.www.build_board.bb_users.BBUserDetailsService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

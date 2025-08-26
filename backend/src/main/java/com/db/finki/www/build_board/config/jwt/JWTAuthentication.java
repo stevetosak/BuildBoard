@@ -1,12 +1,10 @@
 package com.db.finki.www.build_board.config.jwt;
 
-import com.db.finki.www.build_board.dto.BBUserMinClaimSet;
-import com.db.finki.www.build_board.entity.user_type.BBUser;
+import com.db.finki.www.build_board.bb_users.BBUser;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.web.authentication.WebAuthenticationDetails;
 
 import java.util.Collection;
 import java.util.List;

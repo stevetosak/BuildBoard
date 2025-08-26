@@ -189,7 +189,7 @@ CREATE TABLE users_project_roles
 );
 CREATE TABLE project_roles_permissions
 (
-    permission_name VARCHAR(32) REFERENCES permissions (name),
+    permission_name VARCHAR(32) REFERENCES permissions (name) on delete cascade ,
     role_name       VARCHAR(32),
     project_id      INT,
     FOREIGN KEY (role_name, project_id)
@@ -264,6 +264,46 @@ AS
 SELECT users.id, username, is_activate, password, description, registered_at, sex
 FROM moderator
          JOIN users ON moderator.id = users.id;
+
+create or replace view v_named_threads as
+WITH topics_projects AS (SELECT pr.id,
+                                pr.title,
+                                'project'::text AS "type"
+                         FROM project_thread pr
+                         UNION
+                         SELECT topic_thread.id,
+                                topic_thread.title,
+                                'topic'::text AS "type"
+                         FROM topic_thread),
+     topics_projects_threads AS (SELECT t.id,
+                                        t.content,
+                                        tp.type,
+                                        tp.title,
+                                        u.username,
+                                        u.id        AS user_id,
+                                        t.created_at,
+                                        t.parent_id AS parent
+                                 FROM thread t
+                                          JOIN users u ON u.id = t.user_id
+                                          JOIN topics_projects tp ON tp.id = t.id)
+        ,
+     named_threads_tags as (select tt.thread_id           as "id",
+                                   array_agg(tt.tag_name) as "tags"
+                            from tag_threads tt
+                            where tt.thread_id in (select id from topics_projects_threads)
+                            group by tt.thread_id)
+SELECT tpt.id,
+       tpt.content,
+       tpt.title,
+       tpt.type,
+       tpt.username,
+       tpt.user_id,
+       tpt.created_at,
+       tpt.parent,
+       coalesce((select ntt.tags as "tags"
+                 from named_threads_tags ntt
+                 where ntt.id = tpt.id),'{}') as "tags"
+FROM topics_projects_threads tpt;;
 
 -------------------------- FUNCTIONS ----------------------
 CREATE OR REPLACE FUNCTION fn_validate_topic_title()
@@ -550,3 +590,6 @@ execute function fn_aa_rm_orphan_dics();
 -- on discussion_thread
 -- for each row
 -- execute function fn_remove_thread();
+
+-- PREDEFINED VALUES
+insert into permissions values ('TOPIC_MANAGER'),('CHANNEL_MANAGER'),('MEMBERS_MANAGER')

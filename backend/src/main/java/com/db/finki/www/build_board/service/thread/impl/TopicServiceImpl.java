@@ -1,8 +1,7 @@
 package com.db.finki.www.build_board.service.thread.impl;
 
 import com.db.finki.www.build_board.entity.thread.Project;
-import com.db.finki.www.build_board.entity.user_type.BBUser;
-import com.db.finki.www.build_board.entity.thread.BBThread;
+import com.db.finki.www.build_board.bb_users.BBUser;
 import com.db.finki.www.build_board.entity.thread.Tag;
 import com.db.finki.www.build_board.entity.thread.Topic;
 import com.db.finki.www.build_board.repository.thread.TagRepository;

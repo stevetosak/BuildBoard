@@ -2,7 +2,7 @@ package com.db.finki.www.build_board.entity.request;
 
 import com.db.finki.www.build_board.entity.entity_enum.Status;
 import com.db.finki.www.build_board.entity.thread.Project;
-import com.db.finki.www.build_board.entity.user_type.BBUser;
+import com.db.finki.www.build_board.bb_users.BBUser;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

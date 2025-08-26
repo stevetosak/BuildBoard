@@ -11,7 +11,9 @@ const endpoints = {
 		 "/threads" + `?page=${page}`,
     auth: () => '/login',
     register: () => "/register",
-	web_socket: () => "/channel-websocket"
+	web_socket: () => "/channel-websocket", 
+	projectThread: (projectName:string) => `/projects/${projectName}/threads`,
+	projectDescription: (projectName:string) => `/projects/${projectName}`,
 };
 const endpointsKeys = Object.keys(endpoints)
 
@@ -25,7 +27,7 @@ const handleEndpoints: ProxyHandler<typeof endpoints> = {
 		if (typeof orig !== "function") throw new Error("Endpoint is not a function");
 		
 		return (...args: unknown[]) =>
-			HOST + (orig as (...a: unknown[]) => string)(...args);
+			HOST + "/api" + (orig as (...a: unknown[]) => string)(...args);
 	},
 };
 

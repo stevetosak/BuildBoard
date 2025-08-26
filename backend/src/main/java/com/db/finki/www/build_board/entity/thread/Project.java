@@ -2,8 +2,9 @@ package com.db.finki.www.build_board.entity.thread;
 
 import com.db.finki.www.build_board.entity.request.ProjectRequests;
 import com.db.finki.www.build_board.entity.channel.Channel;
-import com.db.finki.www.build_board.entity.user_type.BBUser;
-import com.db.finki.www.build_board.entity.thread.itf.NamedThread;
+import com.db.finki.www.build_board.bb_users.BBUser;
+import com.db.finki.www.build_board.bb_users.types.Developer;
+import com.db.finki.www.build_board.project.associated_entities.custom_role.CustomRole;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,7 +19,7 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = false)
 @Entity
 @Table(name = "project_thread")
-public class Project extends BBThread implements NamedThread {
+public class Project extends BBThread {
 
     private String title;
 
@@ -34,7 +35,7 @@ public class Project extends BBThread implements NamedThread {
             joinColumns = @JoinColumn(name = "project_id"),
             inverseJoinColumns = @JoinColumn(name = "developer_id")
     )
-    private Set<BBUser> developers = new HashSet<>(); // NE GO KORISTI GETTEROT OVDE
+    private Set<Developer> developers = new HashSet<>(); // NE GO KORISTI GETTEROT OVDE
 
     @OneToMany(mappedBy = "project")
     private Set<ProjectRequests> requests = new HashSet<>();
@@ -43,6 +44,10 @@ public class Project extends BBThread implements NamedThread {
     @OrderBy("name")
     private Set<Channel> channels;
 
+    @OneToMany
+    @JoinColumn(name = "project_id")
+    private List<CustomRole> customRoles;
+
     public Project(String title, String repoUrl, String description, BBUser user) {
         setTitle(title);
         setRepoUrl(repoUrl);
@@ -50,12 +55,10 @@ public class Project extends BBThread implements NamedThread {
         setUser(user);
     }
 
-    @Override
-    public String getTypeName() {
-        return "projects";
-    }
-
     public String getDescription() {return content;}
     public void setDescription(String description) {this.content = description;}
 
+    public String getLogoURL(){
+        return "";
+    }
 }

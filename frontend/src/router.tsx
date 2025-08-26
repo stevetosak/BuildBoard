@@ -14,6 +14,10 @@ import SecurityOutlet from "./components/auth/security-context-outlet";
 import {topicLoader} from "@pages/TopicPage/data/loader.ts";
 import {ChannelPage} from "@pages/ChannelPage/ChannelPage.tsx";
 import {channelLoader} from "@pages/ChannelPage/data/loader.ts";
+import {default as ProjectTopic} from "@pages/ProjectPage/ui/topics";
+import {default as ProjectDescription} from "@pages/ProjectPage/ui/description";
+import {default as ProjectManagment} from "@pages/ProjectPage/ui/managment";
+import ProjectPage from "@pages/ProjectPage";
 
 export const router = createBrowserRouter(
     createRoutesFromElements(
@@ -28,12 +32,14 @@ export const router = createBrowserRouter(
             />
             <Route loader={topicLoader}
                 path={"topics/:topicName"} element={<TopicPage/>}></Route>
-            <Route path={"projects/:projectName/"}>
-                <Route path={"channels/:channelName"} loader={channelLoader} element={<ChannelPage/>}></Route>
-                <Route  path={"requests"}></Route>
+            <Route path={"projects/:projectName"} element={<ProjectPage/>}>
+                    <Route path="topics" element={<ProjectTopic/>}/>
+                    <Route path="description" element={<ProjectDescription/>}/>
+                    <Route path={"channels/:channelName"} loader={channelLoader} element={<ChannelPage/>}></Route>
+                    <Route path="manamgnet/:projectName" element={<ProjectManagment />}/>
+                    <Route  path={"requests"}></Route>
             </Route>
             <Route path={":username/profile"}></Route>
-
             <Route path={"login"} element={<LoginPage/>} action={validateUser} />
             <Route path={'register'} element={<Register/>} action={registerUser} />
         </Route>,

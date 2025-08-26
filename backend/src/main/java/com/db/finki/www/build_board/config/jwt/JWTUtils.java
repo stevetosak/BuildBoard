@@ -1,7 +1,6 @@
 package com.db.finki.www.build_board.config.jwt;
 
-import com.db.finki.www.build_board.dto.BBUserMinClaimSet;
-import com.db.finki.www.build_board.entity.user_type.BBUser;
+import com.db.finki.www.build_board.bb_users.BBUser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.*;
@@ -13,7 +12,6 @@ import com.nimbusds.jwt.PlainJWT;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.apache.coyote.BadRequestException;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;

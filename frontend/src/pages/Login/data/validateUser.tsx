@@ -26,7 +26,7 @@ const validateUser:ActionFunction = async ({request}) => {
    const {token} = await response.json() as JWTResponse
    localStorage.setItem("token", token) 
 
-   return redirect('/homepage' );
+   return redirect('/homepage');
 }
 
 export default validateUser;
