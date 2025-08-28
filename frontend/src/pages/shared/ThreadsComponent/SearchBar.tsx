@@ -13,6 +13,7 @@ import DisplayIfLoaded from "@pages/shared/display-if-loaded.tsx";
 type SearchBarProp = {
 	className?: string;
 	helperText?: string;
+	wrapperCls?:string
 	triggerFetch: React.Dispatch<React.SetStateAction<SearchOptions>>;
 };
 
@@ -55,7 +56,7 @@ const parseInput = (
 	}));
 };
 
-const SearchBar = ({ className="", triggerFetch, helperText }: SearchBarProp) => {
+const SearchBar = ({ className="", triggerFetch, helperText, wrapperCls }: SearchBarProp) => {
 	const [query, setQuery] = useState<string>("");
 	const triggerDebounce = useMemo(
 		() =>
@@ -67,11 +68,11 @@ const SearchBar = ({ className="", triggerFetch, helperText }: SearchBarProp) =>
 
 	return (
 		<div>
-			<div className="h-full grid grid-rows-auto justify-center group">
+			<div className={cn("h-full grid grid-rows-auto justify-center group",wrapperCls)}>
 				<div
 					className={cn(
 						className,
-						" group flex items-center rounded-md border group-focus-within:border-accent  border-input pl-2 text-lg text-white  border-[#285842] ring-offset-background bg-bg-2 rounded-3xl",
+						" group flex items-center rounded-md border group-focus-within:border-accent  border-input pl-2 text-lg text-white border-[#285842] ring-offset-background bg-bg-2 rounded-3xl",
 					)}
 				>
 					<div className={'pe-2 border-r-1  border-[#285842] group-focus-within:border-accent'}>

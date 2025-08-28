@@ -96,7 +96,7 @@ const ThreadsComponent = ({fetchTopics, projectId}: ThreadsComponentProps) => {
 			className="grid grid-rows-[8em_auto] h-full overflow-scroll"
 			style={{ scrollbarWidth: "none" }}
 		>
-			<SearchBar triggerFetch={setSearchOptions} className=""/>
+			<SearchBar triggerFetch={setSearchOptions} className={'w-[25vw]'} helperText={"Use tag:neshto for tags"} wrapperCls={'h-[7em]'}/>
 			<div className="flex flex-col gap-5 p-5 row-start-2 items-center">
 				<DisplayIfLoaded
 					data={namedThreads}

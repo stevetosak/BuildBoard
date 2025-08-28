@@ -69,9 +69,9 @@ const Managment = () => {
 									"justify-self-end flex justify-between items-center h-full w-[13em]"
 								}
 							>
-								<div className={"grid grid-cols-2 gap-1 flex items-center"}>
+								<div className={"grid grid-cols-2 gap-1 items-center"}>
 									<span>Roles</span>
-									<DropdownMenu defaultOpen>
+									<DropdownMenu >
 										<DropdownMenuTrigger asChild>
 											<Button
 												variant={"ghost"}
