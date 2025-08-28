@@ -11,9 +11,9 @@ import { debounceGenerator } from "@shared/api-utils";
 import DisplayIfLoaded from "@pages/shared/display-if-loaded.tsx";
 
 type SearchBarProp = {
-	className: string;
-	triggerFetch: React.Dispatch<React.SetStateAction<SearchOptions>>;
+	className?: string;
 	helperText?: string;
+	triggerFetch: React.Dispatch<React.SetStateAction<SearchOptions>>;
 };
 
 const parseInput = (
@@ -55,7 +55,7 @@ const parseInput = (
 	}));
 };
 
-const SearchBar = ({ className, triggerFetch, helperText }: SearchBarProp) => {
+const SearchBar = ({ className="", triggerFetch, helperText }: SearchBarProp) => {
 	const [query, setQuery] = useState<string>("");
 	const triggerDebounce = useMemo(
 		() =>
@@ -67,20 +67,20 @@ const SearchBar = ({ className, triggerFetch, helperText }: SearchBarProp) => {
 
 	return (
 		<div>
-			<div className="h-full grid grid-rows-auto justify-center">
+			<div className="h-full grid grid-rows-auto justify-center group">
 				<div
 					className={cn(
 						className,
-						" group flex items-center rounded-md border border-input pl-2 text-lg text-white  border-[#285842] ring-offset-background bg-bg-2 rounded-3xl",
+						" group flex items-center rounded-md border group-focus-within:border-accent  border-input pl-2 text-lg text-white  border-[#285842] ring-offset-background bg-bg-2 rounded-3xl",
 					)}
 				>
-					<div className={'pe-2 border-r-1  border-[#285842]'}>
+					<div className={'pe-2 border-r-1  border-[#285842] group-focus-within:border-accent'}>
 						<SearchIcon className="h-[16px] w-[16px] group-focus-within:text-accent stroke-accent" />
 					</div>
 					<input
 						type="search"
 						value={query}
-						className="w-full peer pl-1 placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+						className="w-full pl-1 placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
 						placeholder="Search"
 						onChange={(ev) => {
 							setQuery(ev.target.value);
