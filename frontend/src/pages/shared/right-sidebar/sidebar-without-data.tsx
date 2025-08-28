@@ -11,7 +11,7 @@ type RightSidebarProps = {
 	children: ReactNode;
 };
 
-const RightSidebar = ({ userProfile, children,title }: RightSidebarProps) => {
+const RightSidebar = ({ userProfile, children, title }: RightSidebarProps) => {
 	return (
 		<RightSidebarBuilder.Wrapper data={userProfile}>
 			<RightSidebarBuilder.Header
@@ -21,9 +21,7 @@ const RightSidebar = ({ userProfile, children,title }: RightSidebarProps) => {
 			</RightSidebarBuilder.Header>
 			<RightSidebarBuilder.ContextOverrider value={"asdf"}>
 				<RightSidebarBuilder.BodyInsideData>
-					<RightPopUp title={title}>
-                        {children}
-                    </RightPopUp>
+					<RightPopUp title={title}>{children}</RightPopUp>
 				</RightSidebarBuilder.BodyInsideData>
 			</RightSidebarBuilder.ContextOverrider>
 		</RightSidebarBuilder.Wrapper>

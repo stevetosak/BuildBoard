@@ -18,6 +18,7 @@ import {default as ProjectTopic} from "@pages/ProjectPage/ui/topics.tsx";
 import {default as ProjectDescription} from "@pages/ProjectPage/ui/description";
 import {default as ProjectManagment} from "@pages/ProjectPage/ui/managment/managment.tsx";
 import ProjectPage from "@pages/ProjectPage";
+import Something from "@pages/something.tsx";
 
 export const router = createBrowserRouter(
     createRoutesFromElements(
@@ -31,7 +32,7 @@ export const router = createBrowserRouter(
                 element={<HomePage/>}
             />
             <Route loader={topicLoader}
-                path={"managment/:topicName"} element={<TopicPage/>}></Route>
+                path={"managment/:topicName"} element={<TopicPage/>} />
             <Route path={"projects/:projectName"} element={<ProjectPage/>}>
                     <Route path="topics" element={<ProjectTopic/>}/>
                     <Route path="description" element={<ProjectDescription/>}/>
@@ -42,6 +43,7 @@ export const router = createBrowserRouter(
             <Route path={":username/profile"}></Route>
             <Route path={"login"} element={<LoginPage/>} action={validateUser} />
             <Route path={'register'} element={<Register/>} action={registerUser} />
+						<Route path={"asdf"} element={<Something/>}/>
         </Route>,
     ),
 );
