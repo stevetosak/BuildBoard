@@ -1,10 +1,11 @@
 import iconUrl from "@assets/Icon.jpg";
-import { ChevronDown, X } from "lucide-react";
+import { ChevronDown, X, XIcon } from "lucide-react";
 import { useOutletContext } from "react-router-dom";
 import type { Project } from "@shared/api-utils.ts";
 import TrashIcon from "@pages/ProjectPage/ui/managment/trashIcon.tsx";
 import {
-	DropdownMenu, DropdownMenuArrow,
+	DropdownMenu,
+	DropdownMenuArrow,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuLabel,
@@ -13,9 +14,17 @@ import {
 } from "@radix-ui/react-dropdown-menu";
 import { Button } from "@components/ui/button.tsx";
 import SearchBar from "@pages/shared/ThreadsComponent/SearchBar.tsx";
+import {
+	Dialog,
+	DialogClose,
+	DialogContent,
+	DialogPortal,
+	DialogTrigger,
+} from "@radix-ui/react-dialog";
+import { DialogHeader } from "@components/ui/dialog.tsx";
 
 const hoverUserRowStyle = "border-[#46a77b] hover:border-accent";
-const dropDownProps = 'px-2 w-[10em]'
+const dropDownProps = "px-2 w-[10em]";
 
 const Managment = () => {
 	const project = useOutletContext<Project>();
@@ -43,8 +52,8 @@ const Managment = () => {
 					<span></span>
 					<span className={"h-fit"}>Logo</span>
 					<span className={"h-fit justify-self-center"}>Username</span>
-					<div className={'justify-self-end'}>
-					<SearchBar />
+					<div className={"justify-self-end"}>
+						<SearchBar />
 					</div>
 				</div>
 				<div className={"h-full overflow-scroll flex flex-col"}>
@@ -71,7 +80,7 @@ const Managment = () => {
 							>
 								<div className={"grid grid-cols-2 gap-1 items-center"}>
 									<span>Roles</span>
-									<DropdownMenu >
+									<DropdownMenu>
 										<DropdownMenuTrigger asChild>
 											<Button
 												variant={"ghost"}
@@ -83,16 +92,37 @@ const Managment = () => {
 											</Button>
 										</DropdownMenuTrigger>
 										<DropdownMenuContent
-											className={"bg-sidebar-bg rounded-lg py-[1.2em] border-[#285842] border-1"}
+											className={
+												"bg-sidebar-bg rounded-lg py-[1.2em] border-[#285842] border-1"
+											}
 											align={"start"}
 										>
-											<DropdownMenuLabel className={'text-lg'}>Viki's Roles</DropdownMenuLabel>
-											<DropdownMenuSeparator className={'h-5'}/>
-											<DropdownMenuItem className={`flex w-[calc(1.2em+min-content)] justify-between text-md ${dropDownProps} hover:border-0 hover:outline-0`}>
+											<DropdownMenuLabel className={"text-lg"}>
+												<span className={"me-2"}>Viki's Roles</span>
+												<Dialog>
+													<DialogTrigger>
+														<span className={"text-accent"}>+</span>
+													</DialogTrigger>
+													<DialogPortal>
+														<DialogContent>
+																<DialogClose asChild>
+																	<XIcon className={'stroke-white justify-self-end'}/>
+																</DialogClose>
+															<DialogHeader>
+																<DialogHeader className={'text-3xl'}>Select new role</DialogHeader>
+															</DialogHeader>
+														</DialogContent>
+													</DialogPortal>
+												</Dialog>
+											</DropdownMenuLabel>
+											<DropdownMenuSeparator className={"h-5"} />
+											<DropdownMenuItem
+												className={`flex w-[calc(1.2em+min-content)] justify-between text-md ${dropDownProps} hover:border-0 hover:outline-0`}
+											>
 												<span>Manager</span>
-												<X className={'stroke-red-500 cursor-pointer'} />
+												<X className={"stroke-red-500 cursor-pointer"} />
 											</DropdownMenuItem>
-											<DropdownMenuArrow/>
+											<DropdownMenuArrow />
 										</DropdownMenuContent>
 									</DropdownMenu>
 								</div>
