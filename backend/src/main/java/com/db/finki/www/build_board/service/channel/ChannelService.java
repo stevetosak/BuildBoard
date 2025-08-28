@@ -6,8 +6,8 @@ import com.db.finki.www.build_board.entity.thread.Project;
 import com.db.finki.www.build_board.bb_users.BBUser;
 import com.db.finki.www.build_board.bb_users.types.Developer;
 import com.db.finki.www.build_board.bb_users.types.repos.DeveloperRepository;
+import com.db.finki.www.build_board.project.ProjectService;
 import com.db.finki.www.build_board.repository.channel.ChannelRepository;
-import com.db.finki.www.build_board.service.thread.impl.ProjectService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

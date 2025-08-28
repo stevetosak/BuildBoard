@@ -1,11 +1,13 @@
 package com.db.finki.www.build_board.project;
 
+import com.db.finki.www.build_board.entity.channel.Channel;
 import com.db.finki.www.build_board.entity.thread.Project;
 import com.db.finki.www.build_board.namedThread.NamedThread;
 import com.db.finki.www.build_board.namedThread.NamedThreadDTO;
 import com.db.finki.www.build_board.namedThread.SearchService;
 import com.db.finki.www.build_board.project.associated_entities.custom_role.CustomRole;
 import com.db.finki.www.build_board.project.associated_entities.permissions.Permissions;
+import com.db.finki.www.build_board.service.channel.ChannelService;
 import com.db.finki.www.build_board.utils.named_threads.NamedThreadsDTOMapper;
 import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.Page;
@@ -29,11 +31,13 @@ public class ProjectController {
             ProjectDTO.CustomRoles.builder();
     private final SearchService searchService;
     private final NamedThreadsDTOMapper namedThreadsDTOMapper;
+    private final ChannelService channelService;
 
-    public ProjectController(ProjectService projectService, SearchService searchService, NamedThreadsDTOMapper namedThreadsDTOMapper) {
+    public ProjectController(ProjectService projectService, SearchService searchService, NamedThreadsDTOMapper namedThreadsDTOMapper, ChannelService channelService) {
         this.projectService = projectService;
         this.searchService = searchService;
         this.namedThreadsDTOMapper = namedThreadsDTOMapper;
+        this.channelService = channelService;
     }
 
     @GetMapping("{projectName}/threads")
@@ -114,5 +118,12 @@ public class ProjectController {
                                 .toList()
                       )
                 .build();
+    }
+
+    @GetMapping("{id}/channels/{channelName}")
+    public void getChannel(@PathVariable Long id, @PathVariable String channelName) {
+        Project project = projectService.getById(id);
+        Channel channel = channelService.getByNameAndProject(channelName,
+                project.getTitle());
     }
 }

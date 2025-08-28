@@ -1,17 +1,17 @@
 package com.db.finki.www.build_board.rest;
 
+import com.db.finki.www.build_board.bb_users.types.Developer;
+import com.db.finki.www.build_board.bb_users.types.repos.DeveloperRepository;
 import com.db.finki.www.build_board.constants.enums.ChannelMessageEventType;
 import com.db.finki.www.build_board.dto.channel.MessageDTO;
 import com.db.finki.www.build_board.entity.channel.Channel;
 import com.db.finki.www.build_board.entity.channel.Message;
 import com.db.finki.www.build_board.entity.thread.Project;
-import com.db.finki.www.build_board.entity.user_type.Developer;
 import com.db.finki.www.build_board.mapper.MessageMapper;
-import com.db.finki.www.build_board.repository.DeveloperRepository;
+import com.db.finki.www.build_board.project.ProjectService;
 import com.db.finki.www.build_board.rest.dto.ChannelMessageEvent;
 import com.db.finki.www.build_board.service.channel.ChannelService;
 import com.db.finki.www.build_board.service.channel.MessageService;
-import com.db.finki.www.build_board.service.thread.impl.ProjectService;
 import jakarta.transaction.Transactional;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;

@@ -1,8 +1,8 @@
 import ThreadsComponent from "@pages/shared/ThreadsComponent";
 import iconUrl from "@assets/Icon.jpg";
 import { useOutletContext } from "react-router-dom";
-import type { Project } from "@shared/api-utils";
-import { fetchTopicsForProject } from "../data/fetch-topics-project";
+import type { Project } from "@shared/api-utils.ts";
+import { fetchTopicsForProject } from "../data/fetch-topics-project.ts";
 
 const Topics = () => {
     const project = useOutletContext<Project>()
