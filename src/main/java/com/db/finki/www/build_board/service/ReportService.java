@@ -122,4 +122,12 @@ public class ReportService {
 
         reportRepository.save(report);
     }
+
+    public List<Report> getByStatusAndUser(Status status, BBUser byUser) {
+        return reportRepository.findAllBySendByUsernameAndStatus(byUser.getId(),
+                Optional
+                        .ofNullable(status)
+                        .map(Status::name)
+                        .orElse(null));
+    }
 }

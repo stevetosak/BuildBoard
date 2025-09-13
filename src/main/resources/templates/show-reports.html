@@ -106,7 +106,7 @@
                     Deny
                 </button>
             </div>
-            <div class="card-footer">
+            <div class="card-footer" th:if="${req.getFeedback() != null}">
                 <button type="button"
                         class="btn-feedback-open btn btn-success">
                     View

@@ -69,10 +69,9 @@
                 </button>
             </div>
             <div class="card-footer"
-                 th:if="${req.getStatus().name().equals('DENIED')}"
+                 th:if="${req.getFeedback() != null}"
             >
                 <button type="button"
-                        th:if="${req.getStatus().name().equals('DENIED')}"
                         class="btn-feedback-open btn btn-success">View feedback
                 </button>
                 <div th:if="${req.getFeedback()!=null && req.getFeedback().getDescription()!=null}"

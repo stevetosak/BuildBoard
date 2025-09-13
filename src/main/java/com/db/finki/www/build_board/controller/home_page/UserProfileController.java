@@ -2,6 +2,7 @@ package com.db.finki.www.build_board.controller.home_page;
 
 import com.db.finki.www.build_board.entity.entity_enum.Status;
 import com.db.finki.www.build_board.entity.user_type.BBUser;
+import com.db.finki.www.build_board.service.ReportService;
 import com.db.finki.www.build_board.service.user.BBUserDetailsService;
 import com.db.finki.www.build_board.service.request.ProjectRequestService;
 import com.db.finki.www.build_board.service.util.FileUploadService;
@@ -23,11 +24,13 @@ public class UserProfileController {
     private final BBUserDetailsService userService;
     private final FileUploadService fileUploadService;
     private final ProjectRequestService projectRequestService;
+    private final ReportService reportService;
 
-    public UserProfileController(BBUserDetailsService userService, FileUploadService fileUploadService, ProjectRequestService projectRequestService) {
+    public UserProfileController(BBUserDetailsService userService, FileUploadService fileUploadService, ProjectRequestService projectRequestService, ReportService reportService) {
         this.userService = userService;
         this.fileUploadService = fileUploadService;
         this.projectRequestService = projectRequestService;
+        this.reportService = reportService;
     }
 
     @PreAuthorize("#user.getUsername().equals(#username)")
@@ -52,6 +55,17 @@ public class UserProfileController {
         }
     }
 
+    @GetMapping("/reports")
+    public String getReportsByUser(@PathVariable String username,
+            @SessionAttribute @P("user") BBUser user,
+            @RequestParam(required = false) Status status,
+            Model model) {
+        BBUser byUser = (BBUser) userService.loadUserByUsername(username);
+        model.addAttribute("user", byUser);
+        model.addAttribute("requests", reportService.getByStatusAndUser(status,byUser));
+        model.addAttribute("status", Status.values());
+        return "/show-user-reports";
+    }
 
     @GetMapping("/project-requests")
     public String getProjectRequestsPage(
