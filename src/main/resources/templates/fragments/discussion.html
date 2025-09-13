@@ -53,6 +53,7 @@
                 <button type="button"
                         class="btn btn-danger btn-sm edit-delete-btn ms-2 report-btn"
                         th:data-username="${reply.getDiscussion().getUser().getUsername()}"
+                        th:if="${!reply.getUser().getUsername().equals(session.user.getUsername())}"
                         data-bs-toggle="modal"
                         data-bs-target="#reportModal">
                     Report

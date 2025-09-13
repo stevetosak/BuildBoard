@@ -106,11 +106,8 @@
                     Deny
                 </button>
             </div>
-            <div class="card-footer"
-                 th:if="${req.getStatus().name().equals('DENIED')}"
-            >
+            <div class="card-footer">
                 <button type="button"
-                        th:if="${req.getStatus().name().equals('DENIED')}"
                         class="btn-feedback-open btn btn-success">
                     View
                     feedback

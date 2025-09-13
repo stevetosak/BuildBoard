@@ -1,5 +1,6 @@
 package com.db.finki.www.build_board.service;
 
+import com.db.finki.www.build_board.entity.blacklisted_user.BlacklistedUser;
 import com.db.finki.www.build_board.entity.entity_enum.FeedbackFor;
 import com.db.finki.www.build_board.entity.entity_enum.Status;
 import com.db.finki.www.build_board.entity.request.ProjectRequests;
@@ -7,13 +8,18 @@ import com.db.finki.www.build_board.entity.request.Report;
 import com.db.finki.www.build_board.entity.thread.Project;
 import com.db.finki.www.build_board.entity.thread.Topic;
 import com.db.finki.www.build_board.entity.user_type.BBUser;
+import com.db.finki.www.build_board.entity.user_type.Moderator;
+import com.db.finki.www.build_board.repository.BlacklistedUserRepo;
+import com.db.finki.www.build_board.repository.ModeratorRepository;
 import com.db.finki.www.build_board.repository.ReportRepository;
 import com.db.finki.www.build_board.service.request.FeedbackService;
 import com.db.finki.www.build_board.service.thread.itf.TopicService;
+import org.apache.coyote.Request;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,15 +29,21 @@ public class ReportService {
     private final TopicService topicService;
     private final UserDetailsService userDetailsService;
     private final FeedbackService feedbackService;
+    private final BlacklistedUserRepo blacklistedUserRepo;
+    private final ModeratorRepository moderatorRepository;
+
 
     public ReportService(
             ReportRepository reportRepository, TopicService topicService,
-            UserDetailsService userDetailsService, FeedbackService feedbackService
+            UserDetailsService userDetailsService, FeedbackService feedbackService,
+            BlacklistedUserRepo blacklistedUserRepo, ModeratorRepository moderatorRepository
                         ) {
         this.reportRepository = reportRepository;
         this.topicService = topicService;
         this.userDetailsService = userDetailsService;
         this.feedbackService = feedbackService;
+        this.blacklistedUserRepo = blacklistedUserRepo;
+        this.moderatorRepository = moderatorRepository;
     }
 
     public void createReport(
@@ -61,8 +73,36 @@ public class ReportService {
     }
 
     @Transactional
-    void accept(){
-        //TODO: add vo blacklisted user
+    public void accept(long reqId, String feedbackDesc, BBUser moderatorAsAUser) {
+        Report reqForReqId =
+                reportRepository
+                        .findById(reqId)
+                        .orElseThrow(() -> new RuntimeException("The id " +
+                                "is invalid"));
+        String reason = reqForReqId.getDescription();
+        Moderator moderator =
+                moderatorRepository
+                        .findById(moderatorAsAUser.getId())
+                        .orElseThrow(() -> new RuntimeException("The user is not a moderator"));
+
+        reqForReqId.setStatus(Status.ACCEPTED);
+
+        feedbackService.create(
+                feedbackDesc,
+                moderator,
+                FeedbackFor.R,
+                reqForReqId
+                              );
+
+        blacklistedUserRepo.save(
+                new BlacklistedUser(
+                        reqForReqId.getTopic(),
+                        moderator,
+                        LocalDateTime.now(),
+                        reqForReqId.getUser(),
+                        reason
+                )
+                                );
     }
 
     @Transactional
@@ -79,6 +119,7 @@ public class ReportService {
                 creator,
                 FeedbackFor.R,
                 report);
+
         reportRepository.save(report);
     }
 }

@@ -4,6 +4,7 @@ import com.db.finki.www.build_board.entity.entity_enum.Status;
 import com.db.finki.www.build_board.entity.thread.Project;
 import com.db.finki.www.build_board.entity.user_type.BBUser;
 import com.db.finki.www.build_board.entity.thread.Topic;
+import com.db.finki.www.build_board.entity.user_type.Moderator;
 import com.db.finki.www.build_board.service.ReportService;
 import com.db.finki.www.build_board.service.thread.impl.DiscussionService;
 import com.db.finki.www.build_board.service.thread.itf.TagService;
@@ -143,9 +144,11 @@ public class TopicController {
             @RequestParam(name = "feedback-desc") String feedbackDesc,
             @SessionAttribute @P("user") BBUser user
                                      ) {
-        reportService.accept(reqId, feedbackDesc, user);
+        reportService.accept(reqId, feedbackDesc, (Moderator) user); //TODO: gore vo PreAuthorize
+        // ke imash check dali e voopshto vo moderators i da ne e moderator about user deka nemat
+        // smisla
         return new RedirectView(
-                String.format("/topics/%s", topicId)
+                String.format("/topics/%s/reports", topicId)
         );
     }
 
