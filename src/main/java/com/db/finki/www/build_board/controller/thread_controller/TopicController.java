@@ -5,6 +5,7 @@ import com.db.finki.www.build_board.entity.thread.Project;
 import com.db.finki.www.build_board.entity.user_type.BBUser;
 import com.db.finki.www.build_board.entity.thread.Topic;
 import com.db.finki.www.build_board.entity.user_type.Moderator;
+import com.db.finki.www.build_board.service.BlacklistedUserService;
 import com.db.finki.www.build_board.service.ReportService;
 import com.db.finki.www.build_board.service.thread.impl.DiscussionService;
 import com.db.finki.www.build_board.service.thread.itf.TagService;
@@ -27,12 +28,14 @@ public class TopicController {
     private final DiscussionService discussionService;
     private final String DUPLICATE_TITTLE = "There already exists a topic with title";
     private final ReportService reportService;
+    private final BlacklistedUserService  blacklistedUserService;
 
-    public TopicController(TopicService topicService, TagService tagService, DiscussionService discussionService, ReportService reportService) {
+    public TopicController(TopicService topicService, TagService tagService, DiscussionService discussionService, ReportService reportService, BlacklistedUserService blacklistedUserService) {
         this.topicService = topicService;
         this.tagService = tagService;
         this.discussionService = discussionService;
         this.reportService = reportService;
+        this.blacklistedUserService = blacklistedUserService;
     }
 
     private String bootstartTopic(long topicId, Model model){
@@ -54,9 +57,15 @@ public class TopicController {
 
     @GetMapping("/{topic-id}")
     public String showTopic(@PathVariable(name = "topic-id") int topicId, Model model,
-            @RequestParam(required = false) Boolean duplicateTittle) {
+            @RequestParam(required = false) Boolean duplicateTittle,
+            @SessionAttribute() BBUser user) {
+
         if (duplicateTittle != null) {
             model.addAttribute("errMsg", "There already exists a thread with the same title in that parent");
+        }
+
+        if(blacklistedUserService.isBlacklisted(user.getId())) {
+            return "blacklisted";
         }
 
         return bootstartTopic(topicId, model);
