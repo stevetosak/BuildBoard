@@ -66,7 +66,7 @@ VALUES
     ('Create Thread'),
     ('Delete Thread');
 
-INSERT INTO project_roles (name, project_id, description)
+INSERT INTO project_role (name, project_id, description)
 VALUES
     ('Admin', 5, 'Admin role for the project'),
     ('Developer', 5, 'Developer role for the project');

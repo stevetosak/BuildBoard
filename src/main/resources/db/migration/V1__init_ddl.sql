@@ -155,31 +155,36 @@ CREATE TABLE permissions
 (
     name VARCHAR(32) PRIMARY KEY
 );
-CREATE TABLE project_roles
-(
-    name        VARCHAR(32),
-    project_id  INT REFERENCES project_thread(id) ON DELETE CASCADE NOT NULL, --VALID_IN
-    description TEXT,
-    PRIMARY KEY (name, project_id)
+
+CREATE TABLE project_resource (
+    id serial primary key
 );
-CREATE TABLE users_project_roles
-(
-    user_id INT REFERENCES developer(id) on delete cascade,
-    project_id INT,
-    role_name  VARCHAR(32),
-    FOREIGN KEY (role_name, project_id)
-        REFERENCES project_roles (name, project_id) ON DELETE CASCADE,
-    PRIMARY KEY (user_id, project_id, role_name)
+
+create table project_role (
+    name varchar(32) NOT NULL,
+    project_id int references project_thread(id) ON DELETE CASCADE,
+    PRIMARY KEY (name,project_id)
 );
+
 CREATE TABLE project_roles_permissions
 (
     permission_name VARCHAR(32) REFERENCES permissions (name),
     role_name       VARCHAR(32),
     project_id      INT,
-    FOREIGN KEY (role_name, project_id)
-        REFERENCES project_roles (name, project_id) ON DELETE CASCADE,
-    PRIMARY KEY (permission_name, role_name, project_id)
+    project_resource_id int references project_resource(id),
+    FOREIGN KEY (role_name, project_id) REFERENCES project_role (name, project_id) ON DELETE CASCADE,
+    PRIMARY KEY (permission_name, role_name, project_id,project_resource_id)
 );
+
+CREATE TABLE users_project_roles
+(
+    user_id INT REFERENCES developer(id) on delete cascade,
+    project_id INT,
+    role_name  VARCHAR(32),
+    FOREIGN KEY (role_name, project_id) REFERENCES project_role (name, project_id) ON DELETE CASCADE,
+    PRIMARY KEY (user_id, project_id, role_name)
+);
+
 
 create table submission(
     id serial primary key,
@@ -214,6 +219,7 @@ CREATE TABLE channel
     name         VARCHAR(64),
     description  VARCHAR(200),
     project_id   INT REFERENCES project_thread(id) ON DELETE CASCADE NOT NULL, --HAS
+    project_resource_id INT REFERENCES project_resource(id) UNIQUE NOT NULL,
     developer_id INT REFERENCES developer(id) NOT NULL, --CONSTRUCTS
     PRIMARY KEY (name, project_id)
 );
@@ -379,36 +385,21 @@ create or replace function fn_insert_general_for_project()
 as $$
 DECLARE
     developer_id INT;
+    project_resource_id INT;
 BEGIN
     select user_id
     into developer_id
     from thread t
     where t.id=NEW.id;
+    insert into project_resource default values returning id into project_resource_id;
 
-    insert into channel(name,description,project_id,developer_id)
+    insert into channel(name,description,project_id,developer_id,project_resource_id)
     values ('General','General',NEW.id,developer_id);
 
     return new;
 end;
 $$;
 
-CREATE OR REPLACE FUNCTION fn_defined_by_total_custom_roles()
- RETURNS trigger
- LANGUAGE plpgsql
-AS $$
-BEGIN
-IF not exists(
-    select 1
-    from project_roles_permissions p
-    where p.role_name=OLD.role_name and p.project_id = OLD.project_id
-) THEN
-    DELETE FROM project_roles
-    where name=OLD.role_name and project_id=OLD.project_id;
-END IF;
-RETURN OLD;
-END;
-$$
-;
 
 CREATE OR REPLACE FUNCTION fn_remove_orphan_moderator()
  RETURNS trigger
@@ -482,12 +473,6 @@ CREATE OR REPLACE TRIGGER tr_insert_topics_creator_as_moderator --RADI
     FOR EACH ROW
 EXECUTE FUNCTION fn_insert_topics_creator_as_moderator();
 ----
-create or replace TRIGGER tr_defined_by_total_custom_roles
-after delete
-on project_roles_permissions
-for each row
-execute function fn_defined_by_total_custom_roles();
-
 CREATE OR REPLACE TRIGGER tr_remove_orphan_moderator --RADI
 AFTER DELETE
 ON topic_threads_moderators
