@@ -1,12 +1,16 @@
-<th:object th:fragment="discussion(reply_cont)" th:each="reply : ${reply_cont}">
+<th:object
+        th:fragment="discussion(reply_cont)"
+        th:each="reply : ${reply_cont}">
     <div
-         class="card shadow-sm mt-4 d-flex"
-         th:style="'margin-left: ' + (${reply.depth + 1} * 5) + '%'"
+            class="card shadow-sm mt-4 d-flex"
+            th:style="'margin-left: ' + (${reply.depth + 1} * 5) + '%'"
     >
         <div class="card-header bg-light d-flex justify-content-between align-items-center"
              th:id="${reply.getId() + '/' + reply.getUser().getUsername()}">
             <div class="d-flex align-items-center w-100">
-                <img th:src="${reply.getAvatarUrl()}" alt="Profile Picture" id="profileImage"
+                <img th:src="${reply.getAvatarUrl()}"
+                     alt="Profile Picture"
+                     id="profileImage"
                      class="rounded-circle border border-1 border-info me-3"
                      style="width: 3rem; height: 3rem; object-fit: cover; vertical-align: middle;">
                 <span th:text="${reply.getUser().getUsername()}">Reply Author</span>
@@ -15,47 +19,84 @@
                     <i class="bi bi-arrow-return-right me-2"></i>
                      <strong th:text="'Replying to:  ' + ${reply.getDiscussion().getParent().getUser().getUsername()}"></strong>
                 </span>
-
             </div>
             <div th:if="${session.user != null && session.user.getId() == reply.getUser().getId()}"
                  class="ms-5 d-flex align-items-center justify-content-between">
 
                 <div>
                     <button class="btn  btn-warning btn-sm edit-reply-btn"
-                            th:attr="data-reply-id=${reply.getDiscussion().getId()}">Edit
+                            th:attr="data-reply-id=${reply.getDiscussion().getId()}">
+                        Edit
                     </button>
                 </div>
 
                 <div>
                     <form th:action="@{/topics/{topic-id}/discussions/{discussionId}/delete(topic-id=${topic.getId()
-                    },discussionId=${reply.getId()})}" method="post">
-                        <input type="hidden" name="threadId" th:value="${reply.getDiscussion().getId()}" class="w-0">
+                    },discussionId=${reply.getId()})}"
+                          method="post">
+                        <input type="hidden"
+                               name="threadId"
+                               th:value="${reply.getDiscussion().getId()}"
+                               class="w-0">
                         <button class="btn btn-danger btn-sm edit-delete-btn ms-2"
-                                th:attr="data-reply-id=${reply.getDiscussion().getId()}">Delete
+                                th:attr="data-reply-id=${reply.getDiscussion().getId()}">
+                            Delete
                         </button>
-                        <input th:if="${session.user!=null}" type="hidden" name="username"
+                        <input th:if="${session.user!=null}"
+                               type="hidden"
+                               name="username"
                                th:value="${session.user.username}"/>
                     </form>
                 </div>
+            </div>
+            <div th:if="${session.user != null}">
+                <button type="button"
+                        class="btn btn-danger btn-sm edit-delete-btn ms-2 report-btn"
+                        th:data-username="${reply.getDiscussion().getUser().getUsername()}"
+                        data-bs-toggle="modal"
+                        data-bs-target="#reportModal">
+                    Report
+                </button>
             </div>
         </div>
 
         <!-- Reply content -->
         <div class="card-body">
-            <div th:attr="data-reply-id=${reply.getDiscussion().getId()}" class="reply-content">
-                <p th:text="${reply.getDiscussion().getContent()}">Reply content goes here.</p>
+            <div th:attr="data-reply-id=${reply.getDiscussion().getId()}"
+                 class="reply-content">
+                <p th:text="${reply.getDiscussion().getContent()}">
+                    Reply
+                    content
+                    goes
+                    here.</p>
             </div>
-            <div class="d-none edit-reply" th:attr="data-reply-id=${reply.getDiscussion().getId()}">
+            <div class="d-none edit-reply"
+                 th:attr="data-reply-id=${reply.getDiscussion().getId()}">
                 <form th:action="@{/topics/{topic-id}/discussions/{replyId}/edit(topic-id=${topic.getId()},replyId=${reply.getId()})}"
                       method="post">
-                    <input type="hidden" name="replyId" th:value="${reply.getDiscussion().getId()}">
-                    <textarea name="content" th:text="${reply.getDiscussion().getContent()}" class="form-control"
-                              rows="3" placeholder="Write your reply here"></textarea>
+                    <input type="hidden"
+                           name="replyId"
+                           th:value="${reply.getDiscussion().getId()}">
+                    <textarea
+                            name="content"
+                            th:text="${reply.getDiscussion().getContent()}"
+                            class="form-control"
+                            rows="3"
+                            placeholder="Write your reply here"></textarea>
 
-                    <button type="submit" class="btn btn-sm btn-success mt-2">Save Changes</button>
-                    <button type="button" class="close-edit-btn btn btn-sm btn-danger mt-2"
-                            th:attr="data-reply-id=${reply.getDiscussion().getId()}">Cancel</button>
-                    <input th:if="${session.user!=null}" type="hidden" name="username"
+                    <button type="submit"
+                            class="btn btn-sm btn-success mt-2">
+                        Save
+                        Changes
+                    </button>
+                    <button type="button"
+                            class="close-edit-btn btn btn-sm btn-danger mt-2"
+                            th:attr="data-reply-id=${reply.getDiscussion().getId()}">
+                        Cancel
+                    </button>
+                    <input th:if="${session.user!=null}"
+                           type="hidden"
+                           name="username"
                            th:value="${session.user.username}"/>
                 </form>
 
@@ -64,27 +105,39 @@
             <!-- Buttons Row -->
             <div class="d-flex justify-content-between align-items-center mt-3 pt-3">
                 <div class="d-flex flex-row">
-                    <form th:action="@{/threads/{thread-id}/like(thread-id=${reply.getId()})}" method="post">
-                        <input name="topic-id" type="hidden" th:value="${topic.getId()}">
+                    <form th:action="@{/threads/{thread-id}/like(thread-id=${reply.getId()})}"
+                          method="post">
+                        <input name="topic-id"
+                               type="hidden"
+                               th:value="${topic.getId()}">
                         <button th:if="${session.user!=null}"
-                                type="submit" class="btn btn-outline-success btn-sm me-2 like-button"
+                                type="submit"
+                                class="btn btn-outline-success btn-sm me-2 like-button"
                                 th:attr="data-reply-id=${reply.getDiscussion().getId()}">
-                            👍 Like (<span th:text="${reply.getDiscussion().getNumLikes()}">0</span>)
+                            👍
+                            Like
+                            (<span
+                                th:text="${reply.getDiscussion().getNumLikes()}">0</span>)
                         </button>
                     </form>
-                    <form th:action="@{/threads/{thread-id}/dislike(thread-id=${reply.getId()})}" method="post">
-                        <input type="hidden" name="topic-id" th:value="${topic.getId()}">
+                    <form th:action="@{/threads/{thread-id}/dislike(thread-id=${reply.getId()})}"
+                          method="post">
+                        <input type="hidden"
+                               name="topic-id"
+                               th:value="${topic.getId()}">
                         <button th:if="${session.user!=null}"
                                 class="btn btn-outline-danger btn-sm dislike-button"
                                 th:attr="data-reply-id=${reply.getDiscussion().getId()}">
-                            👎 Dislike
+                            👎
+                            Dislike
                         </button>
                     </form>
                 </div>
                 <div>
                     <button th:if="${session.user!=null}"
                             class="btn btn-info btn-sm reply-button"
-                            th:attr="data-reply-id=${reply.getDiscussion().getId()}">Reply
+                            th:attr="data-reply-id=${reply.getDiscussion().getId()}">
+                        Reply
                     </button>
                 </div>
             </div>
@@ -92,19 +145,33 @@
 
 
         <!-- Add Reply Card Hidden -->
-        <div th:attr="data-reply-id=${reply.getDiscussion().getId()}" class="card-body d-none reply-body">
-            <form th:action="@{/topics/{topic-id}/discussions/add(topic-id=${topic.getId()})}" method="post">
+        <div th:attr="data-reply-id=${reply.getDiscussion().getId()}"
+             class="card-body d-none reply-body">
+            <form th:action="@{/topics/{topic-id}/discussions/add(topic-id=${topic.getId()})}"
+                  method="post">
                 <div class="mb-3">
-                    <label class="form-label">Your Reply</label>
-                    <textarea name="content" class="form-control" rows="3" placeholder="Write your reply here"
-                              required></textarea>
+                    <label class="form-label">Your
+                        Reply</label>
+                    <textarea
+                            name="content"
+                            class="form-control"
+                            rows="3"
+                            placeholder="Write your reply here"
+                            required></textarea>
                 </div>
                 <div class="d-flex justify-content-between">
-                    <input type="hidden" th:value="${reply.getId()}" name="parentId">
-                    <button type="submit" class="btn btn-success w-10 ms-2">Post Reply</button>
+                    <input type="hidden"
+                           th:value="${reply.getId()}"
+                           name="parentId">
+                    <button type="submit"
+                            class="btn btn-success w-10 ms-2">
+                        Post
+                        Reply
+                    </button>
                     <div class="d-flex justify-content-end reply-cancel">
                         <button class="btn btn-danger btn-sm reply-cancel w-10 me-2"
-                                th:attr="data-reply-id=${reply.getDiscussion().getId()}">Cancel
+                                th:attr="data-reply-id=${reply.getDiscussion().getId()}">
+                            Cancel
                         </button>
                     </div>
                 </div>

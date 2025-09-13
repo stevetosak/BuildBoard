@@ -2,6 +2,7 @@ package com.db.finki.www.build_board.controller.thread_controller;
 
 import com.db.finki.www.build_board.entity.user_type.BBUser;
 import com.db.finki.www.build_board.entity.thread.Topic;
+import com.db.finki.www.build_board.service.ReportService;
 import com.db.finki.www.build_board.service.thread.impl.DiscussionService;
 import com.db.finki.www.build_board.service.thread.itf.TagService;
 import com.db.finki.www.build_board.service.thread.itf.TopicService;
@@ -21,11 +22,23 @@ public class TopicController {
     private final TagService tagService;
     private final DiscussionService discussionService;
     private final String DUPLICATE_TITTLE = "There already exists a topic with title";
+    private final ReportService reportService;
 
-    public TopicController(TopicService topicService, TagService tagService, DiscussionService discussionService) {
+    public TopicController(TopicService topicService, TagService tagService, DiscussionService discussionService, ReportService reportService) {
         this.topicService = topicService;
         this.tagService = tagService;
         this.discussionService = discussionService;
+        this.reportService = reportService;
+    }
+
+    private String bootstartTopic(long topicId, Model model){
+        Topic t = topicService.getById((long)topicId);
+
+        model.addAttribute("topic", t);
+        model.addAttribute("tags", tagService.getAllNotUsed(t));
+        model.addAttribute("replies", discussionService.getByTopic(t.getId()));
+
+        return "show-topic";
     }
 
     @GetMapping("/create")
@@ -41,11 +54,8 @@ public class TopicController {
         if (duplicateTittle != null) {
             model.addAttribute("errMsg", "There already exists a thread with the same title in that parent");
         }
-        Topic t = topicService.getById((long)topicId);
-        model.addAttribute("topic", t);
-        model.addAttribute("tags", tagService.getAllNotUsed(t));
-        model.addAttribute("replies", discussionService.getByTopic(t.getId()));
-        return "show-topic";
+
+        return bootstartTopic(topicId, model);
     }
 
     @PostMapping("/add")
@@ -84,6 +94,15 @@ public class TopicController {
         } catch (org.springframework.orm.jpa.JpaSystemException e) {
             return handleDuplicatedTitle(e, redirectAttributes, "/topics/" + oldTitle);
         }
+    }
+
+    @PostMapping("{id}/report")
+    public String reportUser(@PathVariable(name = "id") long topicId, @RequestParam String reason
+            , @SessionAttribute BBUser user,
+            @RequestParam(name = "report-username") String reportingUser, Model model){
+        reportService.createReport(topicId,reason,user, reportingUser);
+
+        return bootstartTopic(topicId, model);
     }
 
     public String handleDuplicatedTitle(org.springframework.orm.jpa.JpaSystemException e,

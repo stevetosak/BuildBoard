@@ -2,9 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
     <title th:text="${topic.getTitle()}"></title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+          rel="stylesheet">
 
     <style>
         .edit-reply-btn {
@@ -30,44 +32,73 @@
             font-weight: bold;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
         }
-        .badge{
+
+        .badge {
             background: #00e7ff80
         }
     </style>
 </head>
-<body>
+<body th:attr="data-topic-id=${topic.getId()}">
 <div th:replace="/home_pages/home :: navigation"></div>
 <div class="mt-3 w-100 d-flex justify-content-center align-items-center">
-    <div th:if="${errMsg!=null}" class="error-bubble">
-        <h5 class="text-center">Error</h5>
-        <p th:text="${errMsg}" class="mb-0"></p>
+    <div th:if="${errMsg!=null}"
+         class="error-bubble">
+        <h5 class="text-center">
+            Error</h5>
+        <p th:text="${errMsg}"
+           class="mb-0"></p>
     </div>
 </div>
 <main class="mb-5 container mt-5">
     <!-- Topic Title and Description -->
     <div class="card shadow-sm mb-4">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <h3 th:text="${topic.getTitle()}">Topic Title</h3>
+            <h3 th:text="${topic.getTitle()}">
+                Topic
+                Title</h3>
             <!-- Add Tag Button -->
-            <button th:if="${session.user!=null && session.user.equals(topic.getUser())}"
-                    class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#addTagModal">Add Tag
-            </button>
+            <div>
+                <button th:if="${session.user!=null && session.user.equals(topic.getUser())}"
+                        class="btn btn-info btn-sm"
+                        data-bs-toggle="modal"
+                        data-bs-target="#addTagModal">
+                    Add
+                    Tag
+                </button>
+                <button
+                        class="btn btn-info btn-sm"
+                        data-bs-toggle="modal"
+                        data-bs-target="#show-guidelines">
+                    Show
+                    guidelines
+                </button>
+            </div>
         </div>
 
         <div class="card-body d-flex flex-column justify-content-between">
             <!-- Top Section: Description + Tags -->
             <div class="d-flex justify-content-between">
-                <p th:text="${topic.getContent()}">Description of the topic goes here.</p>
+                <p th:text="${topic.getContent()}">
+                    Description
+                    of
+                    the
+                    topic
+                    goes
+                    here.</p>
                 <!-- Tags Section -->
                 <div>
                     <ul class="list-inline text-end">
-                        <li th:each="tag : ${topic.getTags()}" class="list-inline-item">
+                        <li th:each="tag : ${topic.getTags()}"
+                            class="list-inline-item">
                         <span class="badge text-dark d-inline-flex align-items-center">
                             <span th:text="${tag.getName()}">Tag Name</span>
                             <form th:if="${session.user!=null && session.user.equals(topic.getUser())}"
                                   th:action="@{/topics/{topicId}/tags/{tag-name}/delete (topicId=${topic.getId()}, tag-name=${tag.getName()})}"
-                                  method="post" class="d-inline">
-                                <button type="submit" class="btn btn-sm btn-link text-danger p-0 ms-1" style="line-height: 1;">
+                                  method="post"
+                                  class="d-inline">
+                                <button type="submit"
+                                        class="btn btn-sm btn-link text-danger p-0 ms-1"
+                                        style="line-height: 1;">
                                     &times;
                                 </button>
                             </form>
@@ -83,24 +114,36 @@
                 <div class="d-flex justify-content-end">
                     <button th:if="${session.user != null}"
                             class="btn btn-info btn-sm reply-button"
-                            th:attr="data-reply-id=${topic.getId()}">Reply
+                            th:attr="data-reply-id=${topic.getId()}">
+                        Reply
                     </button>
                 </div>
 
                 <!-- Like & Dislike Buttons -->
                 <div class="d-flex flex-row">
-                    <form th:action="@{/threads/{thread-id}/like(thread-id=${topic.getId()})}" method="post">
-                        <input type="hidden" name="topic-id" th:value="${topic.getId()}">
+                    <form th:action="@{/threads/{thread-id}/like(thread-id=${topic.getId()})}"
+                          method="post">
+                        <input type="hidden"
+                               name="topic-id"
+                               th:value="${topic.getId()}">
                         <button th:if="${session.user!=null}"
-                                type="submit" class="btn btn-outline-success btn-sm me-2 like-button">
-                            👍 Like (<span th:text="${topic.getNumLikes()}">0</span>)
+                                type="submit"
+                                class="btn btn-outline-success btn-sm me-2 like-button">
+                            👍
+                            Like
+                            (<span
+                                th:text="${topic.getNumLikes()}">0</span>)
                         </button>
                     </form>
-                    <form th:action="@{/threads/{thread-id}/dislike(thread-id=${topic.getId()})}" method="post">
-                        <input type="hidden" name="topic-id" th:value="${topic.getId()}">
+                    <form th:action="@{/threads/{thread-id}/dislike(thread-id=${topic.getId()})}"
+                          method="post">
+                        <input type="hidden"
+                               name="topic-id"
+                               th:value="${topic.getId()}">
                         <button th:if="${session.user!=null}"
                                 class="btn btn-outline-danger btn-sm dislike-button">
-                            👎 Dislike
+                            👎
+                            Dislike
                         </button>
                     </form>
                 </div>
@@ -109,54 +152,135 @@
     </div>
 
     <!-- Edit and Delete Buttons for Topic -->
-        <div th:if="${session.user != null && session.user.getId() == topic.getUser().getId()}"
-             class="card-footer d-flex justify-content-between">
-            <div>
-                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editTopicModal">Edit
+    <div th:if="${session.user != null && session.user.getId() == topic.getUser().getId()}"
+         class="card-footer d-flex justify-content-between">
+        <div>
+            <button class="btn btn-warning btn-sm"
+                    data-bs-toggle="modal"
+                    data-bs-target="#editTopicModal">
+                Edit
+                Topic
+            </button>
+            <form th:action="@{/topics/{id}/delete (id=${topic.getId()})}"
+                  method="post"
+                  style="display:inline;">
+                <input type="hidden"
+                       name="id"
+                       th:value="${topic.getId()}"/>
+                <button type="submit"
+                        class="btn btn-danger btn-sm">
+                    Delete
                     Topic
                 </button>
-                <form th:action="@{/topics/{id}/delete (id=${topic.getId()})}" method="post" style="display:inline;">
-                    <input type="hidden" name="id" th:value="${topic.getId()}"/>
-                    <button type="submit" class="btn btn-danger btn-sm">Delete Topic</button>
-                    <input th:if="${session.user!=null}" type="hidden" name="username"
-                           th:value="${session.user.username}"/>
-                </form>
-            </div>
+                <input th:if="${session.user!=null}"
+                       type="hidden"
+                       name="username"
+                       th:value="${session.user.username}"/>
+            </form>
         </div>
+    </div>
     </div>
     <!--    DO TUKA E TOPIC-->
 
     <!-- Replies Section -->
     <div th:replace="~{/fragments/discussion :: discussion(reply_cont=${replies})}"></div>
 
-
+<!--    Report modal -->
+    <div class="modal fade" id="reportModal" tabindex="-1" aria-labelledby="reportModal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="reporting-form" method="post" th:action="@{/topics/{id}/report(id=${topic.getId()})}">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Report User</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="report-username" id="reportUsername">
+                        <label for="reason" class="form-label">Reason</label>
+                        <textarea id="reason"
+                                  name="reason"
+                                  class="form-control"
+                                  rows="3"
+                                  placeholder="Enter reason for reporting..."
+                                  required></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button"
+                                class="btn btn-secondary"
+                                data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit"
+                                class="btn btn-danger">Submit Report</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </main>
 
 <!-- Add Tag Modal -->
-<div class="modal fade" id="addTagModal" tabindex="-1" aria-labelledby="addTagModalLabel" aria-hidden="true">
+<div class="modal fade"
+     id="addTagModal"
+     tabindex="-1"
+     aria-labelledby="show-guidelines"
+     aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h5
-                        class="modal-title" id="addTagModalLabel">Add a Tag</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        class="modal-title"
+                        id="addTagModalLabel">
+                    Add
+                    a
+                    Tag</h5>
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form th:action="@{/topics/{id}/tags/add (id=${topic.getId()})}" method="post" id="addTagForm">
+                <form th:action="@{/topics/{id}/tags/add (id=${topic.getId()})}"
+                      method="post"
+                      id="addTagForm">
                     <div class="mb-3">
-                        <label class="form-label">Tag Name</label>
-                        <select id="existingTags" class="form-select mb-3" name="tagName">
-                            <option value="" selected disabled>Select an existing tag</option>
-                            <option th:each="tag : ${tags}" th:value="${tag.getName()}" th:text="${tag.getName()}">
-                                Example Tag
+                        <label class="form-label">Tag
+                            Name</label>
+                        <select id="existingTags"
+                                class="form-select mb-3"
+                                name="tagName">
+                            <option value=""
+                                    selected
+                                    disabled>
+                                Select
+                                an
+                                existing
+                                tag
                             </option>
-                            <option value="custom">Enter a custom tag...</option>
+                            <option th:each="tag : ${tags}"
+                                    th:value="${tag.getName()}"
+                                    th:text="${tag.getName()}">
+                                Example
+                                Tag
+                            </option>
+                            <option value="custom">
+                                Enter
+                                a
+                                custom
+                                tag...
+                            </option>
                         </select>
-                        <input type="text" id="customTag" class="form-control d-none"
+                        <input type="text"
+                               id="customTag"
+                               class="form-control d-none"
                                placeholder="Enter custom tag name"/>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Add Tag</button>
-                    <input th:if="${session.user!=null}" type="hidden" name="username"
+                    <button type="submit"
+                            class="btn btn-primary w-100">
+                        Add
+                        Tag
+                    </button>
+                    <input th:if="${session.user!=null}"
+                           type="hidden"
+                           name="username"
                            th:value="${session.user.username}"/>
                 </form>
             </div>
@@ -165,27 +289,55 @@
 </div>
 
 <!-- Edit Topic Modal -->
-<div class="modal fade" id="editTopicModal" tabindex="-1" aria-labelledby="editTopicModalLabel" aria-hidden="true">
+<div class="modal fade"
+     id="editTopicModal"
+     tabindex="-1"
+     aria-labelledby="editTopicModalLabel"
+     aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="editTopicModalLabel">Edit Topic</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title"
+                    id="editTopicModalLabel">
+                    Edit
+                    Topic</h5>
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form th:action="@{/topics/{id}/edit (id=${topic.getId()})}" method="post">
+                <form th:action="@{/topics/{id}/edit (id=${topic.getId()})}"
+                      method="post">
                     <div class="mb-3">
-                        <label for="topicTitle" class="form-label">Title</label>
-                        <input type="text" id="topicTitle" name="title" class="form-control"
-                               th:value="${topic.getTitle()}" required>
+                        <label for="topicTitle"
+                               class="form-label">Title</label>
+                        <input type="text"
+                               id="topicTitle"
+                               name="title"
+                               class="form-control"
+                               th:value="${topic.getTitle()}"
+                               required>
                     </div>
                     <div class="mb-3">
-                        <label for="topicContent" class="form-label">Content</label>
-                        <textarea id="topicContent" name="content" class="form-control" rows="5"
-                                  th:text="${topic.getContent()}" required></textarea>
+                        <label for="topicContent"
+                               class="form-label">Content</label>
+                        <textarea
+                                id="topicContent"
+                                name="content"
+                                class="form-control"
+                                rows="5"
+                                th:text="${topic.getContent()}"
+                                required></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Save Changes</button>
-                    <input th:if="${session.user!=null}" type="hidden" name="username"
+                    <button type="submit"
+                            class="btn btn-primary w-100">
+                        Save
+                        Changes
+                    </button>
+                    <input th:if="${session.user!=null}"
+                           type="hidden"
+                           name="username"
                            th:value="${session.user.username}"/>
                 </form>
             </div>
@@ -193,7 +345,43 @@
     </div>
 </div>
 
-<!-- Edit Reply Modal -->
+<!-- Show guidelines modal -->
+<div class="modal fade"
+     id="show-guidelines"
+     tabindex="-1"
+     aria-labelledby="addTagModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title"
+                    id="show-guidelines-label">
+                    Guidelines</h5>
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <p th:text="|The guidelines for ${topic.getTitle()}|"></p>
+                <ul th:each="guideline:${topic.getGuidelines()}">
+                    <li th:text="${guideline.getDescription()}"></li>
+                </ul>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button"
+                        class="btn btn-secondary btn-sm"
+                        data-bs-dismiss="modal">
+                    Close
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
 
 
 <script>
@@ -259,13 +447,16 @@
             const contentBox = document.querySelector(`.reply-content[data-reply-id="${id}"]`)
             editClasses(editBox, 'd-none', 'd-block')
             contentBox.classList.add("d-none")
-        }else if(target.classList.contains("close-edit-btn"))
-        {
+        } else if (target.classList.contains("close-edit-btn")) {
             const id = target.dataset.replyId;
             const editBox = document.querySelector(`.edit-reply[data-reply-id="${id}"]`)
             const contentBox = document.querySelector(`.reply-content[data-reply-id="${id}"]`)
             editClasses(editBox, 'd-block', 'd-none')
             contentBox.classList.remove("d-none")
+        }else if(target.classList.contains("report-btn")){
+           const userForReporting = target.dataset.username
+           const userForReportingInput = document.querySelector('#reportUsername')
+            userForReportingInput.value=userForReporting
         }
     })
 </script>
