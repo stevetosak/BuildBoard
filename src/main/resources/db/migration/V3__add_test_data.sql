@@ -63,13 +63,15 @@ VALUES
 
 INSERT INTO permissions (name)
 VALUES
-    ('Create Thread'),
-    ('Delete Thread');
+    ('READ'),
+    ('WRITE'),
+    ('CREATE'),
+    ('DELETE');
 
-INSERT INTO project_role (name, project_id, description)
+INSERT INTO project_role (name, project_id)
 VALUES
-    ('Admin', 5, 'Admin role for the project'),
-    ('Developer', 5, 'Developer role for the project');
+    ('Admin', 5),
+    ('Developer', 5);
 
 
 INSERT INTO users_project_roles (user_id, project_id, role_name)
@@ -79,8 +81,10 @@ VALUES
 
 INSERT INTO project_roles_permissions (permission_name, role_name, project_id)
 VALUES
-    ('Create Thread', 'Admin', 5),
-    ('Delete Thread', 'Admin', 5);
+    ('READ', 'Admin', 5),
+    ('WRITE', 'Admin', 5),
+    ('CREATE','Admin',5),
+    ('DELETE','Admin',5);
 
 insert into submission(created_by,status,description)
 values
@@ -91,6 +95,7 @@ INSERT INTO report (id,thread_id, for_user_id)
 VALUES
     (1, 2, 1),
     (2, 1, 3);
+
 
 INSERT INTO channel (name, description, project_id, developer_id)
 VALUES

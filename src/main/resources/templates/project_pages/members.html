@@ -56,18 +56,24 @@
                     ></a>
                 </h5>
             </div>
-            <h5 th:if="${member.getId() != project.getUser().getId()}" class="fw-lighter mb-0 fst-italic">Developer</h5>
-            <h5 th:if="${member.getId() == project.getUser().getId()}" class="fw-lighter mb-0 fst-italic">Owner</h5>
-            <div style="position: relative; display: inline-block;" th:if="${session.user.getId() == project.getUser().getId() && member.getId() != project.getUser().getId()}"
-            class="d-flex flex-row gap-1 align-items-center">
-                <button
-                        th:attr="data-mem-id=${member.getId()}"
-                        type="button" class="btn rounded open-kick-dialog"
-                        style="background-image: url('/project_imgs/im-kick-user.svg'); width: 3rem; height: 3rem; background-color: transparent"
-                        data-bs-toggle="modal"
-                        data-bs-target="#confirm"
-                >
-                </button>
+            <div class="d-flex align-items-center gap-5">
+                <div>
+                    roles here ko badges
+                </div>
+                <h5 th:if="${member.getId() != project.getUser().getId()}" class="fw-lighter mb-0 fst-italic">Developer</h5>
+                <h5 th:if="${member.getId() == project.getUser().getId()}" class="fw-lighter mb-0 fst-italic">Owner</h5>
+                <div style="position: relative; display: inline-block;" th:if="${session.user.getId() == project.getUser().getId() && member.getId() != project.getUser().getId()}"
+                     class="d-flex flex-row gap-1 align-items-center">
+                    <button
+                            th:attr="data-mem-id=${member.getId()}"
+                            type="button" class="btn rounded open-kick-dialog"
+                            style="background-image: url('/project_imgs/im-kick-user.svg'); width: 3rem; height: 3rem; background-color: transparent"
+                            data-bs-toggle="modal"
+                            data-bs-target="#confirm"
+                    >
+                    </button>
+            </div>
+
             </div>
         </div>
     </div>
