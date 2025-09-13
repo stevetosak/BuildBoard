@@ -9,7 +9,7 @@ public class BlacklistedUserService {
 
     public BlacklistedUserService(BlacklistedUserRepo blacklistedUserRepo) {this.blacklistedUserRepo = blacklistedUserRepo;}
 
-    public boolean isBlacklisted(long userId) {
-        return blacklistedUserRepo.isUserInBlacklist(userId);
+    public boolean isBlacklisted(long userId, long topicId) {
+        return blacklistedUserRepo.isUserInBlacklist(userId, topicId);
     }
 }

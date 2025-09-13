@@ -12,8 +12,8 @@ public interface BlacklistedUserRepo extends JpaRepository<BlacklistedUser, Blac
         select exists(
                 select *
                 from blacklisted_user bu
-                where bu.user_id=:userId
+                where bu.user_id=:userId and bu.topic_id = :topicId
         ) 
     """)
-    boolean isUserInBlacklist(@Param("userId") long userId);
+    boolean isUserInBlacklist(@Param("userId") long userId, @Param("topicId") long topicId);
 }

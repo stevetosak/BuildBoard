@@ -64,7 +64,7 @@ public class TopicController {
             model.addAttribute("errMsg", "There already exists a thread with the same title in that parent");
         }
 
-        if(blacklistedUserService.isBlacklisted(user.getId())) {
+        if(blacklistedUserService.isBlacklisted(user.getId(), topicId)) {
             return "blacklisted";
         }
 
