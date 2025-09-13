@@ -72,6 +72,11 @@
                     Show
                     guidelines
                 </button>
+<!--                Moderator check -->
+                <a th:if="${session.user != null}" th:href="@{/topics/{id}/reports(id=${topic.getId()})}"
+                   class="btn btn-info btn-sm">
+                    Show reports
+                </a>
             </div>
         </div>
 

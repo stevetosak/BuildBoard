@@ -1,5 +1,7 @@
 package com.db.finki.www.build_board.controller.thread_controller;
 
+import com.db.finki.www.build_board.entity.entity_enum.Status;
+import com.db.finki.www.build_board.entity.thread.Project;
 import com.db.finki.www.build_board.entity.user_type.BBUser;
 import com.db.finki.www.build_board.entity.thread.Topic;
 import com.db.finki.www.build_board.service.ReportService;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.view.RedirectView;
 
 @Controller
 @RequestMapping("/topics")
@@ -114,4 +117,48 @@ public class TopicController {
         throw e;
     }
 
+    @GetMapping("{id}/reports")
+    //TODO: check if moderators
+    public String getReports(@PathVariable(name = "id") long topicId, Model model,
+            @RequestParam(required = false) Status status,
+            @RequestParam(required = false, name = "checkSearchLatest") String isSearForLatestActive
+
+                            ){
+       Topic t = topicService.getById(topicId);
+
+       model.addAttribute("topic", t);
+       model.addAttribute("reports", reportService.getByStatusAndProjectAndLatest(status,
+                       (int) topicId, isSearForLatestActive));
+
+       model.addAttribute("status", Status.values());
+       model.addAttribute("isSearForLatestActive", isSearForLatestActive);
+
+       return "show-reports";
+    }
+
+    @PostMapping("{id}/reports/{req-id}/accept")
+    public RedirectView acceptRequest(
+            @PathVariable(name = "req-id") Integer reqId,
+            @PathVariable(name = "id") long topicId,
+            @RequestParam(name = "feedback-desc") String feedbackDesc,
+            @SessionAttribute @P("user") BBUser user
+                                     ) {
+        reportService.accept(reqId, feedbackDesc, user);
+        return new RedirectView(
+                String.format("/topics/%s", topicId)
+        );
+    }
+
+    @PostMapping("{id}/reports/{req-id}/deny")
+    public RedirectView denyRequest(
+            @PathVariable(name = "req-id") Integer reqId,
+            @PathVariable(name = "id") long topicId,
+            @RequestParam(name = "feedback-desc") String feedbackDesc,
+            @SessionAttribute @P("user") BBUser user
+                                   ) {
+        reportService.deny(reqId, feedbackDesc, user);
+        return new RedirectView(
+                String.format("/topics/{id}/reports", topicId)
+        );
+    }
 }

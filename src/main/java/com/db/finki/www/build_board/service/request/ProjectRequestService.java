@@ -30,6 +30,7 @@ public class ProjectRequestService {
                 .get();
     }
 
+    @Transactional
     public void deny(Integer reqId, String desc, BBUser creator) {
         ProjectRequests prReq = getRequestById(reqId);
         prReq.setStatus(Status.DENIED);

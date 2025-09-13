@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>
+        Requests</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+</head>
+<body>
+<header>
+    <div th:replace="/home_pages/home :: navigation"></div>
+</header>
+<section
+        class="d-flex mt-3 flex-column w-100 align-items-center mt-5">
+    <form method="get"
+          th:action="@{/topics/{id}/reports(id=${topic.getId()})}"
+          class="d-flex flex-row gap-2 align-items-center"
+          style="width:fit-content">
+        <label for="status-query">Filter
+            by
+            status:</label>
+        <select id="status-query"
+                name="status"
+                class="form-select form-select-sm w-auto">
+            <option
+                    th:each="st:${status}"
+                    th:text="${st}"
+                    th:value="${st}"
+            ></option>
+            <option value=""
+                    selected>
+                All
+            </option>
+        </select>
+        <label>
+            <input type="checkbox"
+                   th:checked="${isSearForLatestActive != null}"
+                   th:value="y"
+                   name="checkSearchLatest">
+            Show
+            only
+            latest
+            request
+        </label>
+        <button class="btn btn-primary">
+            Search
+        </button>
+    </form>
+</section>
+<main class="d-flex justify-content-center mt-5 align-items-center flex-column ">
+    <div class="card shadow-sm mb-4 w-75"
+         th:each="req:${reports}"
+    >
+        <div class="card-header  text-white d-flex justify-content-between align-items-center"
+             th:with="st=${req.getStatus()}"
+             th:classappend="${st.name() == 'PENDING' ? 'bg-warning' : (st.name() == 'DENIED' ? 'bg-danger' : 'bg-info')}"
+        >
+            <h3 th:text="|About ${req.getUser().getUsername()}|">
+                Creator
+                of
+                request</h3>
+            <h3 class="fs-6 ">
+                <span>Status:</span>
+                <span
+                        th:text="${#strings.capitalize(req.getStatus().name().toLowerCase())}"></span>
+            </h3>
+        </div>
+        <div class="d-flex flex-column gap-3 justify-content-between card-body">
+            <div>
+                <h4>
+                    Description</h4>
+                <p th:text="${req.getDescription()}">
+                    Description
+                    of
+                    the
+                    project
+                    goes
+                    here.</p>
+                <p th:text="|Submitted on: ${#temporals.format(req.getCreatedAt(), 'dd/MM/yyyy HH:mm')}|"></p>
+                <p>
+                    <span>Created by:</span>
+                    <span class="fw-bold"
+                          th:text="${req.getCreator().getUsername()}">Created by</span>
+                </p>
+            </div>
+            <!--            Tuka moderator -->
+            <!--                        th:attr="data-pr-title=${project.getTitle()}, data-req-id=${req.getId()}"-->
+
+            <div th:if="${req.getStatus().name().equals('PENDING') &&  session.user != null && session.user.getId() == topic.getUser().getId()}"
+                 class="card-footer d-flex flex-row gap-3">
+                <button type="button"
+                        class="btn btn-success accept-btn footer-btn"
+                        th:attr="data-topic-id=${req.getTopic().getId()}, data-req-id=${req.getId()}"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modal"
+                >
+                    Accept
+                </button>
+                <button type="button"
+                        class="btn btn-danger deny-btn footer-btn"
+                        th:attr="data-topic-id=${req.getTopic().getId()}, data-req-id=${req.getId()}"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modal"
+                >
+                    Deny
+                </button>
+            </div>
+            <div class="card-footer"
+                 th:if="${req.getStatus().name().equals('DENIED')}"
+            >
+                <button type="button"
+                        th:if="${req.getStatus().name().equals('DENIED')}"
+                        class="btn-feedback-open btn btn-success">
+                    View
+                    feedback
+                </button>
+                <div th:if="${req.getFeedback()!=null && req.getFeedback().getDescription()!=null}"
+                     th:with="feed=${req.getFeedback()}"
+                     class="feedback d-flex flex-column gap-2 invisible"
+                     style="height: 0">
+                    <h5>
+                        Feedback</h5>
+                    <p th:text="${feed==null ? '' : (feed.getDescription() == null ? '' : feed.getDescription()) }"></p>
+                    <p>
+                        <span>Submitted at:</span>
+                        <span th:text="${feed != null ? #temporals.format(feed.getCreatedAt(), 'dd/MM/yyyy  HH:mm')  : ''}"></span>
+                    <div class="w-100 d-flex justify-content-end">
+                        <button type="button"
+                                class="btn-feedback-close btn-danger btn">
+                            Close
+                        </button>
+                    </div>
+                </div>
+                <p th:if="${req.getFeedback() != null && req.getFeedback().getDescription()==null}"
+                   th:text="|Accepted on: ${#temporals.format(req.getFeedback().getCreatedAt(), 'dd/MM/yyyy  HH:mm')}|"></p>
+            </div>
+        </div>
+        <div class="modal fade"
+             id="modal"
+             data-bs-backdrop="static"
+             data-bs-keyboard="false"
+             tabindex="-1"
+             aria-labelledby="staticBackdropLabel"
+             aria-hidden="true"
+        >
+            <form method="post"
+                  id="modal-form">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5"
+                                id="staticBackdropLabel2">
+                                Feedback</h1>
+                            <button type="button"
+                                    class="btn-close"
+                                    data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body d-flex flex-column gap-2">
+                            <label>Description</label>
+                            <textarea
+                                    id="feedback-desc2"
+                                    style="height: 20vh"
+                                    class="w-100 border border-rounded"
+                                    name="feedback-desc"></textarea>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-success">
+                                Submit
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/modal_utils.js"></script>
+<script>
+    document.querySelectorAll(".modal").forEach(modal => modalConts.push(modal))
+    const formModal = document.querySelector("#modal-form")
+    document.addEventListener("click", ev => {
+        if (ev.target == null || ev.target.type !== 'button') return;
+        console.log(ev.target.classList)
+        if (ev.target.classList.contains("footer-btn")) {
+            const btn = ev.target
+            const topicId = btn.dataset.topicId
+            const reqId = btn.dataset.reqId
+            if (btn.classList.contains("deny-btn")) {
+                formModal.action = `/topics/${topicId}/reports/${reqId}/deny`
+            }else if(btn.classList.contains("accept-btn")){
+                formModal.action =`/topics/${topicId}/reports/${reqId}/accept`
+            }
+        } else if (ev.target.classList.contains("btn-feedback-open")) {
+            const btn = ev.target
+            const feedbackCont = btn.nextElementSibling
+
+            btn.classList.add('invisible')
+            btn.style.width = '0'
+            btn.style.height = '0'
+
+            feedbackCont.style.height = 'max-content';
+            feedbackCont.classList.remove('invisible')
+
+        } else if (ev.target.classList.contains("btn-feedback-close")) {
+            const closeBtn = ev.target
+            const feedbackCont = closeBtn.parentElement.parentElement
+            const btn = feedbackCont.previousElementSibling
+
+            console.log(feedbackCont)
+
+            btn.classList.remove('invisible')
+            btn.style.width = 'max-content'
+            btn.style.height = 'max-content'
+
+            feedbackCont.style.height = '0';
+            feedbackCont.classList.add('invisible')
+        }
+    })
+</script>
+</body>
+</html>

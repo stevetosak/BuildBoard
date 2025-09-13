@@ -30,4 +30,5 @@ public class Topic extends EmbeddableThread implements NamedThread {
         return "topics";
     }
 
+    //TODO: add moderator
 }
