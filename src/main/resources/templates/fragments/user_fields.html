@@ -26,7 +26,6 @@
        </label>
        <input type="hidden" name="cur_user_username"
               th:value="${session.user == null} ? '' : ${session.user.getUsername()}">
-       <a th:href="@{/{username}/project-requests(username=${username})}">View project requests</a>
        <button th:if="${canEdit}" class="btn btn-success btn-sm w-50 align-self-center">Save changes
        </button>
 </form>

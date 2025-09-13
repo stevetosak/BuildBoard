@@ -111,6 +111,15 @@
               <div class="profile-description">
                 <h5>Projects worked in:</h5>
               </div>
+              <a th:href="@{/{username}/project-requests(username=${username})}"
+                 class="btn btn-info btn-md me-2 mt-4">
+                View project requests
+              </a>
+              <a th:href="@{/{username}/reports(username=${username})}"
+                 class="btn btn-info btn-md mt-4">
+                View submitted reports
+              </a>
+            </div>
             </div>
           </div>
         </div>
