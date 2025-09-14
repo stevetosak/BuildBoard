@@ -483,6 +483,25 @@ BEGIN
 END;
 $$;
 
+
+CREATE OR REPLACE FUNCTION fn_change_status_on_pending_reports()
+    RETURNS TRIGGER
+    LANGUAGE plpgsql
+AS $$
+BEGIN
+    RAISE NOTICE 'user_id: %, topic_id: %', NEW.user_id, NEW.topic_id;
+
+    UPDATE submission
+    SET status = 'ACCEPTED'
+    WHERE id in (
+        select id
+        from report r
+        where r.for_user_id = NEW.user_id and r.thread_id = NEW.topic_id
+    );
+
+    RETURN NEW;
+END;
+$$;
 -------------------------- TRIGGERS ----------------------
 
 CREATE OR REPLACE TRIGGER tr_check_topic_name --RADI
@@ -547,6 +566,12 @@ create or replace trigger tr_add_blacklisted_user
 before insert on blacklisted_user
 for each row
 execute function fn_add_blacklisted_user();
+
+CREATE OR REPLACE TRIGGER tr_change_status_on_pending_reports
+    AFTER INSERT
+    ON blacklisted_user
+    FOR EACH ROW
+EXECUTE FUNCTION fn_change_status_on_pending_reports();
 
 -- create or replace trigger tr_remove_thread_from_project
 -- after delete
