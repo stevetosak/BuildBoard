@@ -1,11 +1,13 @@
 package com.db.finki.www.build_board.controller.thread_controller;
 
+import com.db.finki.www.build_board.entity.blacklisted_user.BlacklistedUser;
 import com.db.finki.www.build_board.entity.entity_enum.Status;
 import com.db.finki.www.build_board.entity.thread.Project;
 import com.db.finki.www.build_board.entity.user_type.BBUser;
 import com.db.finki.www.build_board.entity.thread.Topic;
 import com.db.finki.www.build_board.entity.user_type.Moderator;
 import com.db.finki.www.build_board.service.BlacklistedUserService;
+import com.db.finki.www.build_board.service.BlacklistedUserType;
 import com.db.finki.www.build_board.service.ReportService;
 import com.db.finki.www.build_board.service.thread.impl.DiscussionService;
 import com.db.finki.www.build_board.service.thread.itf.TagService;
@@ -18,6 +20,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
+
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/topics")
@@ -172,13 +177,28 @@ public class TopicController {
                                    ) {
         reportService.deny(reqId, feedbackDesc, user);
         return new RedirectView(
-                String.format("/topics/{id}/reports", topicId)
+                String.format("/topics/%s/reports", topicId)
         );
     }
 
     @GetMapping("{id}/blacklisted")
     public String getBlacklistedUsers(@PathVariable(name = "id") long topicId, Model model){
+        Map<BlacklistedUserType, List<BlacklistedUser>> tmp = topicService.getBlacklistedUsersForTopicById(topicId);
 
-        return "show-blacklisted-users.html";
+        model.addAttribute("current",  tmp.get(BlacklistedUserType.CURRENT));
+        model.addAttribute("previous",  tmp.get(BlacklistedUserType.PREVIOUS));
+
+        return "show-blacklisted-users";
+    }
+
+    @PostMapping("{id}/blacklisted/{userId}")
+    public RedirectView revokeBlacklistedUser(
+            @PathVariable(name = "id") long topicId,
+            @PathVariable(name = "userId") int blacklistedUserId
+                                             ){
+        blacklistedUserService.revoke(topicId,blacklistedUserId);
+        return new RedirectView(
+                String.format("/topics/%s/blacklisted", topicId)
+        );
     }
 }

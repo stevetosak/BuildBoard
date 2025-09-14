@@ -12,4 +12,8 @@ public class BlacklistedUserService {
     public boolean isBlacklisted(long userId, long topicId) {
         return blacklistedUserRepo.isUserInBlacklist(userId, topicId);
     }
+
+    public void revoke(long topicId, int blacklistedUserId) {
+        blacklistedUserRepo.revoke(topicId,blacklistedUserId);
+    }
 }

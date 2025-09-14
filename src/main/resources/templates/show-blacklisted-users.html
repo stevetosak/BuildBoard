@@ -1,24 +1,95 @@
 <!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
-    <title>Reports</title>
+    <title>
+        Reports</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
           rel="stylesheet">
 </head>
 <body>
-<div class="list-group-item d-flex gap-2 justify-content-between align-items-center ps-4 pe-4"
-     th:each="blacklistedUser : ${blacklistedUsers}">
-    <div class="d-flex flex-row align-items-center gap-3">
-        <img class="rounded-circle border border-1 border-info"
-             style="width: 5em; height: 5em"
-             th:src="${blacklistedUser.getAvatarUrl()}">
-        <h5 class="mb-1 d-flex">
-            <a th:href="@{/{username}/profile (username=${blacklistedUser.getUsername()})}"
-               th:text="${blacklistedUser.getUsername()}"
-               class="text-decoration-none"
-            ></a>
-        </h5>
+<header>
+    <div th:replace="/home_pages/home :: navigation"></div>
+</header>
+<main class="d-flex align-items-center mt-5 flex-column">
+    <div class="list-group w-75">
+        <h1 class="text-center">
+            Latest</h1>
+        <div class="row fs-4" th:if="${!#lists.isEmpty(current)}">
+            <div class="col"></div>
+            <div class="col-auto "
+                 style="width: 7em">
+                <span>Start time</span>
+            </div>
+        </div>
+        <div class="list-group-item d-flex gap-2 justify-content-between align-items-center ps-4 pe-4"
+             th:each="blacklisted : ${current}">
+            <div class="d-flex flex-row align-items-center gap-3">
+                <img class="rounded-circle border border-1 border-info"
+                     style="width: 5em; height: 5em"
+                     th:src="${blacklisted.getRefersTo().getAvatarUrl()}">
+                <h5 class="mb-1 d-flex">
+                    <a th:href="@{/{username}/profile (username=${blacklisted.getRefersTo().getUsername()})}"
+                       th:text="${blacklisted.getRefersTo().getUsername()}"
+                       class="text-decoration-none"
+                    ></a>
+                    </a>
+                </h5>
+            </div>
+            <div class="d-flex gap-3 align-items-center">
+                <form method="post"
+                      th:action="@{/topics/{id}/blacklisted/{userId}(
+          id=${blacklisted.topic.getId()},
+          userId=${blacklisted.getRefersTo().getId()}
+      )}">
+                    <button class="btn btn-outline-danger btn-sm px-3">
+                        <i class="bi bi-x-circle me-1"></i>
+                        Revoke
+                    </button>
+                </form>
+                <p class="mb-0"
+                   th:text="${#temporals.format(blacklisted.getStartTime(), 'dd MMM yyyy')}"
+                   style="width: 7em">
+                    Start
+                    time</p>
+            </div>
+        </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</div>
+    <div class="mt-2 w-75">
+        <h1 class="text-center mb-0 mt-2">
+            Previous</h1>
+        <div class="list-group w-full">
+            <div class="d-flex fs-4 justify-content-end">
+                <span style="margin-right: 1em">Start time</span>
+                <span style="margin-right: 2em">End time</span>
+            </div>
+            <div class="list-group-item d-flex gap-2 justify-content-between align-items-center ps-4 pe-4"
+                 th:each="prev : ${previous}">
+                <div class="d-flex flex-row align-items-center gap-3">
+                    <img class="rounded-circle border border-1 border-info"
+                         style="width: 5em; height: 5em"
+                         th:src="${prev.getRefersTo().getAvatarUrl()}">
+                    <h5 class="mb-1 d-flex">
+                        <a th:href="@{/{username}/profile (username=${prev.getRefersTo().getUsername()})}"
+                           th:text="${prev.getRefersTo().getUsername()}"
+                           class="text-decoration-none"
+                        ></a>
+                    </h5>
+                </div>
+                <div class="d-flex gap-3 align-items-center">
+                    <p class="mb-0"
+                       style="width: 7em"
+                       th:text="${#temporals.format(prev.getStartTime(), 'dd MMM yyyy')}">
+                        Start
+                        time</p>
+                    <p class="mb-0"
+                       style="width: 7em"
+                       th:text="${#temporals.format(prev.getEndTime(), 'dd MMM yyyy')}">
+                        End
+                        time</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

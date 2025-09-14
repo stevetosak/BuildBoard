@@ -8,11 +8,16 @@ import com.db.finki.www.build_board.entity.thread.Tag;
 import com.db.finki.www.build_board.entity.thread.Topic;
 import com.db.finki.www.build_board.repository.thread.TagRepository;
 import com.db.finki.www.build_board.repository.thread.TopicRepository;
+import com.db.finki.www.build_board.service.BlacklistedUserType;
 import com.db.finki.www.build_board.service.thread.itf.TopicService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class TopicServiceImpl implements TopicService {
@@ -28,17 +33,17 @@ public class TopicServiceImpl implements TopicService {
     @Override
     public Topic create(String title, String description, BBUser user) {
         Topic topic = new Topic();
-        
+
         topic.setTitle(title);
         topic.setContent(description);
         topic.setUser(user);
-        
+
         return topicRepository.save(topic);
     }
 
-    public Topic create(String title, String description, BBUser user, Project parent){
+    public Topic create(String title, String description, BBUser user, Project parent) {
         Topic topic = new Topic();
-        
+
         topic.setTitle(title);
         topic.setContent(description);
         topic.setUser(user);
@@ -69,24 +74,38 @@ public class TopicServiceImpl implements TopicService {
 
     @Override
     public Topic getById(Long id) {
-        return topicRepository.findById(id).orElse(null);
+        return topicRepository
+                .findById(id)
+                .orElse(null);
     }
 
     @Override
     @Transactional
     public void addTagToTopic(Topic topic, String tagName, BBUser user) {
-        tagRepository.findByName(tagName).ifPresentOrElse(tag -> {
-            topic.getTags().add(tag);
-            tag.getThreads().add(topic);
-            topicRepository.save(topic);
-            tagRepository.save(tag);
-        },() -> {
-            Tag tag = new Tag(tagName,user);
-            tagRepository.save(tag);
-            topic.getTags().add(tag);
-            tag.getThreads().add(topic);
-            topicRepository.save(topic);
-        });
+        tagRepository
+                .findByName(tagName)
+                .ifPresentOrElse(tag -> {
+                            topic
+                                    .getTags()
+                                    .add(tag);
+                            tag
+                                    .getThreads()
+                                    .add(topic);
+                            topicRepository.save(topic);
+                            tagRepository.save(tag);
+                        },
+                        () -> {
+                            Tag tag = new Tag(tagName,
+                                    user);
+                            tagRepository.save(tag);
+                            topic
+                                    .getTags()
+                                    .add(tag);
+                            tag
+                                    .getThreads()
+                                    .add(topic);
+                            topicRepository.save(topic);
+                        });
     }
 
     @Override
@@ -100,13 +119,24 @@ public class TopicServiceImpl implements TopicService {
     @Transactional
     public Topic deleteTagFromTopic(long id, String tagName) {
         Topic t = getById(id);
-        boolean removed = t.getTags().removeIf(tag -> tag.getName().equals(tagName));
-        if(!removed) throw new IllegalArgumentException("Tag not found");
+        boolean removed = t
+                .getTags()
+                .removeIf(tag -> tag
+                        .getName()
+                        .equals(tagName));
+        if (!removed) throw new IllegalArgumentException("Tag not found");
         return topicRepository.save(t);
     }
 
-    public List<BlacklistedUser> getBlacklistedUsersForTopicById(long id) {
-
+    public Map<BlacklistedUserType, List<BlacklistedUser>> getBlacklistedUsersForTopicById(long id) {
+        return topicRepository
+                .findById(id)
+                .getBlacklistedUsers()
+                .stream()
+                .collect(Collectors.groupingBy(
+                        b -> b.getEndTime() == null
+                                ? BlacklistedUserType.CURRENT
+                                : BlacklistedUserType.PREVIOUS
+                                              ));
     }
-
 }
