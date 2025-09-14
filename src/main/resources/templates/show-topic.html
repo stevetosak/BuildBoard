@@ -195,14 +195,15 @@
     <!--    DO TUKA E TOPIC-->
 
     <!-- Replies Section -->
-    <div th:replace="~{/fragments/discussion :: discussion(reply_cont=${replies})}"></div>
+    <div th:replace="~{/fragments/discussion :: discussion(reply_cont=${replies},blacklisted=${blacklisted})}"></div>
 
     <!--    Report modal -->
     <div class="modal fade"
          id="reportModal"
          tabindex="-1"
          aria-labelledby="reportModal"
-         aria-hidden="true">
+         aria-hidden="true"
+    >
         <div class="modal-dialog">
             <div class="modal-content">
                 <form id="reporting-form"

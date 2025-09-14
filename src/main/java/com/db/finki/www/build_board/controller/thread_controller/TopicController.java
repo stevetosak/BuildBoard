@@ -73,6 +73,7 @@ public class TopicController {
             return "blacklisted";
         }
 
+        model.addAttribute("blacklisted", blacklistedUserService.findForTopic(topicId));
         return bootstartTopic(topicId, model);
     }
 

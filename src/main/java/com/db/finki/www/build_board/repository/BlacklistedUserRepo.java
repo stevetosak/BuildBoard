@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface BlacklistedUserRepo extends JpaRepository<BlacklistedUser, BlacklistedUserId> {
     @Query(nativeQuery = true,
     value = """
@@ -28,4 +30,6 @@ public interface BlacklistedUserRepo extends JpaRepository<BlacklistedUser, Blac
     where topic_id=:topic and user_id = :user
 """)
     void revoke(@Param("topic") long topicId, @Param("user") int blacklistedUserId);
+
+    List<BlacklistedUser> findAllByTopicId(Integer topicId);
 }

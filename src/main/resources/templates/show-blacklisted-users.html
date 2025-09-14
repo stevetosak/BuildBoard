@@ -22,40 +22,49 @@
                 <span>Start time</span>
             </div>
         </div>
-        <div class="list-group-item d-flex gap-2 justify-content-between align-items-center ps-4 pe-4"
+        <div class="list-group-item d-flex gap-2 justify-content-between align-items-center ps-4 pe-4 flex-wrap"
              th:each="blacklisted : ${current}">
-            <div class="d-flex flex-row align-items-center gap-3">
-                <img class="rounded-circle border border-1 border-info"
-                     style="width: 5em; height: 5em"
-                     th:src="${blacklisted.getRefersTo().getAvatarUrl()}">
-                <h5 class="mb-1 d-flex">
-                    <a th:href="@{/{username}/profile (username=${blacklisted.getRefersTo().getUsername()})}"
-                       th:text="${blacklisted.getRefersTo().getUsername()}"
-                       class="text-decoration-none"
-                    ></a>
-                    </a>
-                </h5>
-            </div>
-            <div class="d-flex gap-3 align-items-center">
-                <form method="post"
-                      th:action="@{/topics/{id}/blacklisted/{userId}(
+            <div class="w-100 d-flex flex-row justify-content-between">
+                <div class="d-flex flex-row align-items-center gap-3">
+                    <img class="rounded-circle border border-1 border-info"
+                         style="width: 5em; height: 5em"
+                         th:src="${blacklisted.getRefersTo().getAvatarUrl()}">
+                    <h5 class="mb-1 d-flex">
+                        <a th:href="@{/{username}/profile (username=${blacklisted.getRefersTo().getUsername()})}"
+                           th:text="${blacklisted.getRefersTo().getUsername()}"
+                           class="text-decoration-none"
+                        ></a>
+                        </a>
+                    </h5>
+                </div>
+                <div class="d-flex gap-3 align-items-center">
+                    <p style="cursor: pointer;"
+                       class="show-reason text-decoration-underline mb-0"
+                       th:if="${!blacklisted.getReason().isBlank()}">
+                        Reason</p>
+                    <form method="post"
+                          th:action="@{/topics/{id}/blacklisted/{userId}(
           id=${blacklisted.topic.getId()},
           userId=${blacklisted.getRefersTo().getId()}
       )}">
-                    <button class="btn btn-outline-danger btn-sm px-3">
-                        <i class="bi bi-x-circle me-1"></i>
-                        Revoke
-                    </button>
-                </form>
-                <p class="mb-0"
-                   th:text="${#temporals.format(blacklisted.getStartTime(), 'dd MMM yyyy')}"
-                   style="width: 7em">
-                    Start
-                    time</p>
-                <p style="cursor: pointer;"
-                   class="show-reason text-decoration-underline"
-                   th:if="${!blacklisted.getReason().isBlank()}">
-                    Reason</p>
+                        <button class="btn btn-outline-danger btn-sm px-3">
+                            <i class="bi bi-x-circle me-1"></i>
+                            Revoke
+                        </button>
+                    </form>
+                    <p class="mb-0"
+                       th:text="${#temporals.format(blacklisted.getStartTime(), 'dd MMM yyyy')}"
+                       style="width: 7em">
+                        Start
+                        time</p>
+                </div>
+            </div>
+            <div th:if="${!blacklisted.getReason().isBlank()}"
+                 style="display: none"
+                 class="reason w-100 mt-3">
+                <h3>
+                    Reason:</h3>
+                <p th:text="${blacklisted.getReason()}"></p>
             </div>
         </div>
     </div>

@@ -1,5 +1,5 @@
 <th:object
-        th:fragment="discussion(reply_cont)"
+        th:fragment="discussion(reply_cont, blacklisted)"
         th:each="reply : ${reply_cont}">
     <div
             class="card shadow-sm mt-4 d-flex"
@@ -49,7 +49,7 @@
                     </form>
                 </div>
             </div>
-            <div th:if="${session.user != null}">
+            <div th:if="${session.user != null }">
                 <button type="button"
                         class="btn btn-danger btn-sm edit-delete-btn ms-2 report-btn"
                         th:data-username="${reply.getDiscussion().getUser().getUsername()}"
@@ -179,5 +179,5 @@
             </form>
         </div>
     </div>
-    <div th:replace="~{/fragments/discussion :: discussion(reply_cont=${reply.getChildren()})}"></div>
+    <div th:replace="~{/fragments/discussion :: discussion(reply_cont=${reply.getChildren()},blacklisted=${blacklisted})}"></div>
 </th:object>
