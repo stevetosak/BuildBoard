@@ -455,8 +455,6 @@ BEGIN
 END;
 $$;
 
-
-
 -- create or replace function fn_remove_thread()
 -- returns trigger
 -- language plpgsql
@@ -468,6 +466,22 @@ $$;
 -- END;
 -- $$;
 
+create or replace function fn_add_blacklisted_user()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+	IF NOT EXISTS(
+		select 1
+		from blacklisted_user
+		where  topic_id = NEW.topic_id and user_id = NEW.user_id and end_date is NULL
+	)
+	THEN
+		RETURN NEW;
+    END IF;
+    RETURN NULL;
+END;
+$$;
 
 -------------------------- TRIGGERS ----------------------
 
@@ -528,6 +542,11 @@ create or replace trigger tr_rm_orphan_disc
     on topic_thread
     for each row
 execute function fn_aa_rm_orphan_dics();
+
+create or replace trigger tr_add_blacklisted_user
+before insert on blacklisted_user
+for each row
+execute function fn_add_blacklisted_user();
 
 -- create or replace trigger tr_remove_thread_from_project
 -- after delete
