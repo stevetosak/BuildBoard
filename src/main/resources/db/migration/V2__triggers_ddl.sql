@@ -242,9 +242,3 @@ create or replace trigger tr_add_project_resource_channel
     on channel
     for each row
 execute function fn_add_project_resource();
-
-create or replace trigger tr_add_project_resource_project_roles_permissions
-    before insert
-    on project_roles_permissions
-    for each row
-execute function fn_add_project_resource();

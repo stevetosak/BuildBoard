@@ -1,9 +1,11 @@
 package com.db.finki.www.build_board.controller.channel;
 
+import com.db.finki.www.build_board.entity.access_managment.Permission;
 import com.db.finki.www.build_board.entity.channel.Channel;
 import com.db.finki.www.build_board.entity.thread.Project;
 import com.db.finki.www.build_board.entity.user_type.BBUser;
 import com.db.finki.www.build_board.mapper.MessageMapper;
+import com.db.finki.www.build_board.service.access_managment.ProjectAccessManagementService;
 import com.db.finki.www.build_board.service.channel.ChannelService;
 import com.db.finki.www.build_board.service.channel.MessageService;
 import com.db.finki.www.build_board.service.thread.impl.ProjectService;
@@ -24,12 +26,14 @@ public class ChannelController {
     private final MessageMapper messageMapper;
     private final MessageService messageService;
     private final ProjectService projectService;
+    private final ProjectAccessManagementService projectAccessManagementService;
 
-    public ChannelController(ChannelService channelService, MessageMapper messageMapper, MessageService messageService, ProjectService projectService) {
+    public ChannelController(ChannelService channelService, MessageMapper messageMapper, MessageService messageService, ProjectService projectService, ProjectAccessManagementService projectAccessManagementService) {
         this.channelService = channelService;
         this.messageMapper = messageMapper;
         this.messageService = messageService;
         this.projectService = projectService;
+        this.projectAccessManagementService = projectAccessManagementService;
     }
 
     @GetMapping()
@@ -48,17 +52,27 @@ public class ChannelController {
                              @SessionAttribute @P("user") BBUser user
     ) {
         Channel c = (Channel) redirectAttributes.getAttribute("channel");
+
+
         if (c == null) {
             c = channelService.getByNameAndProject(channelName, project);
             model.addAttribute("channel", c);
             model.addAttribute("messages", messageMapper.toDTO(
                     messageService.getAllMessagesForProjectChannel(project.getId(), channelName)));
-            model.addAttribute("developers",projectService.getAllDevelopersForProject(project));
+            model.addAttribute("developers", projectService.getAllDevelopersForProject(project));
         } else {
             model.addAttribute("channel", c);
         }
+        if (!projectAccessManagementService.hasPermissionToAccessResource(user.getId(),
+                Permission.READ,
+                c.getProjectResource().getId(),
+                project.getId()
+        )){
+            model.addAttribute("error","You dont have permission to access this channel");
+            return "redirect:/projects/" + project.getId();
+        }
 
-        return "channels/show-channel";
+            return "channels/show-channel";
     }
 
     @PreAuthorize("@channelService.getByNameAndProject(#channelName,#project).getDeveloper().equals(#user)")

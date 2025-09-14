@@ -1,7 +1,9 @@
 package com.db.finki.www.build_board.controller.thread_controller;
 
+import com.db.finki.www.build_board.dto.AddRoleDTO;
 import com.db.finki.www.build_board.entity.thread.Project;
 import com.db.finki.www.build_board.entity.user_type.BBUser;
+import com.db.finki.www.build_board.service.access_managment.ProjectAccessManagementService;
 import com.db.finki.www.build_board.service.thread.impl.ProjectService;
 import com.db.finki.www.build_board.service.thread.impl.TagServiceImpl;
 import com.db.finki.www.build_board.service.thread.itf.TagService;
@@ -21,10 +23,12 @@ public class ProjectController {
     private final ProjectService projectService;
     private final TagService tagService;
     private final String DUPLICATED_TITLE_MSG="could not execute statement [ERROR: duplicate key value violates unique constraint";
+    private final ProjectAccessManagementService  projectAccessManagementService;
 
-    public ProjectController(ProjectService projectService, TagServiceImpl topicService) {
+    public ProjectController(ProjectService projectService, TagServiceImpl topicService, ProjectAccessManagementService projectAccessManagementService) {
         this.projectService = projectService;
         this.tagService = topicService;
+        this.projectAccessManagementService = projectAccessManagementService;
     }
 
     @GetMapping("/{title}")
@@ -33,6 +37,7 @@ public class ProjectController {
         model.addAttribute("project", project);
         model.addAttribute("tags", tagService.getAll());
         model.addAttribute("developers",projectService.getAllDevelopersForProject(project));
+        model.addAttribute("developersRoles",projectAccessManagementService.getRolesForMembersInProject(project));
         String error = (String) redirectAttributes.getAttribute("error");
         
         if(error != null){
@@ -46,6 +51,11 @@ public class ProjectController {
 
         return "project_pages/show-project";
     }
+
+//    @PostMapping("/{title}/roles/add")
+//    public String addProjectRole(@PathVariable(name = "title") String title, @RequestBody AddRoleDTO addRoleDTO, RedirectAttributes redirectAttributes) {
+//
+//    }
 
     @GetMapping("/create")
     public String getCreateProjectPage(Model model, @RequestParam(required = false) String duplicateTitle) {

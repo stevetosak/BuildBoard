@@ -79,12 +79,12 @@ VALUES
     (3, 5, 'Admin'),
     (5, 5, 'Developer');
 
-INSERT INTO project_roles_permissions (permission_name, role_name, project_id)
+INSERT INTO role_permissions (permission_name, role_name, project_id,override_type)
 VALUES
-    ('READ', 'Admin', 5),
-    ('WRITE', 'Admin', 5),
-    ('CREATE','Admin',5),
-    ('DELETE','Admin',5);
+    ('READ', 'Admin', 5,'EXCLUDE'),
+    ('WRITE', 'Admin', 5,'EXCLUDE'),
+    ('CREATE','Admin',5,'EXCLUDE'),
+    ('DELETE','Admin',5,'EXCLUDE');
 
 insert into submission(created_by,status,description)
 values
