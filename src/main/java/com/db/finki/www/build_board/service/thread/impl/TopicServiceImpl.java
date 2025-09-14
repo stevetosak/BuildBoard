@@ -1,5 +1,6 @@
 package com.db.finki.www.build_board.service.thread.impl;
 
+import com.db.finki.www.build_board.entity.blacklisted_user.BlacklistedUser;
 import com.db.finki.www.build_board.entity.thread.Project;
 import com.db.finki.www.build_board.entity.user_type.BBUser;
 import com.db.finki.www.build_board.entity.thread.BBThread;
@@ -102,6 +103,10 @@ public class TopicServiceImpl implements TopicService {
         boolean removed = t.getTags().removeIf(tag -> tag.getName().equals(tagName));
         if(!removed) throw new IllegalArgumentException("Tag not found");
         return topicRepository.save(t);
+    }
+
+    public List<BlacklistedUser> getBlacklistedUsersForTopicById(long id) {
+
     }
 
 }

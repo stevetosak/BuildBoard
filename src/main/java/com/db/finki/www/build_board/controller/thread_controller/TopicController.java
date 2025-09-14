@@ -110,8 +110,10 @@ public class TopicController {
     }
 
     @PostMapping("{id}/report")
-    public String reportUser(@PathVariable(name = "id") long topicId, @RequestParam String reason
-            , @SessionAttribute BBUser user,
+    @PreAuthorize("@topicServiceImpl.getById(#topicId).user.id.equals(#user.id)")
+    public String reportUser(@PathVariable(name = "id") @P("topicId") long topicId,
+            @RequestParam String reason
+            , @SessionAttribute @P("user") BBUser user,
             @RequestParam(name = "report-username") String reportingUser, Model model){
         reportService.createReport(topicId,reason,user, reportingUser);
 
@@ -128,11 +130,11 @@ public class TopicController {
     }
 
     @GetMapping("{id}/reports")
-    //TODO: check if moderators
-    public String getReports(@PathVariable(name = "id") long topicId, Model model,
+    @PreAuthorize("@topicServiceImpl.getById(#topicId).user.id.equals(#user.id)")
+    public String getReports(@PathVariable(name = "id") @P("topicId") long topicId, Model model,
             @RequestParam(required = false) Status status,
-            @RequestParam(required = false, name = "checkSearchLatest") String isSearForLatestActive
-
+            @RequestParam(required = false, name = "checkSearchLatest") String isSearForLatestActive,
+            @SessionAttribute @P("user") BBUser user
                             ){
        Topic t = topicService.getById(topicId);
 
@@ -147,24 +149,24 @@ public class TopicController {
     }
 
     @PostMapping("{id}/reports/{req-id}/accept")
+    @PreAuthorize("@topicServiceImpl.getById(#topicId).user.id.equals(#user.id)")
     public RedirectView acceptRequest(
             @PathVariable(name = "req-id") Integer reqId,
-            @PathVariable(name = "id") long topicId,
+            @PathVariable(name = "id") @P("topicId") long topicId,
             @RequestParam(name = "feedback-desc") String feedbackDesc,
             @SessionAttribute @P("user") BBUser user
                                      ) {
-        reportService.accept(reqId, feedbackDesc, (Moderator) user); //TODO: gore vo PreAuthorize
-        // ke imash check dali e voopshto vo moderators i da ne e moderator about user deka nemat
-        // smisla
+        reportService.accept(reqId, feedbackDesc, user);
         return new RedirectView(
                 String.format("/topics/%s/reports", topicId)
         );
     }
 
     @PostMapping("{id}/reports/{req-id}/deny")
+    @PreAuthorize("@topicServiceImpl.getById(#topicId).user.id.equals(#user.id)")
     public RedirectView denyRequest(
             @PathVariable(name = "req-id") Integer reqId,
-            @PathVariable(name = "id") long topicId,
+            @PathVariable(name = "id") @P("topicId") long topicId,
             @RequestParam(name = "feedback-desc") String feedbackDesc,
             @SessionAttribute @P("user") BBUser user
                                    ) {
@@ -172,5 +174,11 @@ public class TopicController {
         return new RedirectView(
                 String.format("/topics/{id}/reports", topicId)
         );
+    }
+
+    @GetMapping("{id}/blacklisted")
+    public String getBlacklistedUsers(@PathVariable(name = "id") long topicId, Model model){
+
+        return "show-blacklisted-users.html";
     }
 }

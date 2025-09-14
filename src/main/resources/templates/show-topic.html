@@ -72,10 +72,17 @@
                     Show
                     guidelines
                 </button>
-<!--                Moderator check -->
-                <a th:if="${session.user != null}" th:href="@{/topics/{id}/reports(id=${topic.getId()})}"
+                <!--                Moderator check -->
+                <a th:if="${session.user != null && session.user.id == topic.getUser().getId()}"
+                   th:href="@{/topics/{id}/reports(id=${topic.getId()})}"
                    class="btn btn-info btn-sm">
-                    Show reports
+                    Show
+                    reports
+                </a>
+                <a th:if="${session.user != null && session.user.id == topic.getUser().getId()}"
+                   th:href="@{/topics/{id}/blacklisted(id=${topic.getId()})}"
+                   class="btn btn-info btn-sm">
+                    Show blacklisted users
                 </a>
             </div>
         </div>
@@ -190,31 +197,50 @@
     <!-- Replies Section -->
     <div th:replace="~{/fragments/discussion :: discussion(reply_cont=${replies})}"></div>
 
-<!--    Report modal -->
-    <div class="modal fade" id="reportModal" tabindex="-1" aria-labelledby="reportModal" aria-hidden="true">
+    <!--    Report modal -->
+    <div class="modal fade"
+         id="reportModal"
+         tabindex="-1"
+         aria-labelledby="reportModal"
+         aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form id="reporting-form" method="post" th:action="@{/topics/{id}/report(id=${topic.getId()})}">
+                <form id="reporting-form"
+                      method="post"
+                      th:action="@{/topics/{id}/report(id=${topic.getId()})}">
                     <div class="modal-header">
-                        <h5 class="modal-title">Report User</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        <h5 class="modal-title">
+                            Report
+                            User</h5>
+                        <button type="button"
+                                class="btn-close"
+                                data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
-                        <input type="hidden" name="report-username" id="reportUsername">
-                        <label for="reason" class="form-label">Reason</label>
-                        <textarea id="reason"
-                                  name="reason"
-                                  class="form-control"
-                                  rows="3"
-                                  placeholder="Enter reason for reporting..."
-                                  required></textarea>
+                        <input type="hidden"
+                               name="report-username"
+                               id="reportUsername">
+                        <label for="reason"
+                               class="form-label">Reason</label>
+                        <textarea
+                                id="reason"
+                                name="reason"
+                                class="form-control"
+                                rows="3"
+                                placeholder="Enter reason for reporting..."
+                                required></textarea>
                     </div>
                     <div class="modal-footer">
                         <button type="button"
                                 class="btn btn-secondary"
-                                data-bs-dismiss="modal">Cancel</button>
+                                data-bs-dismiss="modal">
+                            Cancel
+                        </button>
                         <button type="submit"
-                                class="btn btn-danger">Submit Report</button>
+                                class="btn btn-danger">
+                            Submit
+                            Report
+                        </button>
                     </div>
                 </form>
             </div>
@@ -458,10 +484,10 @@
             const contentBox = document.querySelector(`.reply-content[data-reply-id="${id}"]`)
             editClasses(editBox, 'd-block', 'd-none')
             contentBox.classList.remove("d-none")
-        }else if(target.classList.contains("report-btn")){
-           const userForReporting = target.dataset.username
-           const userForReportingInput = document.querySelector('#reportUsername')
-            userForReportingInput.value=userForReporting
+        } else if (target.classList.contains("report-btn")) {
+            const userForReporting = target.dataset.username
+            const userForReportingInput = document.querySelector('#reportUsername')
+            userForReportingInput.value = userForReporting
         }
     })
 </script>
