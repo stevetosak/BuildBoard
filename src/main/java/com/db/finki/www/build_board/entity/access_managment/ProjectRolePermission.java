@@ -24,6 +24,10 @@ public class ProjectRolePermission {
     @Column(name = "override_type",nullable = false)
     private String overrideType;
 
+    public ProjectRolePermission(ProjectRolePermissionId projectRolePermissionId) {
+        this.id = projectRolePermissionId;
+    }
+
     public Permission getPermission() {
         return id.getPermission();
     }

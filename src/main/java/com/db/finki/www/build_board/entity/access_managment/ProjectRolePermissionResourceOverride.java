@@ -21,6 +21,7 @@ public class ProjectRolePermissionResourceOverride {
     @EmbeddedId
     private ProjectRolePermissionResourceOverrideId projectRolePermissionResourceOverrideId;
 
+
     public ProjectRolePermission getProjectRolePermission() {
         return projectRolePermissionResourceOverrideId.getProjectRolePermission();
     }

@@ -2,11 +2,14 @@ package com.db.finki.www.build_board.service.access_managment;
 
 import com.db.finki.www.build_board.dto.AddRoleDTO;
 import com.db.finki.www.build_board.dto.MembersPerRoleWrapper;
+import com.db.finki.www.build_board.dto.PermissionResourceWrapper;
 import com.db.finki.www.build_board.entity.access_managment.ProjectRole;
 import com.db.finki.www.build_board.entity.access_managment.ProjectRolePermission;
+import com.db.finki.www.build_board.entity.access_managment.ProjectRolePermissionResourceOverride;
 import com.db.finki.www.build_board.entity.access_managment.UsersProjectRoles;
 import com.db.finki.www.build_board.entity.compositeId.ProjectRoleId;
 import com.db.finki.www.build_board.entity.compositeId.ProjectRolePermissionId;
+import com.db.finki.www.build_board.entity.compositeId.ProjectRolePermissionResourceOverrideId;
 import com.db.finki.www.build_board.entity.thread.Project;
 import com.db.finki.www.build_board.repository.DeveloperRepository;
 import com.db.finki.www.build_board.repository.access_managment.ProjectRolePermissionResourceOverrideRepository;
@@ -38,27 +41,34 @@ public class ProjectAccessManagementService {
     }
 
     public boolean hasPermissionToAccessResource(int userId, String permission, int resourceId, int projectId) {
-        return projectRolePermissionResourceOverrideRepository.hasPermissionForResource(projectId,userId, permission, resourceId);
+        return projectRolePermissionResourceOverrideRepository.hasPermissionForResource(projectId, userId, permission, resourceId);
     }
 
-    public List<UsersProjectRoles> getRolesForMembersInProject(Project project){
-       return userProjectRoleRepository.findByIdRoleIdProject(project);
+    public List<UsersProjectRoles> getRolesForMembersInProject(Project project) {
+        return userProjectRoleRepository.findByIdRoleIdProject(project);
 
     }
 
     @Transactional
     public void addRole(AddRoleDTO addRoleDTO) {
-        ProjectRole projectRole = new ProjectRole(new ProjectRoleId(addRoleDTO.getName(),addRoleDTO.getProject()));
+        ProjectRole projectRole = new ProjectRole(new ProjectRoleId(addRoleDTO.getName(), addRoleDTO.getProject()));
         projectRoleRepository.save(projectRole);
 
-        List<ProjectRolePermission> projectRolePermissions = addRoleDTO
-                        .getPermissions()
-                        .stream()
-                        .map(permission ->
-                                new ProjectRolePermission(new ProjectRolePermissionId(permission,projectRole),
-                                        addRoleDTO.getProjectResourcePermissionOverrideType().name())).toList();
+        List<PermissionResourceWrapper> permissionResourceWrapperList = addRoleDTO.getPermissionResource();
+        List<ProjectRolePermission> projectRolePermissions = permissionResourceWrapperList.stream().map(PermissionResourceWrapper::getPermission)
+                .map(permission -> new ProjectRolePermission(new ProjectRolePermissionId(permission, projectRole),
+                        addRoleDTO.getProjectResourcePermissionOverrideType().name())).toList();
 
         projectRolePermissionRepository.saveAll(projectRolePermissions);
+
+        List<ProjectRolePermissionResourceOverride> permissionOverrides = permissionResourceWrapperList.stream().map(pr ->
+                new ProjectRolePermissionResourceOverride(
+                    new ProjectRolePermissionResourceOverrideId(new ProjectRolePermission(new ProjectRolePermissionId(pr.getPermission(), projectRole)),
+                        pr.getResource()
+                )
+        )).toList();
+
+        projectRolePermissionResourceOverrideRepository.saveAll(permissionOverrides);
 
     }
 }

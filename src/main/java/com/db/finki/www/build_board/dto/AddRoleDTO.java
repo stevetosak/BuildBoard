@@ -1,8 +1,7 @@
 package com.db.finki.www.build_board.dto;
 
-import com.db.finki.www.build_board.common.enums.ProjectResourcePermissionOverrideType;
-import com.db.finki.www.build_board.entity.access_managment.Permission;
-import com.db.finki.www.build_board.entity.thread.Project;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import java.util.List;
@@ -11,9 +10,14 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class AddRoleDTO {
+    @JsonProperty
     String name;
-    Project project;
-    List<Permission> permissions;
-    ProjectResourcePermissionOverrideType projectResourcePermissionOverrideType;
+    @JsonProperty
+    String projectTitle;
+    @JsonProperty
+    List<PermissionResourceDTO> permissionResourceDTOS;
+    @JsonProperty
+    String permissionOverrideType;
 }

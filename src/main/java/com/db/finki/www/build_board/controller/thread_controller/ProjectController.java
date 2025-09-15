@@ -1,5 +1,6 @@
 package com.db.finki.www.build_board.controller.thread_controller;
 
+import com.db.finki.www.build_board.common.enums.PermissionValue;
 import com.db.finki.www.build_board.dto.AddRoleDTO;
 import com.db.finki.www.build_board.entity.thread.Project;
 import com.db.finki.www.build_board.entity.user_type.BBUser;
@@ -14,6 +15,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
 @Controller
@@ -37,7 +42,6 @@ public class ProjectController {
         model.addAttribute("project", project);
         model.addAttribute("tags", tagService.getAll());
         model.addAttribute("developers",projectService.getAllDevelopersForProject(project));
-        model.addAttribute("developersRoles",projectAccessManagementService.getRolesForMembersInProject(project));
         String error = (String) redirectAttributes.getAttribute("error");
         
         if(error != null){
@@ -52,10 +56,12 @@ public class ProjectController {
         return "project_pages/show-project";
     }
 
-//    @PostMapping("/{title}/roles/add")
-//    public String addProjectRole(@PathVariable(name = "title") String title, @RequestBody AddRoleDTO addRoleDTO, RedirectAttributes redirectAttributes) {
-//
-//    }
+    @PostMapping("/{title}/roles/add")
+    public String addProjectRole(@PathVariable(name = "title") String title, @RequestBody AddRoleDTO addRoleDTO, RedirectAttributes redirectAttributes) {
+        projectAccessManagementService.addRole(addRoleDTO);
+
+        return  "redirect:/projects/" + title + "/roles";
+    }
 
     @GetMapping("/create")
     public String getCreateProjectPage(Model model, @RequestParam(required = false) String duplicateTitle) {
@@ -65,6 +71,19 @@ public class ProjectController {
         model.addAttribute("project", new Project());
         model.addAttribute("isCreatingProject", tagService.getAll());
         return "project_pages/project-create";
+    }
+
+
+    @GetMapping("{title}/roles")
+    public String getRolesPage(@PathVariable(name = "title") Project project, Model model){
+
+        model.addAttribute("project", project);
+        model.addAttribute("developersRoles",projectAccessManagementService.getRolesForMembersInProject(project));
+        model.addAttribute("perResourcePermissions", List.of("READ","WRITE"));
+        model.addAttribute("globalPermissions", List.of("CREATE","DELETE"));
+        model.addAttribute("errMsg",null);
+        model.addAttribute("overrideTypeDefault","INCLUDE");
+        return "project_pages/project-roles";
     }
 
 

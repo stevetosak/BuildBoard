@@ -13,17 +13,5 @@ import java.util.List;
 public interface ProjectRolePermissionRepository extends JpaRepository<ProjectRolePermission, ProjectRolePermissionId> {
     List<ProjectRolePermission> findByIdProjectRole(ProjectRole projectRole);
 
-    @Query(nativeQuery = true,value = """
-            SELECT EXISTS (
-                            SELECT upr.role_name,upr.project_id FROM users_project_roles upr
-                            JOIN role_permissions prp
-                            ON prp.project_id = upr.project_id AND prp.role_name = upr.role_name
-                            WHERE upr.user_id = :userId
-                                AND prp.project_id = :projectId
-                                AND prp.permission_name = :permissionName
-                                AND prp.project_resource_id = :resourceId
-                        )
-            """)
-    boolean isAuthorizedToPerformActionOnResource(int projectId,int userId,String permissionName,int resourceId);
 
 }
