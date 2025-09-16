@@ -55,15 +55,15 @@
 
                 <div th:each="dvpr : ${developersRoles}" class="role-card d-flex justify-content-between align-items-center">
                     <div>
-                        <h5 th:text="${dvpr.getProjectRole().getName()}">Role Name</h5>
+                        <h5 th:text="${dvpr.getName()}">Role Name</h5>
 <!--                        <small th:text="'Members: ' + ${role.memberCount}">Members: 0</small>-->
                     </div>
                     <div class="d-flex gap-2">
                         <button th:if="${isManager}" class="btn btn-warning btn-sm"
-                                data-bs-toggle="modal" th:data-bs-target="'#updateRoleModal-' + ${dvpr.getProjectRole().id}">
+                                data-bs-toggle="modal" th:data-bs-target="'#updateRoleModal-' + ${dvpr.getId()}">
                             Edit
                         </button>
-                        <form th:if="${isManager}" th:action="@{/projects/{projectTitle}/roles/{roleName}/delete (projectTitle=${project.getTitle()}, roleName=${dvpr.getProjectRole().getName()})}" method="post">
+                        <form th:if="${isManager}" th:action="@{/projects/{projectTitle}/roles/{roleName}/delete (projectTitle=${project.getTitle()}, roleName=${dvpr.getName()})}" method="post">
                             <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                         </form>
                     </div>
@@ -217,7 +217,9 @@
         })
 
         if(!response.ok)
-            throw new Error(data);
+            throw new Error("Something went wrong")
+
+        location.reload()
     });
 
     document.getElementById("add-role-modal-submit").addEventListener('click',() => {

@@ -47,8 +47,8 @@ public class ProjectAccessManagementService {
                 resourceId);
     }
 
-    public List<UsersProjectRoles> getRolesForMembersInProject(Project project) {
-        return userProjectRoleRepository.findByIdRoleIdProjectId(project.getId());
+    public List<ProjectRole> getRolesForMembersInProject(Project project) {
+        return projectRoleRepository.findByIdProjectId(project.getId());
     }
 
     private List<ProjectRolePermission> mapGlobalsToProjectRolePermissions(
