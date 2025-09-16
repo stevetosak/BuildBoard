@@ -55,15 +55,15 @@
 
                 <div th:each="dvpr : ${developersRoles}" class="role-card d-flex justify-content-between align-items-center">
                     <div>
-                        <h5 th:text="${dvpr.getProjectRole().getName()}">Role Name</h5>
+                        <h5 th:text="${dvpr.getName()}">Role Name</h5>
 <!--                        <small th:text="'Members: ' + ${role.memberCount}">Members: 0</small>-->
                     </div>
                     <div class="d-flex gap-2">
                         <button th:if="${isManager}" class="btn btn-warning btn-sm"
-                                data-bs-toggle="modal" th:data-bs-target="'#updateRoleModal-' + ${dvpr.getProjectRole().id}">
+                                data-bs-toggle="modal" th:data-bs-target="'#updateRoleModal-' + ${dvpr.getId()}">
                             Edit
                         </button>
-                        <form th:if="${isManager}" th:action="@{/projects/{projectTitle}/roles/{roleName}/delete (projectTitle=${project.getTitle()}, roleName=${dvpr.getProjectRole().getName()})}" method="post">
+                        <form th:if="${isManager}" th:action="@{/projects/{projectTitle}/roles/{roleName}/delete (projectTitle=${project.getTitle()}, roleName=${dvpr.getName()})}" method="post">
                             <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                         </form>
                     </div>
@@ -116,7 +116,7 @@
                                            type="checkbox"
                                            th:id="${permission}"
                                            th:name="'global-permission'"
-                                           th:value="${permission}">
+                                           th:value="${permission.toLowerCase()}">
 <!--                                           th:checked="${permissionDefaultSelected.contains(permission.name)}">-->
                                     <label class="form-check-label" th:for="${permission}" th:text="${permission.toLowerCase() + ' channels'}">Permission</label>
                                 </div>
@@ -134,9 +134,9 @@
                                             <input class="form-check-input perm-checkbox"
                                                    type="checkbox"
                                                    th:id="${permission + '-' + channel.getProjectResource().getId()}"
-                                                   th:name="'per-resource-permission"
-                                                   th:attr="data-resourceId=${channel.getProjectResource().getId()}"
-                                                   th:value="${channel.getProjectResource().getId()}"
+                                                   name="per-resource-permission"
+                                                   th:value="${permission}"
+                                                   th:attr="data-resource-id=${channel.getProjectResource().getId()}"
                                                    th:checked="${overrideTypeDefault == 'EXCLUDE'}">
                                             <label class="form-check-label"
                                                    th:for="${permission + '-' + channel.getProjectResource().getId()}"
@@ -158,40 +158,69 @@
         </div>
     </div>
 </div>
-
-
-<!--TODO submit na add modalot da e ustvari link (a tag) so href do add role endpoint, ko ke go cliknis pred da sa pustit, sa triggervite
-javascriptot so mu klavat fakticki request bodyto ko query param vo forma na json string, na backend so object mapper go deserijalizirivime vo AddRoleDTO-->
 <script>
+    const getCheckedValues = (inputs) => {
+        const values = []
+        for(let i of inputs){
+            if(i.checked)
+                values.push(i.value)
+        }
+        return values
+    }
 
-    document.getElementById('add-role-form').addEventListener('submit', function(event) {
-        event.preventDefault(); // Prevent default form submission
+    const processPerResourcePermissions = (inputs) => {
+        const values = []
+        for(let i of inputs){
+            if(i.checked){
+                values.push({
+                    name: i.value,
+                    resourceId: i.dataset.resourceId
+                })
+            }
+        }
+        return values
+    }
 
-        const formData = new FormData(this);
+    const getProjectTitle = () => {
+        return document.body.dataset.projectTitle
+    }
 
-        // Get individual values
-        const roleName = formData.get('roleName');
-        const overrideType = formData.get('overrideType');
+    document.getElementById('add-role-form').addEventListener('submit', async function(event) {
+        event.preventDefault()
+        const roleNameInput = document.querySelector("#roleName")
+        const includeExcludeInput = document.querySelectorAll("input[name='overrideType']")
+        const globalPermissions = document.querySelectorAll("input[name='global-permission']")
+        const perResourcePermissions = document.querySelectorAll("input[name='per-resource-permission']")
 
-        const addRoleDto = { name: roleName,projectTitle: document.body.dataset.projectTitle}
+        const roleName = roleNameInput.value
+        const includeExcludeDecided = getCheckedValues(includeExcludeInput)[0]
+        const globalSelectedPermissions = getCheckedValues(globalPermissions)
+        const perResourceSelectedPermissions = processPerResourcePermissions(perResourcePermissions)
+        const projectTitle = getProjectTitle()
 
-        // Get all permissions (multiple checkboxes with same name)
-        const perResourcePermissions = formData.getAll('per-resource-permission');
+        const response = await fetch(`/projects/${projectTitle}/roles/add`, {
+            method: "POST",
+            headers: {
+                "Content-Type" : "application/json",
+            },
+            body: JSON.stringify({
+                name: roleName,
+                projectTitle: projectTitle,
+                permissionOverrideType: includeExcludeDecided,
+                globalPermissions: globalSelectedPermissions,
+                permissionResourceDTOS: perResourceSelectedPermissions.map(p => ({
+                    permissionName: p.name,
+                    projectResourceID: p.resourceId
+                }))
+            }),
+            credentials: "include"
+        })
 
-        // String permissionName;
-        // int projectResourceID;
+        if(!response.ok)
+            throw new Error("Something went wrong")
 
-        addRoleDto['permissionResourceDTOS'] = perResourcePermissions.map(pr => ({permissionName: pr.}))
-
-        console.log('Role Name:', roleName);
-        console.log('Override Type:', overrideType);
-        console.log('Permissions:', perResourcePermissions);
-
-        // Convert to object if needed
-        const formObject = Object.fromEntries(formData.entries());
-        console.log('Form as object:', formObject);
+        location.reload()
     });
-
 
     document.getElementById("add-role-modal-submit").addEventListener('click',() => {
 
