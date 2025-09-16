@@ -14,7 +14,6 @@ import lombok.Setter;
 public class PermissionResourceWrapper {
     Permission permission;
     ProjectResource resource;
-
 }
 
 

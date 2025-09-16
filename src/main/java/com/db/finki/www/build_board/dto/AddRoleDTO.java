@@ -16,8 +16,13 @@ public class AddRoleDTO {
     String name;
     @JsonProperty
     String projectTitle;
+
+    @JsonProperty
+    List<String> globalPermissions;
+
     @JsonProperty
     List<PermissionResourceDTO> permissionResourceDTOS;
+
     @JsonProperty
     String permissionOverrideType;
 }

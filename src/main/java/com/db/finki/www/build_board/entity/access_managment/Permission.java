@@ -5,12 +5,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Table(name = "permissions")
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
 public class Permission {
     @Id
     String name;
@@ -19,4 +21,8 @@ public class Permission {
     public static final String WRITE = "WRITE";
     public static final String DELETE = "DELETE";
     public static final String CREATE = "CREATE";
+
+    public Permission(String name){
+        this.name = name;
+    }
 }

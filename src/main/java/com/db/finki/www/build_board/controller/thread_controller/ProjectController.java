@@ -4,6 +4,7 @@ import com.db.finki.www.build_board.common.enums.PermissionValue;
 import com.db.finki.www.build_board.dto.AddRoleDTO;
 import com.db.finki.www.build_board.entity.thread.Project;
 import com.db.finki.www.build_board.entity.user_type.BBUser;
+import com.db.finki.www.build_board.service.access_managment.AddRoleDTOEntitiesMapper;
 import com.db.finki.www.build_board.service.access_managment.ProjectAccessManagementService;
 import com.db.finki.www.build_board.service.thread.impl.ProjectService;
 import com.db.finki.www.build_board.service.thread.impl.TagServiceImpl;
@@ -16,8 +17,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -29,11 +28,13 @@ public class ProjectController {
     private final TagService tagService;
     private final String DUPLICATED_TITLE_MSG="could not execute statement [ERROR: duplicate key value violates unique constraint";
     private final ProjectAccessManagementService  projectAccessManagementService;
+    private final AddRoleDTOEntitiesMapper mapper;
 
-    public ProjectController(ProjectService projectService, TagServiceImpl topicService, ProjectAccessManagementService projectAccessManagementService) {
+    public ProjectController(ProjectService projectService, TagServiceImpl topicService, ProjectAccessManagementService projectAccessManagementService, AddRoleDTOEntitiesMapper mapper) {
         this.projectService = projectService;
         this.tagService = topicService;
         this.projectAccessManagementService = projectAccessManagementService;
+        this.mapper = mapper;
     }
 
     @GetMapping("/{title}")
@@ -57,9 +58,8 @@ public class ProjectController {
     }
 
     @PostMapping("/{title}/roles/add")
-    public String addProjectRole(@PathVariable(name = "title") String title, @RequestBody AddRoleDTO addRoleDTO, RedirectAttributes redirectAttributes) {
-        projectAccessManagementService.addRole(addRoleDTO);
-
+    public String addProjectRole(@PathVariable(name = "title") String title, @RequestBody AddRoleDTO addRoleDTO) {
+        projectAccessManagementService.addRole(mapper.map(addRoleDTO));
         return  "redirect:/projects/" + title + "/roles";
     }
 
@@ -76,7 +76,6 @@ public class ProjectController {
 
     @GetMapping("{title}/roles")
     public String getRolesPage(@PathVariable(name = "title") Project project, Model model){
-
         model.addAttribute("project", project);
         model.addAttribute("developersRoles",projectAccessManagementService.getRolesForMembersInProject(project));
         model.addAttribute("perResourcePermissions", List.of("READ","WRITE"));
