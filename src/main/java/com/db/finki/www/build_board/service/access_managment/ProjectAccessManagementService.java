@@ -48,8 +48,7 @@ public class ProjectAccessManagementService {
     }
 
     public List<UsersProjectRoles> getRolesForMembersInProject(Project project) {
-        return userProjectRoleRepository.findByIdRoleIdProject(project);
-
+        return userProjectRoleRepository.findByIdRoleIdProjectId(project.getId());
     }
 
     private List<ProjectRolePermission> mapGlobalsToProjectRolePermissions(
@@ -140,5 +139,9 @@ public class ProjectAccessManagementService {
                 getResources(addRoleDTO.getPermissionResource()),
                 entities
                                                                                       ));
+    }
+
+    public void deleteByRoleNameAndProjectTitle(Project project, String roleName) {
+        projectRoleRepository.deleteById(new ProjectRoleId(roleName,project));
     }
 }

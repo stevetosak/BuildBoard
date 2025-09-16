@@ -26,8 +26,8 @@ public class ProjectController {
 
     private final ProjectService projectService;
     private final TagService tagService;
-    private final String DUPLICATED_TITLE_MSG="could not execute statement [ERROR: duplicate key value violates unique constraint";
-    private final ProjectAccessManagementService  projectAccessManagementService;
+    private final String DUPLICATED_TITLE_MSG = "could not execute statement [ERROR: duplicate key value violates unique constraint";
+    private final ProjectAccessManagementService projectAccessManagementService;
     private final AddRoleDTOEntitiesMapper mapper;
 
     public ProjectController(ProjectService projectService, TagServiceImpl topicService, ProjectAccessManagementService projectAccessManagementService, AddRoleDTOEntitiesMapper mapper) {
@@ -38,51 +38,79 @@ public class ProjectController {
     }
 
     @GetMapping("/{title}")
-    public String getProjectPage(@PathVariable(name = "title") Project project, Model model, RedirectAttributes redirectAttributes,
-    @RequestParam(required = false) String duplicateTitle) {
-        model.addAttribute("project", project);
-        model.addAttribute("tags", tagService.getAll());
-        model.addAttribute("developers",projectService.getAllDevelopersForProject(project));
+    public String getProjectPage(
+            @PathVariable(name = "title") Project project, Model model, RedirectAttributes redirectAttributes,
+            @RequestParam(required = false) String duplicateTitle
+                                ) {
+        model.addAttribute("project",
+                project);
+        model.addAttribute("tags",
+                tagService.getAll());
+        model.addAttribute("developers",
+                projectService.getAllDevelopersForProject(project));
         String error = (String) redirectAttributes.getAttribute("error");
-        
-        if(error != null){
-            model.addAttribute("error", error);
+
+        if (error != null) {
+            model.addAttribute("error",
+                    error);
         }
-        if(duplicateTitle!=null){
-            model.addAttribute("errMsg","There already exists a project with the provided title" );
+        if (duplicateTitle != null) {
+            model.addAttribute("errMsg",
+                    "There already exists a project with the provided title");
         }
-        
+
         Hibernate.initialize(project.getTags());
 
         return "project_pages/show-project";
     }
 
-    @PostMapping("/{title}/roles/add")
-    public String addProjectRole(@PathVariable(name = "title") String title, @RequestBody AddRoleDTO addRoleDTO) {
-        projectAccessManagementService.addRole(mapper.map(addRoleDTO));
-        return  "redirect:/projects/" + title + "/roles";
-    }
-
     @GetMapping("/create")
     public String getCreateProjectPage(Model model, @RequestParam(required = false) String duplicateTitle) {
-        if(duplicateTitle!=null){
-            model.addAttribute("errMsg", "There already exists a project with the provided title"); 
+        if (duplicateTitle != null) {
+            model.addAttribute("errMsg",
+                    "There already exists a project with the provided title");
         }
-        model.addAttribute("project", new Project());
-        model.addAttribute("isCreatingProject", tagService.getAll());
+        model.addAttribute("project",
+                new Project());
+        model.addAttribute("isCreatingProject",
+                tagService.getAll());
         return "project_pages/project-create";
     }
 
 
+    @PostMapping("/{title}/roles/add")
+    public String addProjectRole(@PathVariable(name = "title") String title, @RequestBody AddRoleDTO addRoleDTO) {
+        projectAccessManagementService.addRole(mapper.map(addRoleDTO));
+        return "redirect:/projects/" + title + "/roles";
+    }
+
     @GetMapping("{title}/roles")
-    public String getRolesPage(@PathVariable(name = "title") Project project, Model model){
-        model.addAttribute("project", project);
-        model.addAttribute("developersRoles",projectAccessManagementService.getRolesForMembersInProject(project));
-        model.addAttribute("perResourcePermissions", List.of("READ","WRITE"));
-        model.addAttribute("globalPermissions", List.of("CREATE","DELETE"));
-        model.addAttribute("errMsg",null);
-        model.addAttribute("overrideTypeDefault","INCLUDE");
+    public String getRolesPage(@PathVariable(name = "title") Project project, Model model) {
+        model.addAttribute("project",
+                project);
+        model.addAttribute("developersRoles",
+                projectAccessManagementService.getRolesForMembersInProject(project));
+        model.addAttribute("perResourcePermissions",
+                List.of("READ",
+                        "WRITE"));
+        model.addAttribute("globalPermissions",
+                List.of("CREATE",
+                        "DELETE"));
+        model.addAttribute("errMsg",
+                null);
+        model.addAttribute("overrideTypeDefault",
+                "INCLUDE");
         return "project_pages/project-roles";
+    }
+
+    //projects/Project 1 Thread/roles/Admin/delete
+    @PostMapping("{project_title}/roles/{role_name}/delete")
+    public String deleteRole(
+            @PathVariable(name = "project_title") Project project,
+            @PathVariable(name = "role_name") String roleName
+                            ){
+        projectAccessManagementService.deleteByRoleNameAndProjectTitle(project,roleName);
+        return String.format("redirect:/projects/%s/roles", project.getTitle());
     }
 
 
@@ -90,17 +118,19 @@ public class ProjectController {
     public String getAddTopicPage(
             @PathVariable String title,
             Model model
-    ){
-        model.addAttribute("project_title",title);
-        return "create-topic" ;
+                                 ) {
+        model.addAttribute("project_title",
+                title);
+        return "create-topic";
     }
 
     @GetMapping("/{pr-title}/edit")
     public String getModifyPage(
             @PathVariable(name = "pr-title") Project project,
             Model model
-    ) {
-        model.addAttribute("project", project);
+                               ) {
+        model.addAttribute("project",
+                project);
         return "project_pages/project-create";
     }
 
@@ -108,17 +138,19 @@ public class ProjectController {
     public String getProjectMembersPage(
             Model model,
             @PathVariable(name = "pr-title") Project project
-    )
-    {
-        model.addAttribute("project", project);
-        model.addAttribute("developers", projectService.getAllDevelopersForProject(project));
+                                       ) {
+        model.addAttribute("project",
+                project);
+        model.addAttribute("developers",
+                projectService.getAllDevelopersForProject(project));
         return "project_pages/members";
     }
 
     @PreAuthorize("#project.getUser().equals(#user)")
     @PostMapping("/{pr-title}/members/{mem-id}/kick")
-    public String kickMember(@PathVariable(name = "pr-title") @P("project") Project project,@PathVariable(name = "mem-id") int memberId,@SessionAttribute @P("user") BBUser user){
-        projectService.kickMember(project, memberId);
+    public String kickMember(@PathVariable(name = "pr-title") @P("project") Project project, @PathVariable(name = "mem-id") int memberId, @SessionAttribute @P("user") BBUser user) {
+        projectService.kickMember(project,
+                memberId);
         return "redirect:/projects/" + project.getTitle() + "/members";
     }
 
@@ -131,16 +163,24 @@ public class ProjectController {
             @RequestParam @P("username") String username,
             @RequestParam String description,
             RedirectAttributes attributes
-    ){
+                               ) {
         String oldTitle = project.getTitle();
-        try{
-            return "redirect:/projects/" +  projectService.update(project, repoUrl, description, newTitle).getTitle();
-        }catch(org.springframework.dao.DataIntegrityViolationException e){
-            if(e.getMessage().contains(DUPLICATED_TITLE_MSG)){
-                attributes.addAttribute("duplicateTitle", "y");
-                return "redirect:/projects/" + oldTitle; 
+        try {
+            return "redirect:/projects/" + projectService
+                    .update(project,
+                            repoUrl,
+                            description,
+                            newTitle)
+                    .getTitle();
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            if (e
+                    .getMessage()
+                    .contains(DUPLICATED_TITLE_MSG)) {
+                attributes.addAttribute("duplicateTitle",
+                        "y");
+                return "redirect:/projects/" + oldTitle;
             }
-            throw e ; 
+            throw e;
         }
     }
 
@@ -151,16 +191,22 @@ public class ProjectController {
             @RequestParam(required = false) String description,
             @SessionAttribute BBUser user,
             RedirectAttributes redirectAttributes
-    ) {
-        try{
-            projectService.create(title,repoUrl,description,user);
+                               ) {
+        try {
+            projectService.create(title,
+                    repoUrl,
+                    description,
+                    user);
             return "redirect:/";
-        }catch(org.springframework.dao.DataIntegrityViolationException e){
-            if(e.getMessage().contains(DUPLICATED_TITLE_MSG)){
-                redirectAttributes.addAttribute("duplicateTitle", "y");
-                return "redirect:/projects/create"; 
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            if (e
+                    .getMessage()
+                    .contains(DUPLICATED_TITLE_MSG)) {
+                redirectAttributes.addAttribute("duplicateTitle",
+                        "y");
+                return "redirect:/projects/create";
             }
-            throw e ; 
+            throw e;
         }
     }
 
@@ -171,9 +217,12 @@ public class ProjectController {
             @RequestParam(name = "title") String topicsTitle,
             @RequestParam String description,
             @RequestParam @P("username") String username,
-            @SessionAttribute("user") BBUser user 
-    ){
-        projectService.createTopic(project, topicsTitle, description, user);
+            @SessionAttribute("user") BBUser user
+                          ) {
+        projectService.createTopic(project,
+                topicsTitle,
+                description,
+                user);
         return "redirect:/projects/" + project.getTitle();
     }
 
@@ -182,9 +231,10 @@ public class ProjectController {
     public String delete(
             @PathVariable(name = "title") @P("project") Project project,
             @RequestParam @P("username") String username
-    ) {
+                        ) {
         projectService.delete(project);
-        return "redirect:/" ;
+        return "redirect:/";
     }
+
 
 }
