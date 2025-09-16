@@ -117,10 +117,12 @@ public class TopicController {
 
     @PostMapping("{id}/report")
     @PreAuthorize("@topicServiceImpl.getById(#topicId).user.id.equals(#user.id)")
-    public String reportUser(@PathVariable(name = "id") @P("topicId") long topicId,
+    public String reportUser(
+            @PathVariable(name = "id") @P("topicId") long topicId,
             @RequestParam String reason
             , @SessionAttribute @P("user") BBUser user,
             @RequestParam(name = "report-username") String reportingUser, Model model){
+
         reportService.createReport(topicId,reason,user, reportingUser);
 
         return bootstartTopic(topicId, model);

@@ -49,7 +49,7 @@
                     </form>
                 </div>
             </div>
-            <div th:if="${session.user != null }">
+            <div th:if="${session.user != null && !blacklisted.contains(reply.getDiscussion().getUser().getId())}">
                 <button type="button"
                         class="btn btn-danger btn-sm edit-delete-btn ms-2 report-btn"
                         th:data-username="${reply.getDiscussion().getUser().getUsername()}"

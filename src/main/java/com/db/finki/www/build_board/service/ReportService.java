@@ -53,6 +53,10 @@ public class ReportService {
         Topic topic = topicService.getById(topicId);
         BBUser reportedUser = (BBUser) userDetailsService.loadUserByUsername(reportingUsername);
 
+        if(blacklistedUserRepo.isUserInBlacklist(reportedUser.getId(), topicId)){
+            return;
+        }
+
         reportRepository.save(
                 new Report(topic,
                         creator,
