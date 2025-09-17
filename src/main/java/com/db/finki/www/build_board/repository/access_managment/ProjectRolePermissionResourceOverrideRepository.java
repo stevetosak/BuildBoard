@@ -1,10 +1,14 @@
 package com.db.finki.www.build_board.repository.access_managment;
 
+import com.db.finki.www.build_board.entity.access_managment.ProjectRole;
+import com.db.finki.www.build_board.entity.access_managment.ProjectRolePermission;
 import com.db.finki.www.build_board.entity.access_managment.ProjectRolePermissionResourceOverride;
 import com.db.finki.www.build_board.entity.compositeId.ProjectRolePermissionResourceOverrideId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public interface ProjectRolePermissionResourceOverrideRepository extends JpaRepository<ProjectRolePermissionResourceOverride, ProjectRolePermissionResourceOverrideId> {
@@ -33,4 +37,6 @@ public interface ProjectRolePermissionResourceOverrideRepository extends JpaRepo
                    ) AS has_access;
             """, nativeQuery = true)
     boolean hasPermissionForResource(int projectId,int userId,String permissionName,int resourceId);
+
+    List<ProjectRolePermissionResourceOverride> findAllByIdProjectRolePermissionIdProjectRole(ProjectRole projectRole);
 }

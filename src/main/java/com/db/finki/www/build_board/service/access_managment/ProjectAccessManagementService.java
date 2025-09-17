@@ -167,4 +167,11 @@ public class ProjectAccessManagementService {
         ProjectRole role = new ProjectRole(new ProjectRoleId(roleName,project));
         userProjectRoleRepository.deleteById(new UsersProjectRolesId(role,user));
     }
+
+    public List<ProjectRolePermission> getRolePermissionsForRole(String roleName, Project project) {
+        return projectRolePermissionRepository.findAllByIdProjectRole(new ProjectRole(new ProjectRoleId(roleName,project)));
+    }
+    public List<ProjectRolePermissionResourceOverride> getResourceOverridesForRole(String roleName, Project project) {
+        return projectRolePermissionResourceOverrideRepository.findAllByIdProjectRolePermissionIdProjectRole(new ProjectRole(new ProjectRoleId(roleName,project)));
+    }
 }

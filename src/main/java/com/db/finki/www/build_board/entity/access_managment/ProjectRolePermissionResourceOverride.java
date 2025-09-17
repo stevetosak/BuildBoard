@@ -1,7 +1,6 @@
 package com.db.finki.www.build_board.entity.access_managment;
 
 import com.db.finki.www.build_board.entity.compositeId.ProjectRolePermissionResourceOverrideId;
-import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -19,13 +18,13 @@ import lombok.Setter;
 public class ProjectRolePermissionResourceOverride {
 
     @EmbeddedId
-    private ProjectRolePermissionResourceOverrideId projectRolePermissionResourceOverrideId;
+    private ProjectRolePermissionResourceOverrideId id;
 
 
     public ProjectRolePermission getProjectRolePermission() {
-        return projectRolePermissionResourceOverrideId.getProjectRolePermission();
+        return id.getProjectRolePermission();
     }
     public ProjectResource getProjectResource() {
-        return projectRolePermissionResourceOverrideId.getProjectResource();
+        return id.getProjectResource();
     }
 }

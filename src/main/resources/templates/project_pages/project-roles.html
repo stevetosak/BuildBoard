@@ -61,7 +61,7 @@
                     <div class="d-flex gap-2">
                         <button th:if="${isManager}" class="btn btn-warning btn-sm"
                                 data-bs-toggle="modal" th:data-bs-target="'#updateRoleModal-' + ${dvpr.getId()}">
-                            Edit
+                            <a th:href="@{/projects/{title}/roles/{roleName}/edit (title=${project.getTitle()},roleName=${dvpr.getName()})}">Edit</a>
                         </button>
                         <form th:if="${isManager}" th:action="@{/projects/{projectTitle}/roles/{roleName}/delete (projectTitle=${project.getTitle()}, roleName=${dvpr.getName()})}" method="post">
                             <button type="submit" class="btn btn-danger btn-sm">Delete</button>

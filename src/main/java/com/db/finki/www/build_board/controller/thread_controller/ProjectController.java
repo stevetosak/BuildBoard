@@ -1,11 +1,18 @@
 package com.db.finki.www.build_board.controller.thread_controller;
 
+import com.db.finki.www.build_board.common.enums.ProjectResourcePermissionOverrideType;
 import com.db.finki.www.build_board.dto.AddRoleDTO;
 import com.db.finki.www.build_board.dto.DeveloperWithRolesForProjectDTO;
+import com.db.finki.www.build_board.entity.access_managment.Permission;
+import com.db.finki.www.build_board.entity.access_managment.ProjectResource;
+import com.db.finki.www.build_board.entity.access_managment.ProjectRolePermission;
+import com.db.finki.www.build_board.entity.access_managment.ProjectRolePermissionResourceOverride;
+import com.db.finki.www.build_board.entity.channel.Channel;
 import com.db.finki.www.build_board.entity.thread.Project;
 import com.db.finki.www.build_board.entity.user_type.BBUser;
 import com.db.finki.www.build_board.service.access_managment.AddRoleDTOEntitiesMapper;
 import com.db.finki.www.build_board.service.access_managment.ProjectAccessManagementService;
+import com.db.finki.www.build_board.service.channel.ChannelService;
 import com.db.finki.www.build_board.service.thread.impl.ProjectService;
 import com.db.finki.www.build_board.service.thread.impl.TagServiceImpl;
 import com.db.finki.www.build_board.service.thread.itf.TagService;
@@ -18,7 +25,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 
 @Controller
@@ -31,13 +40,15 @@ public class ProjectController {
     private final ProjectAccessManagementService projectAccessManagementService;
     private final AddRoleDTOEntitiesMapper mapper;
     private final BBUserDetailsService userDetailsService;
+    private final ChannelService channelService;
 
-    public ProjectController(ProjectService projectService, TagServiceImpl topicService, ProjectAccessManagementService projectAccessManagementService, AddRoleDTOEntitiesMapper mapper, BBUserDetailsService userDetailsService) {
+    public ProjectController(ProjectService projectService, TagServiceImpl topicService, ProjectAccessManagementService projectAccessManagementService, AddRoleDTOEntitiesMapper mapper, BBUserDetailsService userDetailsService, ChannelService channelService) {
         this.projectService = projectService;
         this.tagService = topicService;
         this.projectAccessManagementService = projectAccessManagementService;
         this.mapper = mapper;
         this.userDetailsService = userDetailsService;
+        this.channelService = channelService;
     }
 
     @GetMapping("/{title}")
@@ -104,6 +115,72 @@ public class ProjectController {
         model.addAttribute("overrideTypeDefault",
                 "INCLUDE");
         return "project_pages/project-roles";
+    }
+
+    @GetMapping("{title}/roles/{roleName}/edit")
+    public String getEditRolePage(@PathVariable(name = "title") Project project, @PathVariable(name = "roleName") String roleName, Model model) {
+        List<ProjectRolePermission> projectRolePermissions = projectAccessManagementService.getRolePermissionsForRole(roleName,project);
+        List<ProjectRolePermissionResourceOverride> projectRolePermissionResourceOverrides = projectAccessManagementService.getResourceOverridesForRole(roleName, project);
+        List<Channel> channels = channelService.getAllChannelsForProject(project);
+        List<String> perResourcePermissionNames = List.of("READ",
+                "WRITE");
+
+         ProjectResourcePermissionOverrideType overrideType = projectRolePermissions
+                 .stream()
+                 .filter(p -> p.getPermission().getName().equals("READ") || p.getPermission().getName().equals("WRITE"))
+                 .findFirst().map(ProjectRolePermission::getOverrideType).orElseThrow(() -> new IllegalStateException("krcna"));
+        Map<ProjectResource,Channel> resourceToChannelMap = channels.stream().collect(Collectors.toMap(Channel::getProjectResource, Function.identity()));
+
+        Set<ProjectResource> resourceOverrides = projectRolePermissionResourceOverrides.stream()
+                .map(ProjectRolePermissionResourceOverride::getProjectResource)
+                .collect(Collectors.toSet());
+
+        Set<ProjectResource> channelProjectResources = resourceToChannelMap.keySet();
+
+        Map<String, Set<ProjectResource>> init = new HashMap<>();
+        init.put("READ", new HashSet<>());
+        init.put("WRITE", new HashSet<>());
+
+        projectRolePermissionResourceOverrides.stream()
+                .filter(pr -> pr.getProjectRolePermission()
+                        .getPermission().getName().equals("READ") || pr.getProjectRolePermission().getPermission().getName().equals("WRITE"))
+                .forEach(p -> init.get(p.getProjectRolePermission().getPermission().getName()).add(p.getProjectResource()));
+
+        Map<String, Set<ProjectResource>> selectedChannels = init.entrySet()
+                .stream().map(entry -> {
+                    if (overrideType == ProjectResourcePermissionOverrideType.INCLUDE) {
+                        entry.getValue().retainAll(channelProjectResources);
+                        return Map.entry(entry.getKey(), entry.getValue());
+                    } else {
+                        Set<ProjectResource> tmp = new HashSet<>(channelProjectResources);
+                        tmp.removeAll(resourceOverrides);
+                        return Map.entry(entry.getKey(), tmp);
+                    }
+                }).collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue
+                ));
+
+
+        model.addAttribute("roleName",roleName);
+        model.addAttribute("overrideType",projectRolePermissions.get(0).getOverrideType().name());
+        model.addAttribute("project",project);
+        model.addAttribute("globalPermissions",
+                List.of("CREATE",
+                        "DELETE"));
+        model.addAttribute("perResourcePermissions",
+                List.of("READ",
+                        "WRITE"));
+        model.addAttribute("selectedGlobalPermissions",projectRolePermissions
+                .stream()
+                .filter(p -> p.getPermission().getName().equals("CREATE") || p.getPermission().getName().equals("DELETE")).collect(Collectors.toSet()));
+        model.addAttribute("channels",channels);
+        model.addAttribute("selectedChannels",selectedChannels);
+
+        return "project_pages/edit-role";
+
+
+
     }
 
     //projects/Project 1 Thread/roles/Admin/delete

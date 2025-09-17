@@ -5,38 +5,111 @@
     <title>Update Role</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
+<body th:attr="data-project-title=${project.getTitle()}">
+
 <div th:replace="/home_pages/home :: navigation"></div>
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-
-            <div class="card shadow">
-                <div class="card-header bg-warning text-white">
-                    <h5 class="mb-0">Update Role</h5>
-                </div>
-                <div class="card-body">
-                    <form th:action="@{/projects/{title}/roles/{roleName}/update(title=${project.getTitle()}, roleName=${role.name})}"
-                          method="post">
-                        <div class="mb-3">
-                            <label for="updateRoleName" class="form-label">Role Name</label>
-                            <input type="text"
-                                   class="form-control"
-                                   id="updateRoleName"
-                                   name="roleName"
-                                   th:value="${role.name}"
-                                   required>
-                        </div>
-                        <button type="submit" class="btn btn-warning w-100">Update Role</button>
-                    </form>
-                </div>
+<!-- Update Role Modal (prefilled) -->
+<div class="modal fade show" id="updateRoleModal" tabindex="-1" aria-labelledby="updateRoleModalLabel" aria-modal="true" style="display: block;">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Update Role</h5>
             </div>
 
+            <form th:action="@{/projects/{title}/roles/{roleName}/update(title=${project.getTitle()}, roleName=${roleName})}"
+                  method="post"
+                  id="update-role-form">
+
+                <div class="modal-body">
+                    <!-- Role Name -->
+                    <div class="mb-3">
+                        <label for="updateRoleName" class="form-label">Role Name</label>
+                        <input type="text" class="form-control" id="updateRoleName" name="roleName"
+                               th:value="${roleName}" required>
+                    </div>
+
+                    <!-- Override Type -->
+                    <div class="mb-3">
+                        <label class="form-label">Override Type</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="overrideType" id="includeTypeUpdate" value="INCLUDE"
+                                   th:checked="${overrideType == 'INCLUDE' ? 'checked' : ''}">
+                            <label class="form-check-label" for="includeTypeUpdate">INCLUDE</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="overrideType" id="excludeTypeUpdate" value="EXCLUDE"
+                                   th:checked="${overrideType == 'EXCLUDE' ? 'checked' : ''}">
+                            <label class="form-check-label" for="excludeTypeUpdate">EXCLUDE</label>
+                        </div>
+                    </div>
+
+                    <!-- Global Permissions -->
+                    <div class="mb-2 border p-2 rounded">
+                        <strong>Global Permissions</strong>
+                        <div class="d-flex flex-wrap gap-2 mt-1" th:each="permission : ${globalPermissions}">
+                            <div class="form-check">
+                                <input class="form-check-input"
+                                       type="checkbox"
+                                       th:id="'global-' + ${permission}"
+                                       th:name="'global-permission'"
+                                       th:value="${permission.toLowerCase()}"
+                                       th:checked="${selectedGlobalPermissions.contains(permission) ? 'checked' : ''}">
+                                <label class="form-check-label" th:for="'global-' + ${permission}"
+                                       th:text="${permission.toLowerCase() + ' channels'}">Permission</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Per-Resource Permissions -->
+                    <div class="mb-2 border p-2 rounded">
+                        <strong>Per-Resource Permissions</strong>
+                        <div th:each="permission : ${perResourcePermissions}">
+                            <div class="mb-2">
+                                <strong th:text="${permission}">Permission Name</strong>
+                                <div class="d-flex flex-wrap gap-2 mt-1" th:each="channel : ${project.getChannels()}">
+                                    <div class="form-check">
+                                        <input class="form-check-input perm-checkbox"
+                                               type="checkbox"
+                                               th:id="${permission + '-' + channel.getProjectResource().getId()}"
+                                               name="per-resource-permission"
+                                               th:value="${permission}"
+                                               th:attr="data-resource-id=${channel.getProjectResource().getId()}"
+                                               th:checked="${selectedChannels.get(permission).contains(channel.getProjectResource())}">
+                                        <label class="form-check-label"
+                                               th:for="${permission + '-' + channel.getProjectResource().getId()}"
+                                               th:text="${channel.getName()}">Resource Name</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Submit -->
+                <div class="modal-footer">
+                    <button type="submit" id="update-role-modal-submit" class="btn btn-warning w-100">Update Role</button>
+                </div>
+
+            </form>
         </div>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Script to show modal by default -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const modalEl = document.getElementById('updateRoleModal');
+        const modal = new bootstrap.Modal(modalEl, {
+            backdrop: 'static',
+            keyboard: false
+        });
+        modal.show();
+    });
+</script>
+
 </body>
 </html>
