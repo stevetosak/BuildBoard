@@ -6,7 +6,9 @@ import com.db.finki.www.build_board.entity.access_managment.*;
 import com.db.finki.www.build_board.entity.compositeId.ProjectRoleId;
 import com.db.finki.www.build_board.entity.compositeId.ProjectRolePermissionId;
 import com.db.finki.www.build_board.entity.compositeId.ProjectRolePermissionResourceOverrideId;
+import com.db.finki.www.build_board.entity.compositeId.UsersProjectRolesId;
 import com.db.finki.www.build_board.entity.thread.Project;
+import com.db.finki.www.build_board.entity.user_type.BBUser;
 import com.db.finki.www.build_board.repository.access_managment.ProjectRolePermissionResourceOverrideRepository;
 import com.db.finki.www.build_board.repository.access_managment.ProjectRoleRepository;
 import com.db.finki.www.build_board.repository.access_managment.ProjectRolePermissionRepository;
@@ -45,6 +47,10 @@ public class ProjectAccessManagementService {
                 userId,
                 permission,
                 resourceId);
+    }
+
+    public List<ProjectRole> getRolesForDeveloperInProject(BBUser user,Project project){
+        return userProjectRoleRepository.findByIdRoleIdProjectIdAndIdUserId(project.getId(),user.getId()).stream().map(UsersProjectRoles::getProjectRole).toList();
     }
 
     public List<ProjectRole> getRolesForMembersInProject(Project project) {
@@ -143,5 +149,22 @@ public class ProjectAccessManagementService {
 
     public void deleteByRoleNameAndProjectTitle(Project project, String roleName) {
         projectRoleRepository.deleteById(new ProjectRoleId(roleName,project));
+    }
+
+    public void addRolesToUser(BBUser user, Project project, List<String> roleNames) {
+        List<UsersProjectRoles> roles = roleNames
+                .stream()
+                .map(r -> new ProjectRole(new ProjectRoleId(r,project)))
+                .map(role -> new UsersProjectRoles(new UsersProjectRolesId(role,user)))
+                .toList();
+
+        userProjectRoleRepository.saveAll(roles);
+
+
+    }
+
+    public void deleteRoleForUser(BBUser user, Project project, String roleName) {
+        ProjectRole role = new ProjectRole(new ProjectRoleId(roleName,project));
+        userProjectRoleRepository.deleteById(new UsersProjectRolesId(role,user));
     }
 }

@@ -72,6 +72,10 @@ public class ChannelController {
             return "redirect:/projects/" + project.getId();
         }
 
+        boolean canWrite = projectAccessManagementService
+                .hasPermissionToAccessResource(user.getId(),Permission.WRITE,c.getProjectResource().getId(),project.getId());
+        model.addAttribute("canWrite", canWrite);
+
             return "channels/show-channel";
     }
 

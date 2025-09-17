@@ -10,37 +10,27 @@ import org.springframework.stereotype.Repository;
 public interface ProjectRolePermissionResourceOverrideRepository extends JpaRepository<ProjectRolePermissionResourceOverride, ProjectRolePermissionResourceOverrideId> {
 
     @Query(value = """
-            SELECT COALESCE((
-                                SELECT
-                                    CASE
-                                        WHEN rp.override_type = 'INCLUDE'
-                                            THEN EXISTS (
-                                            SELECT 1
-                                            FROM role_permissions_overrides rpo
-                                            WHERE rpo.role_name = rp.role_name
-                                              AND rpo.project_id = rp.project_id
-                                              AND rpo.permission_name = rp.permission_name
-                                              AND rpo.project_resource_id = :resource_id
-                                        )
-                                        WHEN rp.override_type = 'EXCLUDE'
-                                            THEN NOT EXISTS (
-                                            SELECT 1
-                                            FROM role_permissions_overrides rpo
-                                            WHERE rpo.role_name = rp.role_name
-                                              AND rpo.project_id = rp.project_id
-                                              AND rpo.permission_name = rp.permission_name
-                                              AND rpo.project_resource_id = :resource_id
-                                        )
-                                        END
-                                FROM users_project_roles upr
-                                         JOIN role_permissions rp
-                                              ON upr.role_name = rp.role_name
-                                                  AND upr.project_id = rp.project_id
-                                WHERE upr.user_id = :user_id
-                                  AND rp.project_id = :project_id
-                                  AND rp.permission_name = :permission_name
-                                LIMIT 1
-                            ), FALSE) AS has_access;
+            SELECT COALESCE(
+                           EXISTS (
+                               SELECT 1
+                               FROM users_project_roles upr
+                                        JOIN role_permissions rp
+                                             ON upr.role_name = rp.role_name
+                                                 AND upr.project_id = rp.project_id
+                                        LEFT JOIN role_permissions_overrides rpo
+                                                  ON rpo.role_name = rp.role_name
+                                                      AND rpo.project_id = rp.project_id
+                                                      AND rpo.permission_name = rp.permission_name
+                                                      AND rpo.project_resource_id = :resourceId
+                               WHERE upr.user_id = :userId
+                                 AND rp.project_id = :projectId
+                                 AND rp.permission_name = :permissionName
+                                 AND (
+                                   (rp.override_type = 'INCLUDE' AND rpo.project_resource_id IS NOT NULL)
+                                       OR (rp.override_type = 'EXCLUDE' AND rpo.project_resource_id IS NULL)
+                                   )
+                           ), FALSE
+                   ) AS has_access;
             """, nativeQuery = true)
     boolean hasPermissionForResource(int projectId,int userId,String permissionName,int resourceId);
 }

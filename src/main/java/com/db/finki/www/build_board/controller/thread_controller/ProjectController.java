@@ -1,7 +1,7 @@
 package com.db.finki.www.build_board.controller.thread_controller;
 
-import com.db.finki.www.build_board.common.enums.PermissionValue;
 import com.db.finki.www.build_board.dto.AddRoleDTO;
+import com.db.finki.www.build_board.dto.DeveloperWithRolesForProjectDTO;
 import com.db.finki.www.build_board.entity.thread.Project;
 import com.db.finki.www.build_board.entity.user_type.BBUser;
 import com.db.finki.www.build_board.service.access_managment.AddRoleDTOEntitiesMapper;
@@ -9,6 +9,7 @@ import com.db.finki.www.build_board.service.access_managment.ProjectAccessManage
 import com.db.finki.www.build_board.service.thread.impl.ProjectService;
 import com.db.finki.www.build_board.service.thread.impl.TagServiceImpl;
 import com.db.finki.www.build_board.service.thread.itf.TagService;
+import com.db.finki.www.build_board.service.user.BBUserDetailsService;
 import org.hibernate.Hibernate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.parameters.P;
@@ -29,12 +30,14 @@ public class ProjectController {
     private final String DUPLICATED_TITLE_MSG = "could not execute statement [ERROR: duplicate key value violates unique constraint";
     private final ProjectAccessManagementService projectAccessManagementService;
     private final AddRoleDTOEntitiesMapper mapper;
+    private final BBUserDetailsService userDetailsService;
 
-    public ProjectController(ProjectService projectService, TagServiceImpl topicService, ProjectAccessManagementService projectAccessManagementService, AddRoleDTOEntitiesMapper mapper) {
+    public ProjectController(ProjectService projectService, TagServiceImpl topicService, ProjectAccessManagementService projectAccessManagementService, AddRoleDTOEntitiesMapper mapper, BBUserDetailsService userDetailsService) {
         this.projectService = projectService;
         this.tagService = topicService;
         this.projectAccessManagementService = projectAccessManagementService;
         this.mapper = mapper;
+        this.userDetailsService = userDetailsService;
     }
 
     @GetMapping("/{title}")
@@ -141,8 +144,19 @@ public class ProjectController {
                                        ) {
         model.addAttribute("project",
                 project);
-        model.addAttribute("developers",
-                projectService.getAllDevelopersForProject(project));
+
+        List<BBUser> developers = projectService.getAllDevelopersForProject(project);
+
+        List<DeveloperWithRolesForProjectDTO> devWrapper = developers
+                .stream()
+                .map(dev -> new DeveloperWithRolesForProjectDTO(dev,projectAccessManagementService.getRolesForDeveloperInProject(dev,project))).toList();
+
+        System.out.println("MAPPED" + " " + devWrapper);
+
+        model.addAttribute("developers", devWrapper);
+        model.addAttribute("projectRoles",projectAccessManagementService.getRolesForMembersInProject(project));
+
+
         return "project_pages/members";
     }
 
@@ -209,6 +223,21 @@ public class ProjectController {
             throw e;
         }
     }
+
+    @PostMapping("{title}/add-role/{userId}")
+    public String assignRolesToUser(@PathVariable(name = "title") @P("project") Project project, @PathVariable Integer userId,@RequestParam(name = "roles") List<String> roleNames){
+        BBUser user = userDetailsService.loadUserById(userId);
+        projectAccessManagementService.addRolesToUser(user,project,roleNames);
+        return "redirect:/projects/" + project.getTitle() + "/members";
+    }
+    @PostMapping("{title}/remove-role/{userId}")
+    public String deleteRoleForUser(@PathVariable(name = "title") @P("project") Project project, @PathVariable Integer userId,String roleName){
+        BBUser user = userDetailsService.loadUserById(userId);
+        projectAccessManagementService.deleteRoleForUser(user,project,roleName);
+        return "redirect:/projects/" + project.getTitle() + "/members";
+    }
+
+
 
     @PreAuthorize("#project.getUser().getUsername().equals(#username)")
     @PostMapping("/topics/add")
