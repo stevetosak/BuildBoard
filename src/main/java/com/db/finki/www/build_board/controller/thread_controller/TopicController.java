@@ -63,13 +63,13 @@ public class TopicController {
     @GetMapping("/{topic-id}")
     public String showTopic(@PathVariable(name = "topic-id") int topicId, Model model,
             @RequestParam(required = false) Boolean duplicateTittle,
-            @SessionAttribute() BBUser user) {
+            @SessionAttribute(required = false) BBUser user) {
 
         if (duplicateTittle != null) {
             model.addAttribute("errMsg", "There already exists a thread with the same title in that parent");
         }
 
-        if(blacklistedUserService.isBlacklisted(user.getId(), topicId)) {
+        if(user != null && blacklistedUserService.isBlacklisted(user.getId(), topicId)) {
             return "blacklisted";
         }
 
@@ -116,16 +116,14 @@ public class TopicController {
     }
 
     @PostMapping("{id}/report")
-    @PreAuthorize("@topicServiceImpl.getById(#topicId).user.id.equals(#user.id)")
     public String reportUser(
             @PathVariable(name = "id") @P("topicId") long topicId,
             @RequestParam String reason
             , @SessionAttribute @P("user") BBUser user,
-            @RequestParam(name = "report-username") String reportingUser, Model model){
+            @RequestParam(name = "report-username") String reportingUser){
 
         reportService.createReport(topicId,reason,user, reportingUser);
-
-        return bootstartTopic(topicId, model);
+        return "redirect:/topics/" + topicId;
     }
 
     public String handleDuplicatedTitle(org.springframework.orm.jpa.JpaSystemException e,

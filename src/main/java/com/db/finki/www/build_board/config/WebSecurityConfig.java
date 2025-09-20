@@ -53,8 +53,10 @@ public class WebSecurityConfig {
                                         "/js/**"
                                 ).permitAll()
                                 .requestMatchers(
-                                        new AntPathRequestMatcher("/topic/*", HttpMethod.GET.name()),
-                                        new AntPathRequestMatcher("/project/*",HttpMethod.GET.name()),
+                                        new AntPathRequestMatcher("/topics/*",
+                                                HttpMethod.GET.name()),
+                                        new AntPathRequestMatcher("/projects/*",
+                                                HttpMethod.GET.name()),
                                         new AntPathRequestMatcher("/avatars/**",HttpMethod.GET.name())
                                 ).permitAll()
                                 .requestMatchers("/topic/**","/project/**").authenticated()

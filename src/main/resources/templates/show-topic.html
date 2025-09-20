@@ -195,7 +195,7 @@
     <!--    DO TUKA E TOPIC-->
 
     <!-- Replies Section -->
-    <div th:replace="~{/fragments/discussion :: discussion(reply_cont=${replies},blacklisted=${blacklisted})}"></div>
+    <div th:replace="~{/fragments/discussion :: discussion(reply_cont=${replies},blacklisted=${blacklisted},ownerId=${topic.getUser().getId()})}"></div>
 
     <!--    Report modal -->
     <div class="modal fade"
