@@ -164,20 +164,18 @@ CREATE TABLE project_resource
 
 create table project_role
 (
+    id serial PRIMARY KEY ,
     name       varchar(32) NOT NULL,
     project_id int references project_thread (id) ON DELETE CASCADE,
-    override_type varchar(20) check ( override_type in ('INCLUDE','EXCLUDE')) NOT NULL DEFAULT 'EXCLUDE',
-    PRIMARY KEY (name, project_id)
+    override_type varchar(20) check ( override_type in ('INCLUDE','EXCLUDE')) NOT NULL DEFAULT 'EXCLUDE'
 );
 
 CREATE TABLE role_permissions
 (
     permission_name VARCHAR(32),
-    role_name       VARCHAR(32),
-    project_id      INT,
-    FOREIGN KEY (role_name, project_id) REFERENCES project_role (name, project_id) ON DELETE CASCADE,
+    role_id INT REFERENCES project_role(id) ON DELETE CASCADE NOT NULL,
     FOREIGN KEY (permission_name) REFERENCES permissions(name),
-    PRIMARY KEY (permission_name, role_name, project_id)
+    PRIMARY KEY (permission_name, role_id)
 );
 
 -- ova sa exceptions, primer ako vo role permissions imat entry ("READ","GUEST",5),
@@ -185,21 +183,18 @@ CREATE TABLE role_permissions
 -- togas role GUEST mozit da citat vo site kanali osven Channel3
 CREATE TABLE role_permissions_overrides
 (
-    permission_name VARCHAR(32) REFERENCES permissions (name) NOT NULL,
-    role_name       VARCHAR(32) NOT NULL,
-    project_id INT NOT NULL,
+    permission_name VARCHAR(32),
+    role_id INT REFERENCES project_role(id) ON DELETE CASCADE NOT NULL,
     project_resource_id int references project_resource(id) NOT NULL,
-    FOREIGN KEY (role_name, project_id,permission_name) REFERENCES role_permissions (role_name,project_id,permission_name) ON DELETE CASCADE,
-    PRIMARY KEY (role_name,project_id,permission_name,project_resource_id)
+    FOREIGN KEY (role_id,permission_name) REFERENCES role_permissions (role_id,permission_name) ON DELETE CASCADE,
+    PRIMARY KEY (role_id,permission_name,project_resource_id)
 );
 
 CREATE TABLE users_project_roles
 (
     user_id    INT REFERENCES developer (id) on delete cascade,
-    project_id INT,
-    role_name  VARCHAR(32),
-    FOREIGN KEY (role_name, project_id) REFERENCES project_role (name, project_id) ON DELETE CASCADE,
-    PRIMARY KEY (user_id, project_id, role_name)
+    role_id    INT REFERENCES project_role(id) on delete cascade,
+    PRIMARY KEY (user_id, role_id)
 );
 
 
@@ -300,8 +295,7 @@ CREATE OR REPLACE VIEW role_channel_permissions AS
 SELECT
     c.project_resource_id,
     c.name,
-    pr.name AS role_name,
-    c.project_id,
+    pr.id as role_id,
     COALESCE(
                     STRING_AGG(
                     DISTINCT rp.permission_name, ',' ORDER BY rp.permission_name
@@ -317,14 +311,12 @@ FROM channel c
          JOIN project_role pr
               ON pr.project_id = c.project_id
          LEFT JOIN role_permissions rp
-                   ON rp.project_id = c.project_id
-                       AND rp.role_name = pr.name
+                   ON rp.role_id = pr.id
                        AND rp.permission_name IN ('READ','WRITE')
          LEFT JOIN role_permissions_overrides rpo
-                   ON rpo.project_id = rp.project_id
-                       AND rpo.role_name = rp.role_name
+                   ON rpo.role_id = pr.id
                        AND rpo.permission_name = rp.permission_name
                        AND rpo.project_resource_id = c.project_resource_id
-GROUP BY c.project_resource_id, c.name, pr.name, c.project_id;
+GROUP BY c.project_resource_id, c.name,pr.id
 
 

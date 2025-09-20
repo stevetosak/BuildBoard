@@ -18,13 +18,10 @@ import lombok.Setter;
 @NoArgsConstructor
 public class UsersProjectRolesId {
     @ManyToOne
-    @JoinColumns({
-            @JoinColumn(name = "project_id", referencedColumnName = "project_id"),
-            @JoinColumn(name = "role_name", referencedColumnName = "name")
-    })
+    @JoinColumn(name = "role_id", referencedColumnName = "id")
     ProjectRole role;
     @ManyToOne
-    @JoinColumn(name = "user_id",referencedColumnName = "id")
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     BBUser user;
 
 }

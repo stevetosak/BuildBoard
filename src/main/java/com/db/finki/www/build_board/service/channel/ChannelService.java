@@ -1,5 +1,6 @@
 package com.db.finki.www.build_board.service.channel;
 
+import com.db.finki.www.build_board.entity.access_managment.ProjectRole;
 import com.db.finki.www.build_board.entity.channel.Channel;
 import com.db.finki.www.build_board.entity.compositeId.ChannelId;
 import com.db.finki.www.build_board.entity.thread.Project;
@@ -7,7 +8,7 @@ import com.db.finki.www.build_board.entity.user_type.BBUser;
 import com.db.finki.www.build_board.entity.user_type.Developer;
 import com.db.finki.www.build_board.entity.view.RoleChannelPermissions;
 import com.db.finki.www.build_board.repository.DeveloperRepository;
-import com.db.finki.www.build_board.repository.RoleChannelPermissionsRepository;
+import com.db.finki.www.build_board.repository.access_managment.RoleChannelPermissionsRepository;
 import com.db.finki.www.build_board.repository.access_managment.ProjectRolePermissionResourceOverrideRepository;
 import com.db.finki.www.build_board.repository.channel.ChannelRepository;
 import org.springframework.stereotype.Service;
@@ -38,8 +39,8 @@ public class ChannelService {
         return channelRepository.findAllByProjectIdOrderByNameAsc(project.getId());
     }
 
-    public List<RoleChannelPermissions> getRoleChannelPermissions(String roleName, Integer projectId) {
-        return roleChannelPermissionsRepository.findByRoleNameAndProjectId(roleName, projectId);
+    public List<RoleChannelPermissions> getChannelPermissionsForRole(ProjectRole role) {
+        return roleChannelPermissionsRepository.findByRole(role);
     }
 
 

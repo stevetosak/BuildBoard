@@ -6,6 +6,7 @@ import com.db.finki.www.build_board.entity.access_managment.ProjectRolePermissio
 import com.db.finki.www.build_board.entity.channel.Channel;
 import com.db.finki.www.build_board.entity.compositeId.ProjectRolePermissionResourceOverrideId;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -21,19 +22,16 @@ public interface ProjectRolePermissionResourceOverrideRepository extends JpaRepo
                   EXISTS (SELECT 1
                           FROM users_project_roles upr
                                    JOIN project_role pr
-                               ON pr.name = upr.role_name
-                                            AND pr.project_id = upr.project_id
+                               ON upr.role_id = pr.id
                                    JOIN role_permissions rp
-                                        ON upr.role_name = rp.role_name
-                                            AND upr.project_id = rp.project_id
+                                    ON pr.id = rp.role_id
                                    LEFT JOIN role_permissions_overrides rpo
-                                             ON rpo.role_name = rp.role_name
-                                                 AND rpo.project_id = rp.project_id
+                                             ON pr.id = rpo.role_id
                                                  AND rpo.permission_name = rp.permission_name
                                                  AND rpo.project_resource_id = :resourceId
    
                           WHERE upr.user_id = :userId
-                            AND rp.project_id = :projectId
+                            AND pr.project_id = :projectId
                             AND rp.permission_name = :permissionName
                             AND (
                               (pr.override_type = 'INCLUDE' AND rpo.project_resource_id IS NOT NULL)
@@ -42,5 +40,8 @@ public interface ProjectRolePermissionResourceOverrideRepository extends JpaRepo
           ) AS has_access;
           """, nativeQuery = true)
     boolean hasPermissionForResource(int projectId,int userId,String permissionName,int resourceId);
-    List<ProjectRolePermissionResourceOverride> findAllByIdProjectRolePermissionIdProjectRole(ProjectRole projectRole);
+    List<ProjectRolePermissionResourceOverride> findAllByIdProjectRolePermissionIdRole(ProjectRole role);
+
+    @Modifying(clearAutomatically = true)
+    void deleteAllByIdProjectRolePermissionIdRole(ProjectRole role);
 }

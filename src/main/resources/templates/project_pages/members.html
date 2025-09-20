@@ -147,10 +147,10 @@
                                 <input class="form-check-input"
                                        type="checkbox"
                                        name="roles"
-                                       th:value="${role.getId().getName()}"
+                                       th:value="${role.getName()}"
                                        id="role_${role.getId().getName()}">
                                 <label class="form-check-label"
-                                       th:for="${'role_' + role.getId().getName()}"
+                                       th:for="${'role_' + role.getName()}"
                                        th:text="${role.getName()}"></label>
                             </div>
                         </div>

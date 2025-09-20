@@ -74,17 +74,17 @@ VALUES
     ('Developer', 5,'INCLUDE');
 
 
-INSERT INTO users_project_roles (user_id, project_id, role_name)
+INSERT INTO users_project_roles (user_id, role_id)
 VALUES
-    (3, 5, 'Admin'),
-    (5, 5, 'Developer');
+    (3, 1),
+    (5, 2);
 
-INSERT INTO role_permissions (permission_name, role_name, project_id)
+INSERT INTO role_permissions (permission_name, role_id)
 VALUES
-    ('READ', 'Admin', 5),
-    ('WRITE', 'Admin', 5),
-    ('CREATE','Admin',5),
-    ('DELETE','Admin',5);
+    ('READ', 1),
+    ('WRITE', 1),
+    ('CREATE',1),
+    ('DELETE',1);
 
 insert into submission(created_by,status,description)
 values

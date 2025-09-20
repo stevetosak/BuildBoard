@@ -3,8 +3,6 @@ package com.db.finki.www.build_board.service.access_managment;
 import com.db.finki.www.build_board.common.enums.ProjectResourcePermissionOverrideType;
 import com.db.finki.www.build_board.dto.PermissionResourceWrapper;
 import com.db.finki.www.build_board.entity.access_managment.*;
-import com.db.finki.www.build_board.entity.channel.Channel;
-import com.db.finki.www.build_board.entity.compositeId.ProjectRoleId;
 import com.db.finki.www.build_board.entity.compositeId.ProjectRolePermissionId;
 import com.db.finki.www.build_board.entity.compositeId.ProjectRolePermissionResourceOverrideId;
 import com.db.finki.www.build_board.entity.compositeId.UsersProjectRolesId;
@@ -15,10 +13,14 @@ import com.db.finki.www.build_board.repository.access_managment.ProjectRoleRepos
 import com.db.finki.www.build_board.repository.access_managment.ProjectRolePermissionRepository;
 import com.db.finki.www.build_board.repository.access_managment.UserProjectRoleRepository;
 import jakarta.transaction.Transactional;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class ProjectAccessManagementService {
@@ -32,7 +34,7 @@ public class ProjectAccessManagementService {
             ProjectRoleRepository projectRoleRepository,
             ProjectRolePermissionRepository projectRolePermissionRepository,
             ProjectRolePermissionResourceOverrideRepository projectRolePermissionResourceOverrideRepository, UserProjectRoleRepository userProjectRoleRepository
-                                         ) {
+    ) {
         this.projectRoleRepository = projectRoleRepository;
         this.projectRolePermissionResourceOverrideRepository =
                 projectRolePermissionResourceOverrideRepository;
@@ -43,25 +45,25 @@ public class ProjectAccessManagementService {
     public boolean hasPermissionToAccessResource(
             int userId, String permission, int resourceId,
             int projectId
-                                                ) {
+    ) {
         return projectRolePermissionResourceOverrideRepository.hasPermissionForResource(projectId,
                 userId,
                 permission,
                 resourceId);
     }
 
-    public List<ProjectRole> getRolesForDeveloperInProject(BBUser user,Project project){
-        return userProjectRoleRepository.findByIdRoleIdProjectIdAndIdUserId(project.getId(),user.getId()).stream().map(UsersProjectRoles::getProjectRole).toList();
+    public List<ProjectRole> getRolesForDeveloperInProject(BBUser user, Project project) {
+        return userProjectRoleRepository.findByIdRoleProjectIdAndIdUserId(project.getId(), user.getId()).stream().map(UsersProjectRoles::getProjectRole).toList();
     }
 
     public List<ProjectRole> getRolesForMembersInProject(Project project) {
-        return projectRoleRepository.findByIdProjectId(project.getId());
+        return projectRoleRepository.findByProject(project);
     }
 
     private List<ProjectRolePermission> mapGlobalsToProjectRolePermissions(
             ProjectRole role,
             List<Permission> permissions
-                                                                          ) {
+    ) {
         return permissions
                 .stream()
                 .map(p -> new ProjectRolePermission(
@@ -75,9 +77,8 @@ public class ProjectAccessManagementService {
 
     private List<ProjectRolePermission> mapPerResourceToProjectRolePermissions(
             ProjectRole role,
-            List<PermissionResourceWrapper> permissions,
-            ProjectResourcePermissionOverrideType overrideType
-                                                                              ) {
+            List<PermissionResourceWrapper> permissions
+    ) {
         return permissions
                 .stream()
                 .map(p -> new ProjectRolePermission(
@@ -92,85 +93,93 @@ public class ProjectAccessManagementService {
             List<ProjectResource> resources,
             List<ProjectRolePermission> rolePermissions
 
-                                                                              ) {
-       List<ProjectRolePermissionResourceOverride> overrides = new ArrayList<>();
+    ) {
+        List<ProjectRolePermissionResourceOverride> overrides = new ArrayList<>();
 
-       for(int i = 0 ; i < resources.size() ; i++){
-           overrides.add(
-                   new ProjectRolePermissionResourceOverride(
-                           new ProjectRolePermissionResourceOverrideId(
-                                  rolePermissions.get(i),
-                                  resources.get(i)
-                           )
-                   )
-                                                     );
-       }
+        for (int i = 0; i < resources.size(); i++) {
+            overrides.add(
+                    new ProjectRolePermissionResourceOverride(
+                            new ProjectRolePermissionResourceOverrideId(
+                                    rolePermissions.get(i),
+                                    resources.get(i)
+                            )
+                    )
+            );
+        }
 
-       return overrides;
+        return overrides;
     }
 
     private List<ProjectResource> getResources(List<PermissionResourceWrapper> rolePermissions) {
         return rolePermissions.stream().map(PermissionResourceWrapper::getResource).toList();
     }
 
+
+    @Transactional
+    public void updateRole(Integer id, AddRoleDTOEntities addRoleDTO) {
+
+        ProjectRole existingRole = projectRoleRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("bad role id"));
+        projectRolePermissionRepository.deleteAllByIdRole(existingRole);
+
+        existingRole.setName(addRoleDTO.getName());
+        existingRole.setOverrideType(addRoleDTO.getProjectResourcePermissionOverrideType().toString());
+
+        projectRoleRepository.save(existingRole);
+
+        List<ProjectRolePermission> newGlobalPermissions = mapGlobalsToProjectRolePermissions(existingRole, addRoleDTO.getGlobalPermissions());
+        List<ProjectRolePermission> newPerResourcePermissions = mapPerResourceToProjectRolePermissions(existingRole,addRoleDTO.getPermissionsResourceWrappers());
+        List<ProjectRolePermissionResourceOverride> resourceOverrides = mapToResourceOverrides(getResources(addRoleDTO.getPermissionsResourceWrappers()),newPerResourcePermissions);
+
+
+        projectRolePermissionRepository.saveAll(newGlobalPermissions);
+        projectRolePermissionRepository.saveAll(newPerResourcePermissions);
+        projectRolePermissionResourceOverrideRepository.saveAll(resourceOverrides);
+
+    }
+
     @Transactional
     public void addRole(AddRoleDTOEntities addRoleDTO) {
         ProjectRole role = projectRoleRepository.save(
                 new ProjectRole(
-                        new ProjectRoleId(
-                                addRoleDTO.getName(),
-                                addRoleDTO.getProject()
-                        ),
-                        addRoleDTO.getProjectResourcePermissionOverrideType().name()
+                        addRoleDTO.getProject(),
+                        addRoleDTO.getName(),
+                        addRoleDTO.getProjectResourcePermissionOverrideType().toString()
                 )
-                                                     );
+        );
 
-        //GLOBALS
-        projectRolePermissionRepository.saveAll(mapGlobalsToProjectRolePermissions(role,
-                addRoleDTO.getGlobalPermissions()
-                                                                                  ));
-
-        //LOCALS
-        //Bitno e po red posle vo role_permissions_overrides da gi klavash
-        List<ProjectRolePermission> entities = mapPerResourceToProjectRolePermissions(
-                role,
-                addRoleDTO.getPermissionResource(),
-                addRoleDTO.getProjectResourcePermissionOverrideType()
-                                                                                     );
+        List<ProjectRolePermission> entities = mapPerResourceToProjectRolePermissions(role, addRoleDTO.getPermissionsResourceWrappers());
+        projectRolePermissionRepository.saveAll(mapGlobalsToProjectRolePermissions(role, addRoleDTO.getGlobalPermissions()));
         projectRolePermissionRepository.saveAll(entities);
-
-        //role_permissions_overrides
         projectRolePermissionResourceOverrideRepository.saveAll(mapToResourceOverrides(
-                getResources(addRoleDTO.getPermissionResource()),
+                getResources(addRoleDTO.getPermissionsResourceWrappers()),
                 entities
-                                                                                      ));
+        ));
     }
 
-    public void deleteByRoleNameAndProjectTitle(Project project, String roleName) {
-        projectRoleRepository.deleteById(new ProjectRoleId(roleName,project));
+    public void deleteRole(ProjectRole role) {
+        projectRoleRepository.deleteById(role.getId());
     }
 
-    public void addRolesToUser(BBUser user, Project project, List<String> roleNames) {
-        List<UsersProjectRoles> roles = roleNames
-                .stream()
-                .map(r -> new ProjectRole(new ProjectRoleId(r,project)))
-                .map(role -> new UsersProjectRoles(new UsersProjectRolesId(role,user)))
+    public void addRolesToUser(BBUser user, List<ProjectRole> roles) {
+        List<UsersProjectRoles> usersProjectRoles = roles.stream()
+                .map(role -> new UsersProjectRoles(new UsersProjectRolesId(role, user)))
                 .toList();
 
-        userProjectRoleRepository.saveAll(roles);
+        userProjectRoleRepository.saveAll(usersProjectRoles);
 
 
     }
 
     public void deleteRoleForUser(BBUser user, Project project, String roleName) {
-        ProjectRole role = new ProjectRole(new ProjectRoleId(roleName,project));
-        userProjectRoleRepository.deleteById(new UsersProjectRolesId(role,user));
+        ProjectRole role = new ProjectRole(project, roleName);
+        userProjectRoleRepository.deleteById(new UsersProjectRolesId(role, user));
     }
 
-    public List<ProjectRolePermission> getRolePermissionsForRole(String roleName, Project project) {
-        return projectRolePermissionRepository.findAllByIdProjectRole(new ProjectRole(new ProjectRoleId(roleName,project)));
+    public List<ProjectRolePermission> getRolePermissionsForRoleInProject(ProjectRole role) {
+        return projectRolePermissionRepository.findAllByIdRole(role);
     }
-    public List<ProjectRolePermissionResourceOverride> getResourceOverridesForRole(String roleName, Project project) {
-        return projectRolePermissionResourceOverrideRepository.findAllByIdProjectRolePermissionIdProjectRole(new ProjectRole(new ProjectRoleId(roleName,project)));
+
+    public List<ProjectRolePermissionResourceOverride> getResourceOverridesForRole(ProjectRole role) {
+        return projectRolePermissionResourceOverrideRepository.findAllByIdProjectRolePermissionIdRole(role);
     }
 }

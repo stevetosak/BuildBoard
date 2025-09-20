@@ -25,11 +25,8 @@ public class ProjectRolePermissionId implements Serializable {
     private Permission permission;
 
     @ManyToOne
-    @JoinColumns({
-            @JoinColumn(name = "role_name", referencedColumnName = "name"),
-            @JoinColumn(name = "project_id", referencedColumnName = "project_id")
-    })
-    private ProjectRole projectRole;
+    @JoinColumn(name = "role_id", referencedColumnName = "id")
+    private ProjectRole role;
 
 
     @Override
@@ -37,12 +34,12 @@ public class ProjectRolePermissionId implements Serializable {
         if (this == o) return true;
         if (!(o instanceof ProjectRolePermissionId that)) return false;
         return Objects.equals(permission, that.permission) &&
-                Objects.equals(projectRole, that.projectRole);
+                Objects.equals(role, that.role);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(permission, projectRole);
+        return Objects.hash(permission, role);
     }
 }
 

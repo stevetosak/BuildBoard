@@ -14,7 +14,7 @@ import java.util.List;
 public class AddRoleDTOEntities {
     String name;
     Project project;
-    List<PermissionResourceWrapper> permissionResource;
+    List<PermissionResourceWrapper> permissionsResourceWrappers;
     List<Permission> globalPermissions;
     ProjectResourcePermissionOverrideType projectResourcePermissionOverrideType;
 }

@@ -38,7 +38,7 @@ public class AddRoleDTOEntitiesMapper {
 
         dto2.setName(dto.getName());
         dto2.setProject(findProject(dto.getProjectTitle()));
-        dto2.setPermissionResource(findPermissionResource(dto.getPermissionResourceDTOS()));
+        dto2.setPermissionsResourceWrappers(findPermissionResource(dto.getPermissionResourceDTOS()));
         dto2.setProjectResourcePermissionOverrideType(ProjectResourcePermissionOverrideType.valueOf(dto.getPermissionOverrideType()));
         dto2.setGlobalPermissions(findGlobalPermissions(dto.getGlobalPermissions()));
 

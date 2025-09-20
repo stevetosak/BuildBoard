@@ -1,14 +1,10 @@
 package com.db.finki.www.build_board.controller.thread_controller;
 
-import com.db.finki.www.build_board.common.enums.ProjectResourcePermissionOverrideType;
 import com.db.finki.www.build_board.dto.AddRoleDTO;
 import com.db.finki.www.build_board.dto.DeveloperWithRolesForProjectDTO;
-import com.db.finki.www.build_board.entity.access_managment.ProjectResource;
 import com.db.finki.www.build_board.entity.access_managment.ProjectRole;
 import com.db.finki.www.build_board.entity.access_managment.ProjectRolePermission;
-import com.db.finki.www.build_board.entity.access_managment.ProjectRolePermissionResourceOverride;
 import com.db.finki.www.build_board.entity.channel.Channel;
-import com.db.finki.www.build_board.entity.compositeId.ProjectRoleId;
 import com.db.finki.www.build_board.entity.thread.Project;
 import com.db.finki.www.build_board.entity.user_type.BBUser;
 import com.db.finki.www.build_board.entity.view.RoleChannelPermissions;
@@ -29,8 +25,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 
 @Controller
@@ -122,20 +116,19 @@ public class ProjectController {
         return "project_pages/project-roles";
     }
 
-    @GetMapping("{title}/roles/{roleName}/edit")
-    public String getEditRolePage(@PathVariable(name = "title") Project project, @PathVariable(name = "roleName") String roleName, Model model) {
-        ProjectRole projectRole = projectRoleRepository.findById(new ProjectRoleId(roleName,project)).orElseThrow(() -> new IllegalArgumentException("bad project id or role name"));
-        List<ProjectRolePermission> projectRolePermissions = projectAccessManagementService.getRolePermissionsForRole(roleName,project);
-        List<RoleChannelPermissions> roleChannelPermissions = channelService.getRoleChannelPermissions(roleName,project.getId());
+    @GetMapping("{title}/roles/{id}/edit")
+    public String getEditRolePage(@PathVariable(name = "title") Project project, @PathVariable(name = "id") Integer roleId,Model model) {
+        ProjectRole projectRole = projectRoleRepository.findById(roleId).orElseThrow(() -> new IllegalArgumentException("bad project id or role name"));
+        List<ProjectRolePermission> projectRolePermissions = projectAccessManagementService.getRolePermissionsForRoleInProject(projectRole);
+        List<RoleChannelPermissions> roleChannelPermissions = channelService.getChannelPermissionsForRole(projectRole);
         List<Channel> channels = channelService.getAllChannelsForProject(project);
         List<String> selectedGlobalPermissions = projectRolePermissions
                 .stream()
                 .filter(p -> p.getPermission().getName().equals("CREATE") || p.getPermission().getName().equals("DELETE")).map(s -> s.getPermission().getName()).toList();
 
 
-        model.addAttribute("roleName",roleName);
+        model.addAttribute("role",projectRole);
         model.addAttribute("overrideType",projectRole.getOverrideType().toString());
-        model.addAttribute("project",project);
         model.addAttribute("globalPermissions", List.of("CREATE", "DELETE"));
         model.addAttribute("perResourcePermissions", List.of("READ", "WRITE"));
         model.addAttribute("selectedGlobalPermissions",selectedGlobalPermissions);
@@ -143,17 +136,24 @@ public class ProjectController {
         model.addAttribute("channels",channels);
         return "project_pages/edit-role";
 
+    }
 
+    @PostMapping("{title}/roles/{id}/edit")
+    public String editRole(@PathVariable(name = "title") Project project, @PathVariable(name = "id") Integer roleId,@RequestBody AddRoleDTO addRoleDTO) {
+        projectAccessManagementService.updateRole(roleId, mapper.map(addRoleDTO));
 
+        return "redirect:/projects/" + project.getId() + "/roles";
     }
 
     //projects/Project 1 Thread/roles/Admin/delete
-    @PostMapping("{project_title}/roles/{role_name}/delete")
+    @PostMapping("{project_title}/roles/{id}/delete")
     public String deleteRole(
             @PathVariable(name = "project_title") Project project,
-            @PathVariable(name = "role_name") String roleName
+            @PathVariable(name = "id") Integer id
                             ){
-        projectAccessManagementService.deleteByRoleNameAndProjectTitle(project,roleName);
+
+        ProjectRole role = projectRoleRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("bad project id or role name"));
+        projectAccessManagementService.deleteRole(role);
         return String.format("redirect:/projects/%s/roles", project.getTitle());
     }
 
@@ -268,7 +268,8 @@ public class ProjectController {
     @PostMapping("{title}/add-role/{userId}")
     public String assignRolesToUser(@PathVariable(name = "title") @P("project") Project project, @PathVariable Integer userId,@RequestParam(name = "roles") List<String> roleNames){
         BBUser user = userDetailsService.loadUserById(userId);
-        projectAccessManagementService.addRolesToUser(user,project,roleNames);
+        List<ProjectRole> roles = projectRoleRepository.findAllByNameInAndProject(roleNames,project);
+        projectAccessManagementService.addRolesToUser(user,roles);
         return "redirect:/projects/" + project.getTitle() + "/members";
     }
     @PostMapping("{title}/remove-role/{userId}")

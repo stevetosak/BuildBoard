@@ -1,12 +1,9 @@
 package com.db.finki.www.build_board.entity.access_managment;
 
-import com.db.finki.www.build_board.common.enums.ProjectResourcePermissionOverrideType;
 import com.db.finki.www.build_board.entity.compositeId.ProjectRolePermissionId;
-import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -29,7 +26,7 @@ public class ProjectRolePermission {
     }
 
     public ProjectRole getProjectRole() {
-        return id.getProjectRole();
+        return id.getRole();
     }
 
 

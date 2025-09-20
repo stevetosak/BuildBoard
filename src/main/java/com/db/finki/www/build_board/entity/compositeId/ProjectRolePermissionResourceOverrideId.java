@@ -18,8 +18,7 @@ import java.util.Objects;
 public class ProjectRolePermissionResourceOverrideId {
     @ManyToOne(optional = false)
     @JoinColumns({
-            @JoinColumn(name = "role_name",referencedColumnName = "role_name"),
-            @JoinColumn(name = "project_id",referencedColumnName = "project_id"),
+            @JoinColumn(name = "role_id",referencedColumnName = "role_id"),
             @JoinColumn(name = "permission_name",referencedColumnName = "permission_name")
     })
     private ProjectRolePermission projectRolePermission;
