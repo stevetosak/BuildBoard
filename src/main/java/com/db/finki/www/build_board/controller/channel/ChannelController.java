@@ -83,7 +83,19 @@ public class ChannelController {
     @PreAuthorize("@channelService.getByNameAndProject(#channelName,#project).getDeveloper().equals(#user)")
     @PostMapping("/{channelName}/delete")
     public String deleteChannel(@PathVariable @P("channelName") String channelName, @PathVariable("title") @P("project") Project project,
-                                @SessionAttribute @P("user") BBUser user, RedirectAttributes redirectAttributes) {
+                                @SessionAttribute @P("user") BBUser user,
+            RedirectAttributes redirectAttributes, Model model) {
+        Channel c = channelService.getByNameAndProject(channelName, project);
+
+        if (!projectAccessManagementService.hasPermissionToAccessResource(user.getId(),
+                Permission.DELETE,
+                c.getProjectResource().getId(),
+                project.getId()
+                                                                         )){
+            model.addAttribute("error","You dont have permission to access this channel");
+            return "redirect:/projects/" + project.getId();
+        }
+
         channelService.deleteChannel(channelName, project);
         return "redirect:/projects/" + project.getTitle();
     }

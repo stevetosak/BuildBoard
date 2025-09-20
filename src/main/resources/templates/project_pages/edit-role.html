@@ -148,6 +148,17 @@
         return document.body.dataset.roleId
     }
 
+    /*
+    * if (!projectAccessManagementService.hasPermissionToAccessResource(user.getId(),
+                Permission.READ,
+                c.getProjectResource().getId(),
+                project.getId()
+        )){
+            System.out.println("vleze deny access");
+            model.addAttribute("error","You dont have permission to access this channel");
+            return "redirect:/projects/" + project.getId();
+        }
+    * */
     document.querySelector("#btn-cancel").addEventListener("click", ev => {
         ev.preventDefault()
 
