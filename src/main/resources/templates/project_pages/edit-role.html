@@ -34,12 +34,12 @@
                         <label class="form-label">Override Type</label>
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="overrideType" id="includeTypeUpdate" value="INCLUDE"
-                                   th:checked="${overrideType == 'INCLUDE' ? 'checked' : ''}">
+                                   th:checked="${overrideType == 'INCLUDE'}">
                             <label class="form-check-label" for="includeTypeUpdate">INCLUDE</label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="overrideType" id="excludeTypeUpdate" value="EXCLUDE"
-                                   th:checked="${overrideType == 'EXCLUDE' ? 'checked' : ''}">
+                                   th:checked="${overrideType == 'EXCLUDE'}">
                             <label class="form-check-label" for="excludeTypeUpdate">EXCLUDE</label>
                         </div>
                     </div>
@@ -54,7 +54,7 @@
                                        th:id="'global-' + ${permission}"
                                        th:name="'global-permission'"
                                        th:value="${permission.toLowerCase()}"
-                                       th:checked="${selectedGlobalPermissions.contains(permission) ? 'checked' : ''}">
+                                       th:checked="${selectedGlobalPermissions.contains(permission)}">
                                 <label class="form-check-label" th:for="'global-' + ${permission}"
                                        th:text="${permission.toLowerCase() + ' channels'}">Permission</label>
                             </div>
@@ -67,18 +67,18 @@
                         <div th:each="permission : ${perResourcePermissions}">
                             <div class="mb-2">
                                 <strong th:text="${permission}">Permission Name</strong>
-                                <div class="d-flex flex-wrap gap-2 mt-1" th:each="channel : ${project.getChannels()}">
+                                <div class="d-flex flex-wrap gap-2 mt-1" th:each="rcp : ${roleChannelPermissions}">
                                     <div class="form-check">
                                         <input class="form-check-input perm-checkbox"
                                                type="checkbox"
-                                               th:id="${permission + '-' + channel.getProjectResource().getId()}"
+                                               th:id="${permission + '-' + rcp.getResourceId()}"
                                                name="per-resource-permission"
                                                th:value="${permission}"
-                                               th:attr="data-resource-id=${channel.getProjectResource().getId()}"
-                                               th:checked="${selectedChannels.get(permission).contains(channel.getProjectResource())}">
+                                               th:attr="data-resource-id=${rcp.getResourceId()}"
+                                               th:checked="${rcp.getPermissions().contains(permission)}">
                                         <label class="form-check-label"
-                                               th:for="${permission + '-' + channel.getProjectResource().getId()}"
-                                               th:text="${channel.getName()}">Resource Name</label>
+                                               th:for="${permission + '-' + rcp.getResourceId()}"
+                                               th:text="${rcp.getChannelName()}">Resource Name</label>
                                     </div>
                                 </div>
                             </div>
@@ -88,9 +88,11 @@
                 </div>
 
                 <!-- Submit -->
-                <div class="modal-footer">
+                <div class="modal-footer d-flex justify-content-between">
+                    <a th:href="@{/projects/{ptitle}/roles (ptitle=${project.getTitle()})}" class="btn btn-secondary w-100 me-2">Cancel</a>
                     <button type="submit" id="update-role-modal-submit" class="btn btn-warning w-100">Update Role</button>
                 </div>
+
 
             </form>
         </div>
@@ -101,7 +103,82 @@
 
 <!-- Script to show modal by default -->
 <script>
+
+    const getCheckedValues = (inputs) => {
+        const values = []
+        for(let i of inputs){
+            if(i.checked)
+                values.push(i.value)
+        }
+        return values
+    }
+
+    const processPerResourcePermissions = (inputs) => {
+        const values = []
+        for(let i of inputs){
+            if(i.checked){
+                values.push({
+                    name: i.value,
+                    resourceId: i.dataset.resourceId
+                })
+            }
+        }
+        return values
+    }
+
+    const getProjectTitle = () => {
+        return document.body.dataset.projectTitle
+    }
+
+    document.getElementById('add-role-form').addEventListener('submit', async function(event) {
+        event.preventDefault()
+        const roleNameInput = document.querySelector("#roleName")
+        const includeExcludeInput = document.querySelectorAll("input[name='overrideType']")
+        const globalPermissions = document.querySelectorAll("input[name='global-permission']")
+        const perResourcePermissions = document.querySelectorAll("input[name='per-resource-permission']")
+
+        const roleName = roleNameInput.value
+        const includeExcludeDecided = getCheckedValues(includeExcludeInput)[0]
+        const globalSelectedPermissions = getCheckedValues(globalPermissions)
+        const perResourceSelectedPermissions = processPerResourcePermissions(perResourcePermissions)
+        const projectTitle = getProjectTitle()
+
+        const response = await fetch(`/projects/${projectTitle}/roles/${roleName}/edit`, {
+            method: "POST",
+            headers: {
+                "Content-Type" : "application/json",
+            },
+            body: JSON.stringify({
+                name: roleName,
+                projectTitle: projectTitle,
+                permissionOverrideType: includeExcludeDecided,
+                globalPermissions: globalSelectedPermissions,
+                permissionResourceDTOS: perResourceSelectedPermissions.map(p => ({
+                    permissionName: p.name,
+                    projectResourceID: p.resourceId
+                }))
+            }),
+            credentials: "include"
+        })
+
+        if(!response.ok)
+            throw new Error("Something went wrong")
+
+        location.reload()
+    });
+
     document.addEventListener("DOMContentLoaded", function() {
+        const includeRadio = document.getElementById("includeType");
+        const excludeRadio = document.getElementById("excludeType");
+        const permCheckboxes = document.querySelectorAll(".perm-checkbox");
+
+        function updateCheckboxes() {
+            permCheckboxes.forEach(cb => cb.checked = !cb.checked);
+        }
+
+        includeRadio.addEventListener("change", updateCheckboxes);
+        excludeRadio.addEventListener("change", updateCheckboxes);
+
         const modalEl = document.getElementById('updateRoleModal');
         const modal = new bootstrap.Modal(modalEl, {
             backdrop: 'static',

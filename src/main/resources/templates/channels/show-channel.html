@@ -55,9 +55,9 @@
 
             <!-- Input Section -->
             <div class="input-container">
-                <textarea id="chat-message" th:disabled="${canWrite}" class="form-control h-fit-content" name="chatMessage"
+                <textarea id="chat-message" th:disabled="${!canWrite}" class="form-control h-fit-content" name="chatMessage"
                           placeholder="Type your message..."></textarea>
-                <button id="send-message-button" th:disabled="${canWrite}" class="btn btn-primary">Send</button>
+                <button id="send-message-button" th:disabled="${!canWrite}" class="btn btn-primary">Send</button>
             </div>
         </div>
 

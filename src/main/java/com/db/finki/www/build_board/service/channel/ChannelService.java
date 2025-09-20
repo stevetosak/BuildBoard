@@ -5,7 +5,10 @@ import com.db.finki.www.build_board.entity.compositeId.ChannelId;
 import com.db.finki.www.build_board.entity.thread.Project;
 import com.db.finki.www.build_board.entity.user_type.BBUser;
 import com.db.finki.www.build_board.entity.user_type.Developer;
+import com.db.finki.www.build_board.entity.view.RoleChannelPermissions;
 import com.db.finki.www.build_board.repository.DeveloperRepository;
+import com.db.finki.www.build_board.repository.RoleChannelPermissionsRepository;
+import com.db.finki.www.build_board.repository.access_managment.ProjectRolePermissionResourceOverrideRepository;
 import com.db.finki.www.build_board.repository.channel.ChannelRepository;
 import org.springframework.stereotype.Service;
 
@@ -15,21 +18,30 @@ import java.util.List;
 public class ChannelService {
     private final ChannelRepository channelRepository;
     private final DeveloperRepository developerRepository;
+    private final ProjectRolePermissionResourceOverrideRepository  projectRolePermissionResourceOverrideRepository;
 
     private final String INVALID_INPUT_REGEX = "(^/|/$|[\\#?])";
+    private final RoleChannelPermissionsRepository roleChannelPermissionsRepository;
 
     private boolean isInvalidInput(String input) {
         return input.matches(INVALID_INPUT_REGEX);
     }
 
-    public ChannelService(ChannelRepository channelRepository, DeveloperRepository developerRepository) {
+    public ChannelService(ChannelRepository channelRepository, DeveloperRepository developerRepository, ProjectRolePermissionResourceOverrideRepository projectRolePermissionResourceOverrideRepository, RoleChannelPermissionsRepository roleChannelPermissionsRepository) {
         this.channelRepository = channelRepository;
         this.developerRepository = developerRepository;
+        this.projectRolePermissionResourceOverrideRepository = projectRolePermissionResourceOverrideRepository;
+        this.roleChannelPermissionsRepository = roleChannelPermissionsRepository;
     }
 
     public List<Channel> getAllChannelsForProject(Project project) {
         return channelRepository.findAllByProjectIdOrderByNameAsc(project.getId());
     }
+
+    public List<RoleChannelPermissions> getRoleChannelPermissions(String roleName, Integer projectId) {
+        return roleChannelPermissionsRepository.findByRoleNameAndProjectId(roleName, projectId);
+    }
+
 
     public Channel create(Project project, String channelName, String description, BBUser user){
         if(channelRepository.findByProjectTitleAndNameOrderByNameAsc(project.getTitle(), channelName) != null) {

@@ -55,11 +55,11 @@ VALUES
     (4, 6),
     (5, 7);
 
-
-INSERT INTO blacklisted_user (topic_id, user_id, moderator_id, start_date, end_date, reason)
-VALUES
-    (1, 2, 1, NOW(), NOW() + INTERVAL '7 days', 'Spamming'),
-    (2, 3, 2, NOW(), NOW() + INTERVAL '3 days', 'Offensive language');
+--
+-- INSERT INTO blacklisted_user (topic_id, user_id, moderator_id, start_date, end_date, reason)
+-- VALUES
+--     (1, 2, 1, NOW(), NOW() + INTERVAL '7 days', 'Spamming'),
+--     (2, 3, 2, NOW(), NOW() + INTERVAL '3 days', 'Offensive language');
 
 INSERT INTO permissions (name)
 VALUES
@@ -68,10 +68,10 @@ VALUES
     ('CREATE'),
     ('DELETE');
 
-INSERT INTO project_role (name, project_id)
+INSERT INTO project_role (name, project_id,override_type)
 VALUES
-    ('Admin', 5),
-    ('Developer', 5);
+    ('Admin', 5,'EXCLUDE'),
+    ('Developer', 5,'INCLUDE');
 
 
 INSERT INTO users_project_roles (user_id, project_id, role_name)
@@ -79,12 +79,12 @@ VALUES
     (3, 5, 'Admin'),
     (5, 5, 'Developer');
 
-INSERT INTO role_permissions (permission_name, role_name, project_id,override_type)
+INSERT INTO role_permissions (permission_name, role_name, project_id)
 VALUES
-    ('READ', 'Admin', 5,'EXCLUDE'),
-    ('WRITE', 'Admin', 5,'EXCLUDE'),
-    ('CREATE','Admin',5,'EXCLUDE'),
-    ('DELETE','Admin',5,'EXCLUDE');
+    ('READ', 'Admin', 5),
+    ('WRITE', 'Admin', 5),
+    ('CREATE','Admin',5),
+    ('DELETE','Admin',5);
 
 insert into submission(created_by,status,description)
 values

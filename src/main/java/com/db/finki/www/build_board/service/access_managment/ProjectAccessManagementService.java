@@ -3,6 +3,7 @@ package com.db.finki.www.build_board.service.access_managment;
 import com.db.finki.www.build_board.common.enums.ProjectResourcePermissionOverrideType;
 import com.db.finki.www.build_board.dto.PermissionResourceWrapper;
 import com.db.finki.www.build_board.entity.access_managment.*;
+import com.db.finki.www.build_board.entity.channel.Channel;
 import com.db.finki.www.build_board.entity.compositeId.ProjectRoleId;
 import com.db.finki.www.build_board.entity.compositeId.ProjectRolePermissionId;
 import com.db.finki.www.build_board.entity.compositeId.ProjectRolePermissionResourceOverrideId;
@@ -67,8 +68,7 @@ public class ProjectAccessManagementService {
                         new ProjectRolePermissionId(
                                 p,
                                 role
-                        ),
-                        ProjectResourcePermissionOverrideType.EXCLUDE.name()
+                        )
                 ))
                 .toList();
     }
@@ -83,9 +83,7 @@ public class ProjectAccessManagementService {
                 .map(p -> new ProjectRolePermission(
                         new ProjectRolePermissionId(
                                 p.getPermission(),
-                                role
-                        ),
-                        overrideType.name()
+                                role)
                 ))
                 .toList();
     }
@@ -122,7 +120,8 @@ public class ProjectAccessManagementService {
                         new ProjectRoleId(
                                 addRoleDTO.getName(),
                                 addRoleDTO.getProject()
-                        )
+                        ),
+                        addRoleDTO.getProjectResourcePermissionOverrideType().name()
                 )
                                                      );
 

@@ -166,16 +166,17 @@ create table project_role
 (
     name       varchar(32) NOT NULL,
     project_id int references project_thread (id) ON DELETE CASCADE,
+    override_type varchar(20) check ( override_type in ('INCLUDE','EXCLUDE')) NOT NULL DEFAULT 'EXCLUDE',
     PRIMARY KEY (name, project_id)
 );
 
 CREATE TABLE role_permissions
 (
-    permission_name VARCHAR(32) REFERENCES permissions (name),
+    permission_name VARCHAR(32),
     role_name       VARCHAR(32),
     project_id      INT,
-    override_type varchar(20) check ( override_type in ('INCLUDE','EXCLUDE')) NOT NULL,
     FOREIGN KEY (role_name, project_id) REFERENCES project_role (name, project_id) ON DELETE CASCADE,
+    FOREIGN KEY (permission_name) REFERENCES permissions(name),
     PRIMARY KEY (permission_name, role_name, project_id)
 );
 
@@ -293,3 +294,37 @@ from tmp d
               on d.id = d1.id and d1.depth = d.depth
          join thread t
               on t.id = d.id;
+
+
+CREATE OR REPLACE VIEW role_channel_permissions AS
+SELECT
+    c.project_resource_id,
+    c.name,
+    pr.name AS role_name,
+    c.project_id,
+    COALESCE(
+                    STRING_AGG(
+                    DISTINCT rp.permission_name, ',' ORDER BY rp.permission_name
+                              ) FILTER (
+                        WHERE
+                        (pr.override_type = 'INCLUDE' AND rpo.project_resource_id IS NOT NULL)
+                            OR
+                        (pr.override_type = 'EXCLUDE' AND rpo.project_resource_id IS NULL)
+                        ),
+                    ''
+    ) AS permissions
+FROM channel c
+         JOIN project_role pr
+              ON pr.project_id = c.project_id
+         LEFT JOIN role_permissions rp
+                   ON rp.project_id = c.project_id
+                       AND rp.role_name = pr.name
+                       AND rp.permission_name IN ('READ','WRITE')
+         LEFT JOIN role_permissions_overrides rpo
+                   ON rpo.project_id = rp.project_id
+                       AND rpo.role_name = rp.role_name
+                       AND rpo.permission_name = rp.permission_name
+                       AND rpo.project_resource_id = c.project_resource_id
+GROUP BY c.project_resource_id, c.name, pr.name, c.project_id;
+
+

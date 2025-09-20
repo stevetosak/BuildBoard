@@ -68,6 +68,7 @@ public class ChannelController {
                 c.getProjectResource().getId(),
                 project.getId()
         )){
+            System.out.println("vleze deny access");
             model.addAttribute("error","You dont have permission to access this channel");
             return "redirect:/projects/" + project.getId();
         }

@@ -112,7 +112,7 @@
                             <strong>Global Permissions</strong>
                             <div class="d-flex flex-wrap gap-2 mt-1" th:each="permission : ${globalPermissions}">
                                 <div class="form-check">
-                                    <input class="form-check-input"
+                                    <input class="form-check-input perm-checkbox"
                                            type="checkbox"
                                            th:id="${permission}"
                                            th:name="'global-permission'"
@@ -222,9 +222,6 @@
         location.reload()
     });
 
-    document.getElementById("add-role-modal-submit").addEventListener('click',() => {
-
-    })
 
     document.addEventListener("DOMContentLoaded", function () {
         const includeRadio = document.getElementById("includeType");
@@ -232,11 +229,7 @@
         const permCheckboxes = document.querySelectorAll(".perm-checkbox");
 
         function updateCheckboxes() {
-            if (includeRadio.checked) {
-                permCheckboxes.forEach(cb => cb.checked = false);
-            } else if (excludeRadio.checked) {
-                permCheckboxes.forEach(cb => cb.checked = true);
-            }
+            permCheckboxes.forEach(cb => cb.checked = !cb.checked);
         }
 
         includeRadio.addEventListener("change", updateCheckboxes);

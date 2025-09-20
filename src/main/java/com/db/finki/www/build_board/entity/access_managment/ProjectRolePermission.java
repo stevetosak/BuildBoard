@@ -13,16 +13,12 @@ import lombok.Setter;
 
 @Table(name = "role_permissions")
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 public class ProjectRolePermission {
     @EmbeddedId
     private ProjectRolePermissionId id;
-
-    @Column(name = "override_type",nullable = false)
-    private String overrideType;
 
     public ProjectRolePermission(ProjectRolePermissionId projectRolePermissionId) {
         this.id = projectRolePermissionId;
@@ -35,10 +31,6 @@ public class ProjectRolePermission {
     public ProjectRole getProjectRole() {
         return id.getProjectRole();
     }
-    public ProjectResourcePermissionOverrideType getOverrideType() {
-        return overrideType.equals(ProjectResourcePermissionOverrideType.INCLUDE.name()) ?
-                ProjectResourcePermissionOverrideType.INCLUDE
-                : ProjectResourcePermissionOverrideType.EXCLUDE;
-    }
+
 
 }
