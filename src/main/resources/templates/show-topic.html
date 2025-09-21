@@ -160,6 +160,38 @@
                     </form>
                 </div>
             </div>
+            <div th:attr="data-reply-id=${topic.getId()}"
+                 class="card-body d-none reply-body">
+                <form th:action="@{/topics/{topic-id}/discussions/add(topic-id=${topic.getId()})}"
+                      method="post">
+                    <div class="mb-3">
+                        <label class="form-label">Your
+                            Reply</label>
+                        <textarea
+                                name="content"
+                                class="form-control"
+                                rows="3"
+                                placeholder="Write your reply here"
+                                required></textarea>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <input type="hidden"
+                               th:value="${topic.getId()}"
+                               name="parentId">
+                        <button type="submit"
+                                class="btn btn-success w-10 ms-2">
+                            Post
+                            Reply
+                        </button>
+                        <div class="d-flex justify-content-end reply-cancel">
+                            <button class="btn btn-danger btn-sm reply-cancel w-10 me-2"
+                                    th:attr="data-reply-id=${topic.getId()}">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -190,7 +222,6 @@
                        th:value="${session.user.username}"/>
             </form>
         </div>
-    </div>
     </div>
     <!--    DO TUKA E TOPIC-->
 
