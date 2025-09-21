@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Update Role</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body th:attr="data-project-title=${role.getProject().getTitle()},data-role-id=${role.getId()}">
+
+<div th:replace="/home_pages/home :: navigation"></div>
+
+<!-- Update Role Modal (prefilled) -->
+<div class="modal fade show" id="updateRoleModal" tabindex="-1" aria-labelledby="updateRoleModalLabel" aria-modal="true" style="display: block;">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Update Role</h5>
+            </div>
+
+            <form th:action="@{/projects/{title}/roles/{id}/edit(title=${role.getProject().getTitle()}, id=${role.getId()})}"
+                  method="post"
+                  id="update-role-form">
+
+                <div class="modal-body">
+                    <!-- Role Name -->
+                    <div class="mb-3">
+                        <label for="updateRoleName" class="form-label">Role Name</label>
+                        <input type="text" class="form-control" id="updateRoleName" name="roleName"
+                               th:value="${role.getName()}" required>
+                    </div>
+
+                    <!-- Override Type -->
+                    <div class="mb-3">
+                        <label class="form-label">Override Type</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="overrideType" id="includeType" value="INCLUDE"
+                                   th:checked="${overrideType == 'INCLUDE'}">
+                            <label class="form-check-label" for="includeType">INCLUDE</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="overrideType" id="excludeType" value="EXCLUDE"
+                                   th:checked="${overrideType == 'EXCLUDE'}">
+                            <label class="form-check-label" for="excludeType">EXCLUDE</label>
+                        </div>
+                    </div>
+
+                    <!-- Global Permissions -->
+                    <div class="mb-2 border p-2 rounded">
+                        <strong>Global Permissions</strong>
+                        <div class="d-flex flex-wrap gap-2 mt-1" th:each="permission : ${globalPermissions}">
+                            <div class="form-check">
+                                <input class="form-check-input"
+                                       type="checkbox"
+                                       th:id="'global-permission'"
+                                       th:name="'global-permission'"
+                                       th:value="${permission.toLowerCase()}"
+                                       th:checked="${selectedGlobalPermissions.contains(permission)}">
+                                <label class="form-check-label" th:for="'global-' + ${permission}"
+                                       th:text="${permission.toLowerCase() + ' channels'}">Permission</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Per-Resource Permissions -->
+                    <!-- Per-Resource Permissions -->
+                    <div class="mb-2 border p-2 rounded">
+                        <strong>Per-Resource Permissions</strong>
+                        <div class="mt-2" th:each="rcp : ${roleChannelPermissions}">
+                            <div class="mb-2">
+                                <strong th:text="${rcp.getChannelName()}">Channel Name</strong>
+                                <div class="d-flex flex-wrap gap-3 mt-1">
+                                    <!-- READ -->
+                                    <div class="form-check">
+                                        <input class="form-check-input perm-checkbox"
+                                               type="checkbox"
+                                               th:id="${'read-' + rcp.getResourceId()}"
+                                               name="per-resource-permission"
+                                               value="READ"
+                                               th:attr="data-resource-id=${rcp.getResourceId()}"
+                                               th:checked="${overrideType == 'INCLUDE' && rcp.getPermissions().contains('READ')
+                                               || overrideType == 'EXCLUDE' && !rcp.getPermissions().contains('READ')}">
+                                        <label class="form-check-label"
+                                               th:for="${'read-' + rcp.getResourceId()}">READ</label>
+                                    </div>
+                                    <!-- WRITE -->
+                                    <div class="form-check">
+                                        <input class="form-check-input perm-checkbox"
+                                               type="checkbox"
+                                               th:id="${'write-' + rcp.getResourceId()}"
+                                               name="per-resource-permission"
+                                               value="WRITE"
+                                               th:attr="data-resource-id=${rcp.getResourceId()}"
+                                               th:checked="${overrideType == 'INCLUDE' && rcp.getPermissions().contains('WRITE')
+                                               || overrideType == 'EXCLUDE' && !rcp.getPermissions().contains('WRITE') }">
+                                        <label class="form-check-label"
+                                               th:for="${'write-' + rcp.getResourceId()}">WRITE</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+
+                <!-- Submit -->
+                <div class="modal-footer d-flex justify-content-between">
+                    <span class="btn btn-secondary w-100 me-2" id="btn-cancel">Cancel</span>
+                    <button type="submit" id="update-role-modal-submit" class="btn btn-warning w-100">Update Role</button>
+                </div>
+
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Script to show modal by default -->
+<script>
+    const getCheckedValues = (inputs) => {
+        const values = []
+        for(let i of inputs){
+            if(i.checked)
+                values.push(i.value)
+        }
+        return values
+    }
+
+    const processPerResourcePermissions = (inputs) => {
+        const values = []
+        for(let i of inputs){
+            if(i.checked){
+                values.push({
+                    name: i.value,
+                    resourceId: i.dataset.resourceId
+                })
+            }
+        }
+        return values
+    }
+
+    const getProjectTitle = () => {
+        return document.body.dataset.projectTitle
+    }
+    const getRoleId = () => {
+        return document.body.dataset.roleId
+    }
+
+    /*
+    * if (!projectAccessManagementService.hasPermissionToAccessResource(user.getId(),
+                Permission.READ,
+                c.getProjectResource().getId(),
+                project.getId()
+        )){
+            System.out.println("vleze deny access");
+            model.addAttribute("error","You dont have permission to access this channel");
+            return "redirect:/projects/" + project.getId();
+        }
+    * */
+    document.querySelector("#btn-cancel").addEventListener("click", ev => {
+        ev.preventDefault()
+
+        const pTitle = getProjectTitle()
+
+        window.location.replace(`/projects/${pTitle}/roles`)
+    })
+
+    document.getElementById('update-role-form').addEventListener('submit', async function(event) {
+        event.preventDefault()
+        const roleNameInput = document.querySelector("#updateRoleName")
+        const includeExcludeInput = document.querySelectorAll("input[name='overrideType']")
+        const globalPermissions = document.querySelectorAll("input[name='global-permission']")
+        const perResourcePermissions = document.querySelectorAll("input[name='per-resource-permission']")
+
+        const roleId = getRoleId()
+
+        const roleName = roleNameInput.value
+        const includeExcludeDecided = getCheckedValues(includeExcludeInput)[0]
+        const globalSelectedPermissions = getCheckedValues(globalPermissions)
+        const perResourceSelectedPermissions = processPerResourcePermissions(perResourcePermissions)
+        const projectTitle = getProjectTitle()
+
+        const response = await fetch(`/projects/${projectTitle}/roles/${roleId}/edit`, {
+            method: "POST",
+            headers: {
+                "Content-Type" : "application/json",
+            },
+            body: JSON.stringify({
+                name: roleName,
+                projectTitle: projectTitle,
+                permissionOverrideType: includeExcludeDecided,
+                globalPermissions: globalSelectedPermissions,
+                permissionResourceDTOS: perResourceSelectedPermissions.map(p => ({
+                    permissionName: p.name,
+                    projectResourceID: p.resourceId
+                }))
+            }),
+            credentials: "include"
+        })
+
+        if(!response.ok)
+            throw new Error("Something went wrong")
+
+        window.location.replace(`/projects/${projectTitle}/roles`)
+    });
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const modalEl = document.getElementById('updateRoleModal');
+        const modal = new bootstrap.Modal(modalEl, {
+            backdrop: 'static',
+            keyboard: false
+        });
+        modal.show();
+        const includeRadio = document.getElementById("includeType");
+        const excludeRadio = document.getElementById("excludeType");
+        const permCheckboxes = document.querySelectorAll(".perm-checkbox");
+
+        function updateCheckboxes() {
+            permCheckboxes.forEach(cb => cb.checked = !cb.checked);
+        }
+
+        includeRadio.addEventListener("change", updateCheckboxes);
+        excludeRadio.addEventListener("change", updateCheckboxes);
+
+
+    });
+</script>
+
+</body>
+</html>

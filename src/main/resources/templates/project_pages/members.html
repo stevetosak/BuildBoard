@@ -24,7 +24,8 @@
             margin-top: 50px;
             text-align: center;
         }
-        #kick-user-button{
+
+        #kick-user-button {
             position: absolute;
             top: 0;
             left: 0;
@@ -32,6 +33,13 @@
             height: 100%;
             opacity: 0;
             cursor: pointer;
+        }
+
+        .btn-close-red {
+            filter: invert(28%) sepia(93%) saturate(7484%) hue-rotate(356deg) brightness(97%) contrast(122%);
+        }
+        .btn-close-red:hover {
+            filter: invert(19%) sepia(94%) saturate(6397%) hue-rotate(356deg) brightness(95%) contrast(126%);
         }
 
     </style>
@@ -45,29 +53,59 @@
 <main class="d-flex justify-content-center align-content-center ">
     <div class="list-group w-75">
         <div class="list-group-item d-flex gap-2 justify-content-between align-items-center ps-4 pe-4"
-             th:each="member : ${developers}">
+             th:each="memberWrapper : ${developers}">
             <div class="d-flex flex-row align-items-center gap-3">
                 <img class="rounded-circle border border-1 border-info"
-                     style="width: 5em; height: 5em" th:src="${member.getAvatarUrl()}">
+                     style="width: 5em; height: 5em" th:src="${memberWrapper.getUser().getAvatarUrl()}">
                 <h5 class="mb-1 d-flex">
-                    <a th:href="@{/{username}/profile (username=${member.getUsername()})}"
-                       th:text="${member.getUsername()}"
-                        class="text-decoration-none"
+                    <a th:href="@{/{username}/profile (username=${memberWrapper.getUser().getUsername()})}"
+                       th:text="${memberWrapper.getUser().getUsername()}"
+                       class="text-decoration-none"
                     ></a>
                 </h5>
+                <div class="d-flex w-100">
+                    <form method="post"
+                          th:action="@{/projects/{projectName}/remove-role/{memberId}(projectName=${project.getTitle()}, memberId=${memberWrapper.getUser().getId()})}"
+                          class="d-inline"
+                          th:each="role : ${memberWrapper.getRoles()}">
+                        <input type="hidden" name="roleName" th:value="${role.getName()}"/>
+                        <span class="badge bg-primary me-1 d-flex align-items-center user-roles" th:attr="data-user=${memberWrapper.getUser().getId()}">
+        <span th:text="${role.getName()}"></span>
+        <button type="submit" class="btn-close btn-sm ms-2 btn-close-red" aria-label="Remove role"></button>
+    </span>
+                    </form>
+                </div>
+
             </div>
-            <h5 th:if="${member.getId() != project.getUser().getId()}" class="fw-lighter mb-0 fst-italic">Developer</h5>
-            <h5 th:if="${member.getId() == project.getUser().getId()}" class="fw-lighter mb-0 fst-italic">Owner</h5>
-            <div style="position: relative; display: inline-block;" th:if="${session.user.getId() == project.getUser().getId() && member.getId() != project.getUser().getId()}"
-            class="d-flex flex-row gap-1 align-items-center">
+            <div class="d-flex align-items-center gap-5">
+
                 <button
-                        th:attr="data-mem-id=${member.getId()}"
-                        type="button" class="btn rounded open-kick-dialog"
-                        style="background-image: url('/project_imgs/im-kick-user.svg'); width: 3rem; height: 3rem; background-color: transparent"
+                        th:if="${session.user.getId() == project.getUser().getId()}"
+                        th:attr="data-mem-id=${memberWrapper.getUser().getId()},data-selected-user=${memberWrapper.getUser().getId()}"
+                        class="btn btn-success open-role-dialog"
                         data-bs-toggle="modal"
-                        data-bs-target="#confirm"
-                >
+                        data-bs-target="#addRoleModal">
+                    Add Role
                 </button>
+
+                <h5 th:if="${memberWrapper.getUser().getId() != project.getUser().getId()}"
+                    class="fw-lighter mb-0 fst-italic">
+                    Developer</h5>
+                <h5 th:if="${memberWrapper.getUser().getId() == project.getUser().getId()}"
+                    class="fw-lighter mb-0 fst-italic">Owner</h5>
+                <div style="position: relative; display: inline-block;"
+                     th:if="${session.user.getId() == project.getUser().getId() && memberWrapper.getUser().getId() != project.getUser().getId()}"
+                     class="d-flex flex-row gap-1 align-items-center">
+                    <button
+                            th:attr="data-mem-id=${memberWrapper.getUser().getId()}"
+                            type="button" class="btn rounded open-kick-dialog"
+                            style="background-image: url('/project_imgs/im-kick-user.svg'); width: 3rem; height: 3rem; background-color: transparent"
+                            data-bs-toggle="modal"
+                            data-bs-target="#confirm"
+                    >
+                    </button>
+                </div>
+
             </div>
         </div>
     </div>
@@ -85,26 +123,79 @@
             <div class="modal-body">
                 <form method="post"
                       class="confirm-form d-flex justify-content-end"
-                      th:action="@{/project/{projectName}/members/{member-id}/kick(projectName=${project.getTitle()})}" >
-                    <button class="btn btn-danger rounded"  type="submit">Confirm</button>
+                      th:action="@{/project/{projectName}/members/{member-id}/kick(projectName=${project.getTitle()})}">
+                    <button class="btn btn-danger rounded" type="submit">Confirm</button>
                 </form>
             </div>
         </div>
     </div>
 </div>
+<!-- Add Role Modal -->
+<div class="modal fade" id="addRoleModal" tabindex="-1" aria-labelledby="addRoleLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="addRoleLabel">Add Role(s)</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" id="add-role-modal">
+                    <div class="mb-3">
+                        <label class="form-label">Select Role(s)</label>
+                        <div class="border rounded p-2" style="max-height: 200px; overflow-y: auto;">
+                            <div class="form-check" th:each="role : ${projectRoles}">
+                                <input class="form-check-input"
+                                       type="checkbox"
+                                       name="roles"
+                                       th:value="${role.getName()}"
+                                       id="role_${role.getId().getName()}">
+                                <label class="form-check-label"
+                                       th:for="${'role_' + role.getName()}"
+                                       th:text="${role.getName()}"></label>
+                            </div>
+                        </div>
+                        <small class="text-muted">You can select multiple roles.</small>
+                    </div>
+
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary">Assign Role(s)</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="/js/modal_utils.js"></script>
 <script>
-modalConts.push(document.querySelector("#confirm"))
+    //data-user
+    const getUserRoles = (userId) =>
+        [...document.querySelectorAll(`span[data-user="${userId}"]`)].map(span => span.textContent.trim());
 
-const projectTitle = document.body.dataset.projectName
-const form=document.querySelector(".confirm-form")
+    const setAvailableRoles = (appliedRoles) =>
+         [...document.querySelectorAll('input[name="roles"]')].filter(input => appliedRoles.includes(input.value)).forEach(input => input.parentElement.style.display = 'none')
 
-document.addEventListener("click", ev => {
-    if(ev.target.classList.contains("open-kick-dialog")){
-        const memberId = ev.target.dataset.memId
-        form.action=`/projects/${projectTitle}/members/${memberId}/kick`
-    }
-})
+
+    document.body.addEventListener('click', (evt) => {
+        if (evt.target.classList.contains('open-role-dialog')) {
+            const projectName = document.body.dataset.projectName
+            const userId = evt.target.dataset.selectedUser
+            document.getElementById("add-role-modal").action = `/projects/${projectName}/add-role/${userId}`
+            setAvailableRoles(getUserRoles(userId))
+        }
+    })
+
+    modalConts.push(document.querySelector("#confirm"))
+
+    const projectTitle = document.body.dataset.projectName
+    const form = document.querySelector(".confirm-form")
+
+    document.addEventListener("click", ev => {
+        if (ev.target.classList.contains("open-kick-dialog")) {
+            const memberId = ev.target.dataset.memId
+            form.action = `/projects/${projectTitle}/members/${memberId}/kick`
+        }
+    })
 
 </script>
 

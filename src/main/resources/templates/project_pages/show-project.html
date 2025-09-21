@@ -46,6 +46,9 @@
                     <a class="text-decoration-none text-reset p-2 border border-success rounded bg-success"
                        th:href="@{/projects/{pr_title}/requests(pr_title=${project.getTitle()})}">View project
                         requests</a>
+                    <a class="text-decoration-none text-reset p-2 border border-success rounded bg-success"
+                       th:href="@{/projects/{pr_title}/roles(pr_title=${project.getTitle()})}">Roles</a>
+
                 </div>
                 <a class="text-decoration-none text-reset p-2 border border-success rounded bg-secondary"
                    th:href="@{/projects/{pr_title}/members(pr_title=${project.getTitle()})}">Show members</a>

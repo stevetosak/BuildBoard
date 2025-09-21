@@ -55,9 +55,9 @@
 
             <!-- Input Section -->
             <div class="input-container">
-                <textarea id="chat-message" class="form-control h-fit-content" name="chatMessage"
+                <textarea id="chat-message" th:disabled="${!canWrite}" class="form-control h-fit-content" name="chatMessage"
                           placeholder="Type your message..."></textarea>
-                <button id="send-message-button" class="btn btn-primary">Send</button>
+                <button id="send-message-button" th:disabled="${!canWrite}" class="btn btn-primary">Send</button>
             </div>
         </div>
 
@@ -168,7 +168,7 @@
     }
 
     const client = new Client({
-        brokerURL: 'ws://localhost:8080/channel-websocket',
+        brokerURL: `ws://localhost:8080/channel-websocket?project=${projectName}&channelName=${channelName}`,
         onConnect: () => {
             client.subscribe(`/projects/${projectName}/channels/${channelName}`, message => {
                     createChatMessage(message.body)

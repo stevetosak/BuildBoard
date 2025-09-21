@@ -1,10 +1,21 @@
 package com.db.finki.www.build_board.controller.thread_controller;
 
+import com.db.finki.www.build_board.dto.AddRoleDTO;
+import com.db.finki.www.build_board.dto.DeveloperWithRolesForProjectDTO;
+import com.db.finki.www.build_board.entity.access_managment.ProjectRole;
+import com.db.finki.www.build_board.entity.access_managment.ProjectRolePermission;
+import com.db.finki.www.build_board.entity.channel.Channel;
 import com.db.finki.www.build_board.entity.thread.Project;
 import com.db.finki.www.build_board.entity.user_type.BBUser;
+import com.db.finki.www.build_board.entity.view.RoleChannelPermissions;
+import com.db.finki.www.build_board.repository.access_managment.ProjectRoleRepository;
+import com.db.finki.www.build_board.service.access_managment.AddRoleDTOEntitiesMapper;
+import com.db.finki.www.build_board.service.access_managment.ProjectAccessManagementService;
+import com.db.finki.www.build_board.service.channel.ChannelService;
 import com.db.finki.www.build_board.service.thread.impl.ProjectService;
 import com.db.finki.www.build_board.service.thread.impl.TagServiceImpl;
 import com.db.finki.www.build_board.service.thread.itf.TagService;
+import com.db.finki.www.build_board.service.user.BBUserDetailsService;
 import org.hibernate.Hibernate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.parameters.P;
@@ -13,6 +24,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.*;
+
 
 @Controller
 @RequestMapping("/projects")
@@ -20,28 +33,45 @@ public class ProjectController {
 
     private final ProjectService projectService;
     private final TagService tagService;
-    private final String DUPLICATED_TITLE_MSG="could not execute statement [ERROR: duplicate key value violates unique constraint";
+    private final String DUPLICATED_TITLE_MSG = "could not execute statement [ERROR: duplicate key value violates unique constraint";
+    private final ProjectAccessManagementService projectAccessManagementService;
+    private final AddRoleDTOEntitiesMapper mapper;
+    private final BBUserDetailsService userDetailsService;
+    private final ChannelService channelService;
+    private final ProjectRoleRepository projectRoleRepository;
 
-    public ProjectController(ProjectService projectService, TagServiceImpl topicService) {
+    public ProjectController(ProjectService projectService, TagServiceImpl topicService, ProjectAccessManagementService projectAccessManagementService, AddRoleDTOEntitiesMapper mapper, BBUserDetailsService userDetailsService, ChannelService channelService, ProjectRoleRepository projectRoleRepository) {
         this.projectService = projectService;
         this.tagService = topicService;
+        this.projectAccessManagementService = projectAccessManagementService;
+        this.mapper = mapper;
+        this.userDetailsService = userDetailsService;
+        this.channelService = channelService;
+        this.projectRoleRepository = projectRoleRepository;
     }
 
     @GetMapping("/{title}")
-    public String getProjectPage(@PathVariable(name = "title") Project project, Model model, RedirectAttributes redirectAttributes,
-    @RequestParam(required = false) String duplicateTitle) {
-        model.addAttribute("project", project);
-        model.addAttribute("tags", tagService.getAll());
-        model.addAttribute("developers",projectService.getAllDevelopersForProject(project));
+    public String getProjectPage(
+            @PathVariable(name = "title") Project project, Model model, RedirectAttributes redirectAttributes,
+            @RequestParam(required = false) String duplicateTitle
+                                ) {
+        model.addAttribute("project",
+                project);
+        model.addAttribute("tags",
+                tagService.getAll());
+        model.addAttribute("developers",
+                projectService.getAllDevelopersForProject(project));
         String error = (String) redirectAttributes.getAttribute("error");
-        
-        if(error != null){
-            model.addAttribute("error", error);
+
+        if (error != null) {
+            model.addAttribute("error",
+                    error);
         }
-        if(duplicateTitle!=null){
-            model.addAttribute("errMsg","There already exists a project with the provided title" );
+        if (duplicateTitle != null) {
+            model.addAttribute("errMsg",
+                    "There already exists a project with the provided title");
         }
-        
+
         Hibernate.initialize(project.getTags());
 
         return "project_pages/show-project";
@@ -49,12 +79,82 @@ public class ProjectController {
 
     @GetMapping("/create")
     public String getCreateProjectPage(Model model, @RequestParam(required = false) String duplicateTitle) {
-        if(duplicateTitle!=null){
-            model.addAttribute("errMsg", "There already exists a project with the provided title"); 
+        if (duplicateTitle != null) {
+            model.addAttribute("errMsg",
+                    "There already exists a project with the provided title");
         }
-        model.addAttribute("project", new Project());
-        model.addAttribute("isCreatingProject", tagService.getAll());
+        model.addAttribute("project",
+                new Project());
+        model.addAttribute("isCreatingProject",
+                tagService.getAll());
         return "project_pages/project-create";
+    }
+
+
+    @PostMapping("/{title}/roles/add")
+    public String addProjectRole(@PathVariable(name = "title") String title, @RequestBody AddRoleDTO addRoleDTO) {
+        projectAccessManagementService.addRole(mapper.map(addRoleDTO));
+        return "redirect:/projects/" + title + "/roles";
+    }
+
+    @GetMapping("{title}/roles")
+    public String getRolesPage(@PathVariable(name = "title") Project project, Model model) {
+        model.addAttribute("project",
+                project);
+        model.addAttribute("developersRoles",
+                projectAccessManagementService.getRolesForMembersInProject(project));
+        model.addAttribute("perResourcePermissions",
+                List.of("READ",
+                        "WRITE"));
+        model.addAttribute("globalPermissions",
+                List.of("CREATE",
+                        "DELETE"));
+        model.addAttribute("errMsg",
+                null);
+        model.addAttribute("overrideTypeDefault",
+                "INCLUDE");
+        return "project_pages/project-roles";
+    }
+
+    @GetMapping("{title}/roles/{id}/edit")
+    public String getEditRolePage(@PathVariable(name = "title") Project project, @PathVariable(name = "id") Integer roleId,Model model) {
+        ProjectRole projectRole = projectRoleRepository.findById(roleId).orElseThrow(() -> new IllegalArgumentException("bad project id or role name"));
+        List<ProjectRolePermission> projectRolePermissions = projectAccessManagementService.getRolePermissionsForRoleInProject(projectRole);
+        List<RoleChannelPermissions> roleChannelPermissions = channelService.getChannelPermissionsForRole(projectRole);
+        List<Channel> channels = channelService.getAllChannelsForProject(project);
+        List<String> selectedGlobalPermissions = projectRolePermissions
+                .stream()
+                .filter(p -> p.getPermission().getName().equals("CREATE") || p.getPermission().getName().equals("DELETE")).map(s -> s.getPermission().getName()).toList();
+
+
+        model.addAttribute("role",projectRole);
+        model.addAttribute("overrideType",projectRole.getOverrideType().toString());
+        model.addAttribute("globalPermissions", List.of("CREATE", "DELETE"));
+        model.addAttribute("perResourcePermissions", List.of("READ", "WRITE"));
+        model.addAttribute("selectedGlobalPermissions",selectedGlobalPermissions);
+        model.addAttribute("roleChannelPermissions",roleChannelPermissions);
+        model.addAttribute("channels",channels);
+        return "project_pages/edit-role";
+
+    }
+
+    @PostMapping("{title}/roles/{id}/edit")
+    public String editRole(@PathVariable(name = "title") Project project, @PathVariable(name = "id") Integer roleId,@RequestBody AddRoleDTO addRoleDTO) {
+        projectAccessManagementService.updateRole(roleId, mapper.map(addRoleDTO));
+
+        return "redirect:/projects/" + project.getId() + "/roles";
+    }
+
+    //projects/Project 1 Thread/roles/Admin/delete
+    @PostMapping("{project_title}/roles/{id}/delete")
+    public String deleteRole(
+            @PathVariable(name = "project_title") Project project,
+            @PathVariable(name = "id") Integer id
+                            ){
+
+        ProjectRole role = projectRoleRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("bad project id or role name"));
+        projectAccessManagementService.deleteRole(role);
+        return String.format("redirect:/projects/%s/roles", project.getTitle());
     }
 
 
@@ -62,17 +162,19 @@ public class ProjectController {
     public String getAddTopicPage(
             @PathVariable String title,
             Model model
-    ){
-        model.addAttribute("project_title",title);
-        return "create-topic" ;
+                                 ) {
+        model.addAttribute("project_title",
+                title);
+        return "create-topic";
     }
 
     @GetMapping("/{pr-title}/edit")
     public String getModifyPage(
             @PathVariable(name = "pr-title") Project project,
             Model model
-    ) {
-        model.addAttribute("project", project);
+                               ) {
+        model.addAttribute("project",
+                project);
         return "project_pages/project-create";
     }
 
@@ -80,17 +182,30 @@ public class ProjectController {
     public String getProjectMembersPage(
             Model model,
             @PathVariable(name = "pr-title") Project project
-    )
-    {
-        model.addAttribute("project", project);
-        model.addAttribute("developers", projectService.getAllDevelopersForProject(project));
+                                       ) {
+        model.addAttribute("project",
+                project);
+
+        List<BBUser> developers = projectService.getAllDevelopersForProject(project);
+
+        List<DeveloperWithRolesForProjectDTO> devWrapper = developers
+                .stream()
+                .map(dev -> new DeveloperWithRolesForProjectDTO(dev,projectAccessManagementService.getRolesForDeveloperInProject(dev,project))).toList();
+
+        System.out.println("MAPPED" + " " + devWrapper);
+
+        model.addAttribute("developers", devWrapper);
+        model.addAttribute("projectRoles",projectAccessManagementService.getRolesForMembersInProject(project));
+
+
         return "project_pages/members";
     }
 
     @PreAuthorize("#project.getUser().equals(#user)")
     @PostMapping("/{pr-title}/members/{mem-id}/kick")
-    public String kickMember(@PathVariable(name = "pr-title") @P("project") Project project,@PathVariable(name = "mem-id") int memberId,@SessionAttribute @P("user") BBUser user){
-        projectService.kickMember(project, memberId);
+    public String kickMember(@PathVariable(name = "pr-title") @P("project") Project project, @PathVariable(name = "mem-id") int memberId, @SessionAttribute @P("user") BBUser user) {
+        projectService.kickMember(project,
+                memberId);
         return "redirect:/projects/" + project.getTitle() + "/members";
     }
 
@@ -103,16 +218,24 @@ public class ProjectController {
             @RequestParam @P("username") String username,
             @RequestParam String description,
             RedirectAttributes attributes
-    ){
+                               ) {
         String oldTitle = project.getTitle();
-        try{
-            return "redirect:/projects/" +  projectService.update(project, repoUrl, description, newTitle).getTitle();
-        }catch(org.springframework.dao.DataIntegrityViolationException e){
-            if(e.getMessage().contains(DUPLICATED_TITLE_MSG)){
-                attributes.addAttribute("duplicateTitle", "y");
-                return "redirect:/projects/" + oldTitle; 
+        try {
+            return "redirect:/projects/" + projectService
+                    .update(project,
+                            repoUrl,
+                            description,
+                            newTitle)
+                    .getTitle();
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            if (e
+                    .getMessage()
+                    .contains(DUPLICATED_TITLE_MSG)) {
+                attributes.addAttribute("duplicateTitle",
+                        "y");
+                return "redirect:/projects/" + oldTitle;
             }
-            throw e ; 
+            throw e;
         }
     }
 
@@ -123,18 +246,40 @@ public class ProjectController {
             @RequestParam(required = false) String description,
             @SessionAttribute BBUser user,
             RedirectAttributes redirectAttributes
-    ) {
-        try{
-            projectService.create(title,repoUrl,description,user);
+                               ) {
+        try {
+            projectService.create(title,
+                    repoUrl,
+                    description,
+                    user);
             return "redirect:/";
-        }catch(org.springframework.dao.DataIntegrityViolationException e){
-            if(e.getMessage().contains(DUPLICATED_TITLE_MSG)){
-                redirectAttributes.addAttribute("duplicateTitle", "y");
-                return "redirect:/projects/create"; 
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            if (e
+                    .getMessage()
+                    .contains(DUPLICATED_TITLE_MSG)) {
+                redirectAttributes.addAttribute("duplicateTitle",
+                        "y");
+                return "redirect:/projects/create";
             }
-            throw e ; 
+            throw e;
         }
     }
+
+    @PostMapping("{title}/add-role/{userId}")
+    public String assignRolesToUser(@PathVariable(name = "title") @P("project") Project project, @PathVariable Integer userId,@RequestParam(name = "roles") List<String> roleNames){
+        BBUser user = userDetailsService.loadUserById(userId);
+        List<ProjectRole> roles = projectRoleRepository.findAllByNameInAndProject(roleNames,project);
+        projectAccessManagementService.addRolesToUser(user,roles);
+        return "redirect:/projects/" + project.getTitle() + "/members";
+    }
+    @PostMapping("{title}/remove-role/{userId}")
+    public String deleteRoleForUser(@PathVariable(name = "title") @P("project") Project project, @PathVariable Integer userId,String roleName){
+        BBUser user = userDetailsService.loadUserById(userId);
+        projectAccessManagementService.deleteRoleForUser(user,project,roleName);
+        return "redirect:/projects/" + project.getTitle() + "/members";
+    }
+
+
 
     @PreAuthorize("#project.getUser().getUsername().equals(#username)")
     @PostMapping("/topics/add")
@@ -143,9 +288,12 @@ public class ProjectController {
             @RequestParam(name = "title") String topicsTitle,
             @RequestParam String description,
             @RequestParam @P("username") String username,
-            @SessionAttribute("user") BBUser user 
-    ){
-        projectService.createTopic(project, topicsTitle, description, user);
+            @SessionAttribute("user") BBUser user
+                          ) {
+        projectService.createTopic(project,
+                topicsTitle,
+                description,
+                user);
         return "redirect:/projects/" + project.getTitle();
     }
 
@@ -154,9 +302,10 @@ public class ProjectController {
     public String delete(
             @PathVariable(name = "title") @P("project") Project project,
             @RequestParam @P("username") String username
-    ) {
+                        ) {
         projectService.delete(project);
-        return "redirect:/" ;
+        return "redirect:/";
     }
+
 
 }

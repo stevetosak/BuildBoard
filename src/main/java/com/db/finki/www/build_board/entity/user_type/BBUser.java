@@ -1,5 +1,6 @@
 package com.db.finki.www.build_board.entity.user_type;
 
+import com.db.finki.www.build_board.entity.access_managment.ProjectRole;
 import com.db.finki.www.build_board.entity.thread.BBThread;
 import com.db.finki.www.build_board.entity.thread.Project;
 import com.db.finki.www.build_board.service.util.FileUploadService;
@@ -7,6 +8,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -64,7 +66,6 @@ private List<Project> projects = new ArrayList<>();
         Path path = Path.of(FileUploadService.USER_AVATAR_DIR + File.separator + "avatar-" + id);
         return Files.exists(path) ? File.separator + "avatars" + File.separator + "avatar-"+id : File.separator + "default-avatar.jpg";
     }
-
 
 
     @Override

@@ -55,32 +55,36 @@ VALUES
     (4, 6),
     (5, 7);
 
-
-INSERT INTO blacklisted_user (topic_id, user_id, moderator_id, start_date, end_date, reason)
-VALUES
-    (1, 2, 1, NOW(), NOW() + INTERVAL '7 days', 'Spamming'),
-    (2, 3, 2, NOW(), NOW() + INTERVAL '3 days', 'Offensive language');
+--
+-- INSERT INTO blacklisted_user (topic_id, user_id, moderator_id, start_date, end_date, reason)
+-- VALUES
+--     (1, 2, 1, NOW(), NOW() + INTERVAL '7 days', 'Spamming'),
+--     (2, 3, 2, NOW(), NOW() + INTERVAL '3 days', 'Offensive language');
 
 INSERT INTO permissions (name)
 VALUES
-    ('Create Thread'),
-    ('Delete Thread');
+    ('READ'),
+    ('WRITE'),
+    ('CREATE'),
+    ('DELETE');
 
-INSERT INTO project_roles (name, project_id, description)
+INSERT INTO project_role (name, project_id,override_type)
 VALUES
-    ('Admin', 5, 'Admin role for the project'),
-    ('Developer', 5, 'Developer role for the project');
+    ('Admin', 5,'EXCLUDE'),
+    ('Developer', 5,'INCLUDE');
 
 
-INSERT INTO users_project_roles (user_id, project_id, role_name)
+INSERT INTO users_project_roles (user_id, role_id)
 VALUES
-    (3, 5, 'Admin'),
-    (5, 5, 'Developer');
+    (3, 1),
+    (5, 2);
 
-INSERT INTO project_roles_permissions (permission_name, role_name, project_id)
+INSERT INTO role_permissions (permission_name, role_id)
 VALUES
-    ('Create Thread', 'Admin', 5),
-    ('Delete Thread', 'Admin', 5);
+    ('READ', 1),
+    ('WRITE', 1),
+    ('CREATE',1),
+    ('DELETE',1);
 
 insert into submission(created_by,status,description)
 values
@@ -91,6 +95,7 @@ INSERT INTO report (id,thread_id, for_user_id)
 VALUES
     (1, 2, 1),
     (2, 1, 3);
+
 
 INSERT INTO channel (name, description, project_id, developer_id)
 VALUES

@@ -1,6 +1,6 @@
 package com.db.finki.www.build_board.service.channel;
 
-import com.db.finki.www.build_board.dto.channel.MessageDTO;
+import com.db.finki.www.build_board.dto.MessageDTO;
 import com.db.finki.www.build_board.entity.channel.Message;
 import com.db.finki.www.build_board.mapper.MessageMapper;
 import com.db.finki.www.build_board.repository.channel.MessageRepository;

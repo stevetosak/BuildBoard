@@ -1,0 +1,19 @@
+package com.db.finki.www.build_board.repository.access_managment;
+
+import com.db.finki.www.build_board.entity.access_managment.ProjectRole;
+import com.db.finki.www.build_board.entity.access_managment.ProjectRolePermission;
+import com.db.finki.www.build_board.entity.compositeId.ProjectRolePermissionId;
+import com.db.finki.www.build_board.entity.thread.Project;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface ProjectRolePermissionRepository extends JpaRepository<ProjectRolePermission, ProjectRolePermissionId> {
+    List<ProjectRolePermission> findAllByIdRole(ProjectRole role);
+    @Modifying(clearAutomatically = true)
+    void deleteAllByIdRole(ProjectRole role);
+}
