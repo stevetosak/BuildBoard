@@ -33,7 +33,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/channel-websocket").addInterceptors(this.webSocketPermissionInterceptor);
+        registry.addEndpoint("/channel-websocket");
     }
 
     @Override
