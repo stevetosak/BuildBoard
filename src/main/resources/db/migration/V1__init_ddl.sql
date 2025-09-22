@@ -89,7 +89,8 @@ CREATE TABLE topic_thread
 (
     title     VARCHAR(256) NOT NULL,
     id        INT PRIMARY KEY REFERENCES embeddable_thread (id) on delete cascade, --INHERITANCE
-    parent_id int REFERENCES project_thread (id) on delete CASCADE                 --PARENT
+    parent_id int REFERENCES project_thread (id) on delete CASCADE,                 --PARENT
+    UNIQUE (parent_id, title)
 );
 create table topic_guidelines
 (
@@ -131,13 +132,14 @@ CREATE TABLE tag_threads
 
 CREATE TABLE blacklisted_user
 (
-    topic_id     INT REFERENCES topic_thread (id) ON DELETE CASCADE NOT NULL, --BLACLISTED_FROM
-    user_id      INT REFERENCES users (id) ON DELETE CASCADE NOT NULL,        --REFERS_TO
-    moderator_id INT REFERENCES moderator (id) ON DELETE CASCADE NOT NULL,    --BLACKLISTED_BY
-    start_date   TIMESTAMP NOT NULL,
+    id serial primary key,
+    topic_id     INT REFERENCES thread (id) ON DELETE CASCADE,
+    user_id      INT REFERENCES users (id) ON DELETE CASCADE,
+    moderator_id INT REFERENCES users (id) ON DELETE CASCADE,
+    start_date   TIMESTAMP,
     end_date     TIMESTAMP,
     reason       TEXT,
-    PRIMARY KEY (user_id, moderator_id, topic_id, start_date)
+    UNIQUE (user_id, moderator_id, topic_id, start_date)
 );
 CREATE TABLE developer_associated_with_project
 (
