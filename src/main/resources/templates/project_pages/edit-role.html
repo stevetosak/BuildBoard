@@ -73,27 +73,27 @@
                                     <div class="form-check">
                                         <input class="form-check-input perm-checkbox"
                                                type="checkbox"
-                                               th:id="${'read-' + rcp.getResourceId()}"
+                                               th:id="${'read-' + rcp.getChannelId()}"
                                                name="per-resource-permission"
                                                value="READ"
-                                               th:attr="data-resource-id=${rcp.getResourceId()}"
+                                               th:attr="data-resource-id=${rcp.getChannelId()}"
                                                th:checked="${overrideType == 'INCLUDE' && rcp.getPermissions().contains('READ')
                                                || overrideType == 'EXCLUDE' && !rcp.getPermissions().contains('READ')}">
                                         <label class="form-check-label"
-                                               th:for="${'read-' + rcp.getResourceId()}">READ</label>
+                                               th:for="${'read-' + rcp.getChannelId()}">READ</label>
                                     </div>
                                     <!-- WRITE -->
                                     <div class="form-check">
                                         <input class="form-check-input perm-checkbox"
                                                type="checkbox"
-                                               th:id="${'write-' + rcp.getResourceId()}"
+                                               th:id="${'write-' + rcp.getChannelId()}"
                                                name="per-resource-permission"
                                                value="WRITE"
-                                               th:attr="data-resource-id=${rcp.getResourceId()}"
+                                               th:attr="data-resource-id=${rcp.getChannelId()}"
                                                th:checked="${overrideType == 'INCLUDE' && rcp.getPermissions().contains('WRITE')
                                                || overrideType == 'EXCLUDE' && !rcp.getPermissions().contains('WRITE') }">
                                         <label class="form-check-label"
-                                               th:for="${'write-' + rcp.getResourceId()}">WRITE</label>
+                                               th:for="${'write-' + rcp.getChannelId()}">WRITE</label>
                                     </div>
                                 </div>
                             </div>
@@ -148,17 +148,7 @@
         return document.body.dataset.roleId
     }
 
-    /*
-    * if (!projectAccessManagementService.hasPermissionToAccessResource(user.getId(),
-                Permission.READ,
-                c.getProjectResource().getId(),
-                project.getId()
-        )){
-            System.out.println("vleze deny access");
-            model.addAttribute("error","You dont have permission to access this channel");
-            return "redirect:/projects/" + project.getId();
-        }
-    * */
+
     document.querySelector("#btn-cancel").addEventListener("click", ev => {
         ev.preventDefault()
 
@@ -194,7 +184,7 @@
                 globalPermissions: globalSelectedPermissions,
                 permissionResourceDTOS: perResourceSelectedPermissions.map(p => ({
                     permissionName: p.name,
-                    projectResourceID: p.resourceId
+                   channelId: p.resourceId
                 }))
             }),
             credentials: "include"

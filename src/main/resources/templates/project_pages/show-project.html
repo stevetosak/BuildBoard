@@ -125,7 +125,7 @@
                                 </div>
                             </form>
                         </div>
-                        <button class="btn btn-success btn-sm w-25 mt-2 mx-auto" data-bs-toggle="modal"
+                        <button th:if="${canCreateChannel}" class="btn btn-success btn-sm w-25 mt-2 mx-auto" data-bs-toggle="modal"
                                 data-bs-target="#addChannelModal">
                             Add Channel
                         </button>

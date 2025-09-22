@@ -108,6 +108,7 @@
                                   th:action="@{/topics/{topicId}/tags/{tag-name}/delete (topicId=${topic.getId()}, tag-name=${tag.getName()})}"
                                   method="post"
                                   class="d-inline">
+                                <input type="hidden" name="username" th:value="${session.user != null ? session.user.getUsername() : null}">
                                 <button type="submit"
                                         class="btn btn-sm btn-link text-danger p-0 ms-1"
                                         style="line-height: 1;">

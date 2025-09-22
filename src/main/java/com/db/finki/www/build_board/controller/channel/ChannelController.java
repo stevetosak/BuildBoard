@@ -32,7 +32,7 @@ public class ChannelController {
             ChannelService channelService, MessageMapper messageMapper,
             MessageService messageService, ProjectService projectService,
             ProjectAccessManagementService projectAccessManagementService
-                            ) {
+    ) {
         this.channelService = channelService;
         this.messageMapper = messageMapper;
         this.messageService = messageService;
@@ -44,16 +44,17 @@ public class ChannelController {
             Model model,
             Channel channel,
             int userId,
-            int projectId,
+            Project project,
             String permission
-                                  ) {
-        if (!projectAccessManagementService.hasPermissionToAccessResource(userId,
-                permission,
-                channel
-                        .getProjectResource()
-                        .getId(),
-                projectId
-                                                                         )) {
+    ) {
+
+        boolean hasPermission = false;
+        if(channel == null) {
+            hasPermission = projectAccessManagementService.hasPermissionToAccessResource(userId,permission,null,project);
+        } else {
+            hasPermission = projectAccessManagementService.hasPermissionToAccessResource(userId, permission, channel.getId(), project);
+        }
+        if (!hasPermission) {
             System.out.println("vleze deny access");
             model.addAttribute("error",
                     "You dont have permission to access this channel");
@@ -77,7 +78,7 @@ public class ChannelController {
             Model model,
             RedirectAttributes redirectAttributes,
             @SessionAttribute @P("user") BBUser user
-                            ) {
+    ) {
         Channel c = (Channel) redirectAttributes.getAttribute("channel");
 
         if (c == null) {
@@ -97,25 +98,17 @@ public class ChannelController {
         }
 
         try {
-            checkIfAuthorized(model,
-                    c,
-                    user.getId(),
-                    project.getId(),
-                    Permission.READ
-                             );
-            boolean canWrite = projectAccessManagementService
-                    .hasPermissionToAccessResource(user.getId(),
+            checkIfAuthorized(model, c, user.getId(), project, Permission.READ);
+            boolean canWrite = projectAccessManagementService.hasPermissionToAccessResource(user.getId(),
                             Permission.WRITE,
-                            c
-                                    .getProjectResource()
-                                    .getId(),
-                            project.getId());
+                            c.getId(),
+                            project);
             model.addAttribute("canWrite",
                     canWrite);
 
             return "channels/show-channel";
         } catch (RuntimeException e) {
-            if(e.getMessage().contains("Unauthorized")) {
+            if (e.getMessage().contains("Unauthorized")) {
                 return "redirect:/projects/" + project.getId();
             }
             throw e;
@@ -130,18 +123,18 @@ public class ChannelController {
                     "project") Project project,
             @SessionAttribute @P("user") BBUser user,
             RedirectAttributes redirectAttributes, Model model
-                               ) {
+    ) {
         Channel c = channelService.getByNameAndProject(channelName,
                 project);
 
-        try{
-            checkIfAuthorized(model,c,user.getId(),project.getId(),Permission.DELETE);
+        try {
+            checkIfAuthorized(model, c, user.getId(), project, Permission.DELETE);
 
             channelService.deleteChannel(channelName,
                     project);
             return "redirect:/projects/" + project.getTitle();
-        }catch (RuntimeException e) {
-            if(e.getMessage().contains("Unauthorized")) {
+        } catch (RuntimeException e) {
+            if (e.getMessage().contains("Unauthorized")) {
                 return "redirect:/projects/" + project.getId();
             }
             throw e;
@@ -155,19 +148,20 @@ public class ChannelController {
             @RequestParam String channelName, @RequestParam String channelDescription,
             @SessionAttribute @P("user") BBUser user, RedirectAttributes redirectAttributes,
             Model model
-                     ) {
+    ) {
         try {
-            Channel channel = channelService.create(project,
-                    channelName,
-                    channelDescription,
-                    user);
 
-            try{
-                checkIfAuthorized(model,channel,user.getId(),project.getId(),Permission.CREATE);
+
+            try {
+                checkIfAuthorized(model, null, user.getId(), project, Permission.CREATE);
+                Channel channel = channelService.create(project,
+                        channelName,
+                        channelDescription,
+                        user);
                 redirectAttributes.addFlashAttribute("channel",
                         channel);
-            }catch (RuntimeException e) {
-                if(e.getMessage().contains("Unauthorized")) {
+            } catch (RuntimeException e) {
+                if (e.getMessage().contains("Unauthorized")) {
                     return "redirect:/projects/" + project.getId();
                 }
                 throw e;

@@ -1,7 +1,7 @@
 package com.db.finki.www.build_board.entity.compositeId;
 
-import com.db.finki.www.build_board.entity.access_managment.ProjectResource;
 import com.db.finki.www.build_board.entity.access_managment.ProjectRolePermission;
+import com.db.finki.www.build_board.entity.channel.Channel;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,18 +23,18 @@ public class ProjectRolePermissionResourceOverrideId {
     })
     private ProjectRolePermission projectRolePermission;
     @ManyToOne(optional = false)
-    @JoinColumn(name = "project_resource_id",referencedColumnName = "id")
-    private ProjectResource  projectResource;
+    @JoinColumn(name = "channel_id",referencedColumnName = "id")
+    private Channel channel;
 
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         ProjectRolePermissionResourceOverrideId that = (ProjectRolePermissionResourceOverrideId) o;
-        return Objects.equals(projectRolePermission, that.projectRolePermission) && Objects.equals(projectResource, that.projectResource);
+        return Objects.equals(projectRolePermission, that.projectRolePermission) && Objects.equals(channel, that.channel);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(projectRolePermission, projectResource);
+        return Objects.hash(projectRolePermission, channel);
     }
 }

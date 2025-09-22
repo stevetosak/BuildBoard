@@ -18,12 +18,9 @@ import java.util.List;
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final ObjectMapper objectMapper;
-    private final WebSocketPermissionInterceptor  webSocketPermissionInterceptor;
 
-    public WebSocketConfig(ObjectMapper objectMapper, WebSocketPermissionInterceptor webSocketPermissionInterceptor) {
-        this.objectMapper = objectMapper;
-        this.webSocketPermissionInterceptor = webSocketPermissionInterceptor;
-    }
+    public WebSocketConfig(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;}
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
