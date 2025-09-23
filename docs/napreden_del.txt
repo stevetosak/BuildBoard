@@ -1,0 +1,557 @@
+== Дополнително имплементирани кориснички сценарија
+
+* Креира улоги за даден проект.
+* !Доделува/Одзема улоги.
+* Додавање на корисник во црната листа на даден thread
+* Преглед на историјатот на црната листа за даден thread
+* Пријавување на корисник за недолично однесување во даден thread
+* Предглед на пријавите за даден thread и за даден корисник
+* Контрола на пристап во рамки на проект
+
+== Погледи
+=== Поглед за прикажување на сите одговори на даден топик
+{{{
+create or replace view v_discussion_thread
+as
+with recursive
+    depth_table as
+        (select parent_id, id, 0 as depth
+         from discussion_thread
+         UNION ALL
+         select discuss.parent_id, dpth.id, dpth.depth + 1
+         from depth_table dpth
+                  join discussion_thread discuss
+                       on dpth.parent_id = discuss.id),
+    tmp as (select id, max(depth) as depth
+            from depth_table
+            group by id)
+select d.id as id, t.user_id as user_id, d.depth as depth, d1.parent_id as parent_id, t.created_at as "created_at"
+from tmp d
+         join depth_table d1
+              on d.id = d1.id and d1.depth = d.depth
+         join thread t
+              on t.id = d.id;
+}}}
+
+=== Поглед за прикажување на пермисиите за дадена улога во за сите канали во даден проект.
+{{{
+CREATE OR REPLACE VIEW role_channel_permissions AS
+SELECT
+    c.project_resource_id,
+    c.name,
+    pr.id as role_id,
+    COALESCE(
+                    STRING_AGG(
+                    DISTINCT rp.permission_name, ',' ORDER BY rp.permission_name
+                              ) FILTER (
+                        WHERE
+                        (pr.override_type = 'INCLUDE' AND rpo.project_resource_id IS NOT NULL)
+                            OR
+                        (pr.override_type = 'EXCLUDE' AND rpo.project_resource_id IS NULL)
+                        ),
+                    ''
+    ) AS permissions
+FROM channel c
+         JOIN project_role pr
+              ON pr.project_id = c.project_id
+         LEFT JOIN role_permissions rp
+                   ON rp.role_id = pr.id
+                       AND rp.permission_name IN ('READ','WRITE')
+         LEFT JOIN role_permissions_overrides rpo
+                   ON rpo.role_id = pr.id
+                       AND rpo.permission_name = rp.permission_name
+                       AND rpo.project_resource_id = c.project_resource_id
+GROUP BY c.project_resource_id, c.name,pr.id
+}}}
+
+== Транзакции
+=== Прифаќање на пријава и зачувување на приложениот feedback
+{{{
+@Transactional
+    public void accept(BBUser creator, Integer reqId) {
+        ProjectRequests prReq = getRequestById(reqId);
+        prReq.setStatus(Status.ACCEPTED);
+
+        feedbackService.create(creator,FeedbackFor.P,prReq);
+        projectService.addDeveloperToProject(prReq.getProject(), prReq.getCreator());
+        prReqRepo.save(prReq);
+    }
+}}}
+
+=== Одбивање на пријава и зачувување на прилоѓениот feedback
+{{{
+@Transactional
+    public void deny(Integer reqId, String desc, BBUser creator) {
+        ProjectRequests prReq = getRequestById(reqId);
+        prReq.setStatus(Status.DENIED);
+        feedbackService.create(desc,creator,FeedbackFor.P,prReq);
+        prReqRepo.save(prReq);
+    }
+}}}
+
+=== Ажурирање на постоечка улога
+{{{
+@Transactional
+    public void updateRole(Integer id, AddRoleDTOEntities addRoleDTO) {
+
+        ProjectRole existingRole = projectRoleRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("bad role id"));
+        projectRolePermissionRepository.deleteAllByIdRole(existingRole);
+
+        existingRole.setName(addRoleDTO.getName());
+        existingRole.setOverrideType(addRoleDTO.getProjectResourcePermissionOverrideType().toString());
+
+        projectRoleRepository.save(existingRole);
+
+        List<ProjectRolePermission> newGlobalPermissions = mapGlobalsToProjectRolePermissions(existingRole, addRoleDTO.getGlobalPermissions());
+        List<ProjectRolePermission> newPerResourcePermissions = mapPerResourceToProjectRolePermissions(existingRole,addRoleDTO.getPermissionsResourceWrappers());
+        List<ProjectRolePermissionResourceOverride> resourceOverrides = mapToResourceOverrides(getResources(addRoleDTO.getPermissionsResourceWrappers()),newPerResourcePermissions);
+
+
+        projectRolePermissionRepository.saveAll(newGlobalPermissions);
+        projectRolePermissionRepository.saveAll(newPerResourcePermissions);
+        projectRolePermissionResourceOverrideRepository.saveAll(resourceOverrides);
+
+    }
+
+}}}
+=== Додавање на нова улога во проект
+{{{
+    @Transactional
+    public void addRole(AddRoleDTOEntities addRoleDTO) {
+        ProjectRole role = projectRoleRepository.save(
+                new ProjectRole(
+                        addRoleDTO.getProject(),
+                        addRoleDTO.getName(),
+                        addRoleDTO.getProjectResourcePermissionOverrideType().toString()
+                )
+        );
+
+        List<ProjectRolePermission> entities = mapPerResourceToProjectRolePermissions(role, addRoleDTO.getPermissionsResourceWrappers());
+        projectRolePermissionRepository.saveAll(mapGlobalsToProjectRolePermissions(role, addRoleDTO.getGlobalPermissions()));
+        projectRolePermissionRepository.saveAll(entities);
+        projectRolePermissionResourceOverrideRepository.saveAll(mapToResourceOverrides(
+                getResources(addRoleDTO.getPermissionsResourceWrappers()),
+                entities
+        ));
+}}}
+{{{}}}
+
+
+
+
+
+
+
+== Тригери
+=== Проверка дали даден топик имат уникатно име во парент threadот
+{{{
+CREATE OR REPLACE FUNCTION fn_validate_topic_title()
+    RETURNS TRIGGER
+    LANGUAGE plpgsql
+AS
+$$
+BEGIN
+    IF new.title IN
+       (SELECT title
+        FROM topic_thread
+                 AS t
+        WHERE t.parent_id = new.parent_id
+           OR (t.parent_id IS NULL AND new.parent_id IS NULL)
+       )
+    THEN
+        RAISE EXCEPTION 'There already exists a topic with title % in parent topic with id %',new.title,new.parent_id;
+    END IF;
+    RETURN new;
+END;
+$$;
+}}}
+{{{
+CREATE OR REPLACE TRIGGER tr_check_topic_name --RADI
+    BEFORE INSERT OR UPDATE
+    ON topic_thread
+    FOR EACH ROW
+EXECUTE FUNCTION fn_validate_topic_title();
+}}}
+
+=== При креирање на топик, креаторот се внесува како модератор
+{{{
+CREATE OR REPLACE FUNCTION fn_insert_topics_creator_as_moderator()
+    RETURNS TRIGGER
+    LANGUAGE plpgsql
+AS
+$$
+DECLARE
+    v_user_id INT;
+BEGIN
+    SELECT v_topic_thread.user_id
+    INTO v_user_id
+    FROM v_topic_thread
+    WHERE v_topic_thread.id = new.id;
+    IF not check_if_user_exists_in('moderator', 'id', v_user_id::text) THEN
+        INSERT INTO moderator values (v_user_id);
+    END IF;
+    INSERT INTO topic_threads_moderators(thread_id, user_id) VALUES (new.id, v_user_id);
+    RETURN NEW;
+END
+$$;
+}}}
+{{{
+CREATE OR REPLACE TRIGGER tr_insert_topics_creator_as_moderator
+    AFTER INSERT
+    ON topic_thread
+    FOR EACH ROW
+EXECUTE FUNCTION fn_insert_topics_creator_as_moderator();
+}}}
+
+=== При бришење на topic, проверка дали модераторот сеуште модерира topicци
+{{{
+CREATE OR REPLACE FUNCTION fn_remove_orphan_moderator()
+    RETURNS trigger
+    LANGUAGE plpgsql
+AS $function$
+BEGIN
+    IF not exists (
+        select 1
+        from topic_threads_moderators t
+        where t.user_id = OLD.user_id
+    )
+    THEN
+        DELETE FROM moderator where id=OLD.user_id;
+    END IF;
+    IF not exists (
+        select 1
+        from topic_threads_moderators t
+        where t.thread_id = OLD.thread_id
+    )
+    THEN
+        delete from discussion_thread where parent_id=OLD.thread_id;
+        DELETE FROM topic_thread where id = OLD.thread_id;
+-- 	delete from thread where id =  OLD.thread_id;
+    END IF;
+    RETURN OLD;
+END;
+}}}
+
+{{{
+CREATE OR REPLACE TRIGGER tr_remove_orphan_moderator
+    AFTER DELETE
+    ON topic_threads_moderators
+    FOR EACH ROW
+EXECUTE FUNCTION fn_remove_orphan_moderator();
+}}}
+
+=== При креирање на проект, креаторот се внесува како PROJECT_OWNER
+{{{
+CREATE OR REPLACE FUNCTION fn_insert_project_manager()
+    RETURNS TRIGGER
+    LANGUAGE plpgsql
+AS
+$$
+DECLARE
+    usrId      INT;
+    new_project_id INT;
+BEGIN
+    SELECT user_id, id
+    into usrId,new_project_id
+    FROM v_project_thread p
+    WHERE NEW.id = p.id;
+    IF not EXISTS(
+        select 1
+        from developer_associated_with_project dawp
+        where dawp.project_id=new_project_id and dawp.developer_id=usrId
+    ) THEN
+        INSERT INTO developer_associated_with_project(project_id, developer_id, started_at)
+        values (new_project_id, usrId, NOW());
+    end if;
+    IF not check_if_user_exists_in('project_manager', 'id', usrId::text) THEN
+        INSERT INTO project_manager VALUES (usrId);
+    end if;
+    RETURN NEW;
+END
+$$;
+}}}
+
+{{{
+CREATE OR REPLACE TRIGGER tr_a_insert_project_manager --RADI
+    AFTER INSERT
+    ON project_thread
+    FOR EACH ROW
+EXECUTE FUNCTION fn_insert_project_manager();
+}}}
+
+
+=== Бришење на не користени тагови
+
+{{{
+create or replace function fn_delete_dangling_tags()
+    RETURNS trigger
+    LANGUAGE plpgsql
+AS $$
+BEGIN
+    IF NOT EXISTS(select 1
+                  from tag_threads
+                  where tag_name = OLD.tag_name
+                  group by tag_name) THEN
+        delete from tag where name = OLD.tag_name;
+    end if;
+    RETURN OLD;
+END;
+$$;
+}}}
+
+{{{
+create or replace trigger tr_delete_dangling_tags
+    after delete
+    on tag_threads
+    for each row
+    execute function fn_delete_dangling_tags();
+}}}
+
+=== Внесување на даден корисник како developer, откако ќе стани дел од даден проект
+{{{
+create or replace function fn_add_dev_if_not_exist()
+    returns trigger
+    language plpgsql
+as $$
+BEGIN
+    IF NOT check_if_user_exists_in('developer','id',new.developer_id::text) THEN
+        INSERT INTO developer values (NEW.developer_id);
+    end if;
+    RETURN new;
+end;
+$$;
+
+}}}
+
+{{{
+create or replace trigger tr_add_dev_if_not_exist
+    before insert on developer_associated_with_project
+    for each row
+execute function fn_add_dev_if_not_exist();
+}}}
+
+=== Креирање на General канал, при креирање на даден проект
+{{{
+create or replace function fn_insert_general_for_project()
+    returns trigger
+    language plpgsql
+as $$
+DECLARE
+    developer_id INT;
+    project_resource_id INT;
+BEGIN
+    select user_id
+    into developer_id
+    from thread t
+    where t.id=NEW.id;
+    insert into project_resource default values returning id into project_resource_id;
+
+    insert into channel(name,description,project_id,developer_id,project_resource_id)
+    values ('General','General',NEW.id,developer_id,project_resource_id);
+
+    return new;
+end;
+$$;
+}}}
+
+{{{
+create or replace trigger tr_insert_general_for_project
+    after insert on project_thread
+    for each row
+execute function fn_insert_general_for_project();
+}}}
+
+=== Сите 'pending' пријави за даден корисник стануваат 'accepted', при додавање на тој корисник во 'blacklist' листата.
+{{{
+CREATE OR REPLACE FUNCTION fn_change_status_on_pending_reports()
+    RETURNS TRIGGER
+    LANGUAGE plpgsql
+AS $$
+BEGIN
+    RAISE NOTICE 'user_id: %, topic_id: %', NEW.user_id, NEW.topic_id;
+
+UPDATE submission
+SET status = 'ACCEPTED'
+WHERE id in (
+    select id
+    from report r
+    where r.for_user_id = NEW.user_id and r.thread_id = NEW.topic_id
+);
+
+RETURN NEW;
+END;
+$$;
+}}}
+
+{{{
+CREATE OR REPLACE TRIGGER tr_change_status_on_pending_reports
+    AFTER INSERT
+    ON blacklisted_user
+    FOR EACH ROW
+EXECUTE FUNCTION fn_change_status_on_pending_reports();
+}}}
+
+=== Оневозможувено повторно додавање на корисник во 'blacklist' листата, доколку е веќе присутен на неа
+
+{{{
+create or replace function fn_add_blacklisted_user()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+	IF NOT EXISTS(
+		select 1
+		from blacklisted_user
+		where  topic_id = NEW.topic_id and user_id = NEW.user_id and end_date is NULL
+	)
+	THEN
+		RETURN NEW;
+END IF;
+RETURN NULL;
+END;
+$$;
+}}}
+
+{{{
+create or replace trigger tr_add_blacklisted_user
+before insert on blacklisted_user
+for each row
+execute function fn_add_blacklisted_user();
+}}}
+
+=== Автоматско додавање на project_resource, при додавање на канал
+{{{
+create or replace function fn_add_project_resource()
+    returns trigger
+    language plpgsql
+as $$
+DECLARE
+    project_resource_id INT;
+BEGIN
+    insert into project_resource default values returning id into project_resource_id;
+    new.project_resource_id := project_resource_id;
+    return new;
+end;
+$$;
+}}}
+
+{{{
+create or replace trigger tr_add_project_resource_channel
+    before insert
+    on channel
+    for each row
+execute function fn_add_project_resource();
+}}}
+
+== Индекси
+== Процедури
+
+=== Процедура за одбивање на 'PENDING' на пријави за корисници постари од 1 месец
+
+{{{
+
+CREATE OR REPLACE PROCEDURE mark_denied_reports_older_than_1month()
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    older_reports RECORD;
+    user_id int;
+BEGIN
+    FOR older_reports IN
+        SELECT
+            r.id AS submission_id,
+            r.thread_id as topic
+        FROM report r
+                 JOIN submission s ON s.id = r.id
+        WHERE s.status = 'PENDING' and now() - s.created_at >= INTERVAL '1 month'
+    LOOP
+        BEGIN
+            UPDATE submission
+            SET status = 'DENIED'
+            WHERE id = older_reports.submission_id;
+
+            select u.id
+            into user_id
+            from thread t
+            join users u
+            on t.user_id = u.id
+            where t.id = older_reports.thread_id;
+
+
+            INSERT INTO feedback(description, submission_type, created_at, submission_id, created_by)
+            VALUES (
+                       'Stale report. Closing due to inactivity.',
+                       'R',
+                       now(),
+                       older_reports.submission_id,
+                       user_id
+                   );
+        END;
+    END LOOP;
+END;
+$$;
+}}}
+
+{{{
+@Transactional
+    @Scheduled(cron = "0 0 0 1 * ?")
+    public void markRejectedPendingReports() {
+        em
+                .createNativeQuery("CALL mark_denied_reports_older_than_1month();")
+                .executeUpdate();
+    }
+}}}
+
+=== Процедура за одбивање на 'PENDING' за барања за учество во даден проект постари од 1 месец
+
+{{{
+CREATE OR REPLACE PROCEDURE mark_denied_pr_requests_older_than_1month()
+LANGUAGE plpgsql
+AS $$
+DECLARE
+older_reports RECORD;
+user_id int;
+BEGIN
+    FOR older_reports IN
+        SELECT
+            pr.id AS submission_id,
+            pr.project_id as thread_id
+        FROM project_request pr
+                 JOIN submission s ON s.id = pr.id
+        WHERE s.status = 'PENDING' and now() - s.created_at >= INTERVAL '1 month'
+            LOOP
+        BEGIN
+            UPDATE submission
+            SET status = 'DENIED'
+            WHERE id = older_reports.submission_id;
+
+            select u.id
+            into user_id
+            from thread t
+                     join users u
+                          on t.user_id = u.id
+            where older_reports.thread_id = t.id;
+
+            INSERT INTO feedback(description, submission_type, created_at, submission_id, created_by)
+            VALUES (
+                       'Stale report. Closing due to inactivity.',
+                       'P',
+                       now(),
+                       older_reports.submission_id,
+                       user_id
+                   );
+        END;
+    END LOOP;
+END;
+$$;
+}}}
+
+{{{
+  @Transactional
+    @Scheduled(cron = "0 0 0 1 * ?")
+    public void markRejectedPendingPrRequests() {
+        em
+                .createNativeQuery("CALL mark_denied_pr_requests_older_than_1month();")
+                .executeUpdate();
+    }
+}}}
