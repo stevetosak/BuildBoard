@@ -178,8 +178,9 @@ public class ProjectAccessManagementService {
 
     }
 
+
     public void deleteRoleForUser(BBUser user, Project project, String roleName) {
-        ProjectRole role = new ProjectRole(project, roleName);
+        ProjectRole role = projectRoleRepository.findByNameAndProject(roleName,project);
         userProjectRoleRepository.deleteById(new UsersProjectRolesId(role, user));
     }
 

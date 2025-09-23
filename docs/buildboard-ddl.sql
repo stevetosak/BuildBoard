@@ -115,13 +115,14 @@ CREATE TABLE topic_belongs_to_project
 );
 CREATE TABLE blacklisted_user
 (
+    id serial primary key ,
     topic_id     INT REFERENCES thread (id) ON DELETE CASCADE,
     user_id      INT REFERENCES users (id) ON DELETE CASCADE,
     moderator_id INT REFERENCES users (id) ON DELETE CASCADE,
     start_date   TIMESTAMP,
     end_date     TIMESTAMP,
     reason       TEXT,
-    PRIMARY KEY (user_id, moderator_id, topic_id, start_date)
+    UNIQUE (user_id, moderator_id, topic_id, start_date)
 );
 
 CREATE TABLE developer_associated_with_project

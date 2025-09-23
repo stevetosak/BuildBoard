@@ -101,10 +101,6 @@ INSERT INTO channel (name, description, project_id, developer_id)
 VALUES
     ('Updates', 'Project updates channel', 5, 3);
 
-INSERT INTO messages (sent_at, content, sent_by, project_id, channel_name)
-VALUES
-    (NOW(), 'Zdravo. Ova e real-time chat za dopisuvanje', 3, 5, 'General'),
-    (NOW(), 'Resen ladno a?', 3, 5, 'Updates');
 
 ---------------- NOV TEST DATA
 
@@ -219,13 +215,7 @@ VALUES
     ('General2', 'General discussion', 18, 8), -- Created by user8 for Project 4
     ('Ideas', 'Feature ideas', 18, 9); -- Created by user9 for Project 4
 
--- Add new messages (only users associated with the project can send messages)
-INSERT INTO messages (sent_at, content, sent_by, project_id, channel_name)
-VALUES
-    (NOW(), 'Welcome to Project 3!', 6, 14, 'General'), -- Sent by user6 in Project 3
-    (NOW(), 'Found a bug in the login module.', 7, 14, 'Bugs'), -- Sent by user7 in Project 3
-    (NOW(), 'Let’s discuss new features.', 8, 18, 'General'), -- Sent by user8 in Project 4
-    (NOW(), 'I have an idea for a new feature.', 9, 18, 'Ideas'); -- Sent by user9 in Project 4
+
 
 
 

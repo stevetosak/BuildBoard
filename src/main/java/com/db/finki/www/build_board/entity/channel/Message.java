@@ -19,13 +19,11 @@ import java.time.LocalDateTime;
 @IdClass(MessageId.class)
 @AllArgsConstructor
 public class Message {
-    @Id
-    @Column(name = "channel_name")
-    private String name;
+
     @Id
     @ManyToOne
-    @JoinColumn(name = "project_id",referencedColumnName = "id",nullable = false)
-    private Project project;
+    @JoinColumn(name = "channel_id",referencedColumnName = "id")
+    private Channel channel;
     @Id
     @ManyToOne
     @JoinColumn(name = "sent_by",referencedColumnName = "id",nullable = false)

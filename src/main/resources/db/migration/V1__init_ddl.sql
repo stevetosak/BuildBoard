@@ -232,12 +232,9 @@ CREATE TABLE messages
 (
     sent_at      TIMESTAMP NOT NULL,
     content      VARCHAR(200) NOT NULL,
-    sent_by      INT REFERENCES developer (id) NOT NULL,
-    project_id   INT NOT NULL,
-    channel_name VARCHAR(64) NOT NULL,
-    FOREIGN KEY (channel_name, project_id)
-        REFERENCES channel (name, project_id) ON DELETE CASCADE,
-    PRIMARY KEY (channel_name, project_id, sent_at, sent_by)
+    sent_by      INT REFERENCES developer (id) on delete no action NOT NULL,
+    channel_id   uuid references channel(id) ON DELETE CASCADE NOT NULL,
+    PRIMARY KEY (channel_id,sent_by,sent_at)
 );
 
 

@@ -14,4 +14,5 @@ public interface ProjectRoleRepository  extends JpaRepository<ProjectRole, Integ
     List<ProjectRole> findByProjectId(Integer projectId);
 
     List<ProjectRole> findAllByNameInAndProject(List<String> roleNames,Project project);
+    ProjectRole findByNameAndProject(String roleName,Project project);
 }

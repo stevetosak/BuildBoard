@@ -48,9 +48,9 @@ public class ChannelWebSocketController {
         }
 
         messageDTO.setSentAt(LocalDateTime.now());
-        Message m = messageService.save(messageDTO);
-        MessageDTO rabotaj = messageMapper.toDTO(m);
-        rabotaj.setAvatarUrl(m.getSentBy().getAvatarUrl());
-        return rabotaj;
+        Message m = messageService.addMessage(messageDTO);
+        MessageDTO newMessage = messageMapper.toDTO(m);
+        newMessage.setAvatarUrl(m.getSentBy().getAvatarUrl());
+        return newMessage;
     }
 }

@@ -18,9 +18,9 @@ public class MessageService {
     }
 
     public List<Message> getAllMessagesForProjectChannel(Integer projectId,String channelName) {
-        return messageRepository.findAllByNameAndProjectIdOrderBySentAtAsc(channelName,projectId);
+        return messageRepository.findAllByChannelNameAndChannelProjectIdOrderBySentAtAsc(channelName,projectId);
     }
-    public Message save(MessageDTO messageDTO) {
+    public Message addMessage(MessageDTO messageDTO) {
         Message message = messageMapper.fromDTO(messageDTO);
         return messageRepository.save(message);
     }
