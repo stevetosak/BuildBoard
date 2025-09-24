@@ -158,7 +158,7 @@ VALUES
     (11, 'Topic 4', NULL),
     (17, 'Topic 8', NULL);
 
--- Add new topic_guidelines
+-- Add new topic_guidelinessubmission_id
 INSERT INTO topic_guidelines (topic_id, description)
 VALUES
     (10, 'Stay on topic'),
@@ -214,10 +214,6 @@ VALUES
     ('Bugs', 'Bug reports and fixes', 14, 7), -- Created by user7 for Project 3
     ('General2', 'General discussion', 18, 8), -- Created by user8 for Project 4
     ('Ideas', 'Feature ideas', 18, 9); -- Created by user9 for Project 4
-
-
-
-
 
 
 
