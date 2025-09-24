@@ -24,7 +24,4 @@ public class ProjectRolePermissionResourceOverride {
     public ProjectRolePermission getProjectRolePermission() {
         return id.getProjectRolePermission();
     }
-    public ProjectResource getProjectResource() {
-        return id.getProjectResource();
-    }
 }

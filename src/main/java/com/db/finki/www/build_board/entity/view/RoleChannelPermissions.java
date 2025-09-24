@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.hibernate.annotations.Immutable;
 
 import java.util.Objects;
+import java.util.UUID;
 
 @Entity
 @Immutable
@@ -19,8 +20,8 @@ import java.util.Objects;
 @NoArgsConstructor
 public class RoleChannelPermissions {
     @Id
-    @Column(name = "project_resource_id")
-    private Integer resourceId;
+    @Column(name = "channel_id")
+    private UUID channelId;
     @Column(name = "name")
     private String channelName;
     @ManyToOne
@@ -33,11 +34,11 @@ public class RoleChannelPermissions {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         RoleChannelPermissions that = (RoleChannelPermissions) o;
-        return Objects.equals(resourceId, that.resourceId) && Objects.equals(channelName, that.channelName) && Objects.equals(role, that.role) && Objects.equals(permissions, that.permissions);
+        return Objects.equals(channelId, that.channelId) && Objects.equals(channelName, that.channelName) && Objects.equals(role, that.role) && Objects.equals(permissions, that.permissions);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(resourceId, channelName, role, permissions);
+        return Objects.hash(channelId, channelName, role, permissions);
     }
 }

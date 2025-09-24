@@ -43,15 +43,14 @@ public class ChannelWebSocketController {
         BBUser user = (BBUser) bbUserDetailsService.loadUserByUsername(messageDTO.getSenderUsername());
         Project project = projectService.getById(Long.valueOf(messageDTO.getProjectId()));
         Channel channel = channelService.getByNameAndProject(messageDTO.getChannelName(), project);
-        if(!projectAccessManagementService.hasPermissionToAccessResource(user.getId(), Permission.WRITE,channel.getProjectResource().getId(),project.getId())){
+        if(!projectAccessManagementService.hasPermissionToAccessResource(user.getId(), Permission.WRITE,channel.getId(),project)){
             return null;
         }
 
-
         messageDTO.setSentAt(LocalDateTime.now());
-        Message m = messageService.save(messageDTO);
-        MessageDTO rabotaj = messageMapper.toDTO(m);
-        rabotaj.setAvatarUrl(m.getSentBy().getAvatarUrl());
-        return rabotaj;
+        Message m = messageService.addMessage(messageDTO);
+        MessageDTO newMessage = messageMapper.toDTO(m);
+        newMessage.setAvatarUrl(m.getSentBy().getAvatarUrl());
+        return newMessage;
     }
 }

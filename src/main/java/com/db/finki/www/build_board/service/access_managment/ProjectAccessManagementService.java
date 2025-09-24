@@ -1,8 +1,8 @@
 package com.db.finki.www.build_board.service.access_managment;
 
-import com.db.finki.www.build_board.common.enums.ProjectResourcePermissionOverrideType;
 import com.db.finki.www.build_board.dto.PermissionResourceWrapper;
 import com.db.finki.www.build_board.entity.access_managment.*;
+import com.db.finki.www.build_board.entity.channel.Channel;
 import com.db.finki.www.build_board.entity.compositeId.ProjectRolePermissionId;
 import com.db.finki.www.build_board.entity.compositeId.ProjectRolePermissionResourceOverrideId;
 import com.db.finki.www.build_board.entity.compositeId.UsersProjectRolesId;
@@ -12,15 +12,16 @@ import com.db.finki.www.build_board.repository.access_managment.ProjectRolePermi
 import com.db.finki.www.build_board.repository.access_managment.ProjectRoleRepository;
 import com.db.finki.www.build_board.repository.access_managment.ProjectRolePermissionRepository;
 import com.db.finki.www.build_board.repository.access_managment.UserProjectRoleRepository;
+import com.db.finki.www.build_board.service.channel.ChannelService;
 import jakarta.transaction.Transactional;
-import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
+import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class ProjectAccessManagementService {
@@ -29,27 +30,34 @@ public class ProjectAccessManagementService {
     private final ProjectRolePermissionRepository projectRolePermissionRepository;
     private final ProjectRolePermissionResourceOverrideRepository projectRolePermissionResourceOverrideRepository;
     private final UserProjectRoleRepository userProjectRoleRepository;
+    private final ChannelService channelService;
 
     public ProjectAccessManagementService(
             ProjectRoleRepository projectRoleRepository,
             ProjectRolePermissionRepository projectRolePermissionRepository,
-            ProjectRolePermissionResourceOverrideRepository projectRolePermissionResourceOverrideRepository, UserProjectRoleRepository userProjectRoleRepository
+            ProjectRolePermissionResourceOverrideRepository projectRolePermissionResourceOverrideRepository, UserProjectRoleRepository userProjectRoleRepository, ChannelService channelService
     ) {
         this.projectRoleRepository = projectRoleRepository;
         this.projectRolePermissionResourceOverrideRepository =
                 projectRolePermissionResourceOverrideRepository;
         this.projectRolePermissionRepository = projectRolePermissionRepository;
         this.userProjectRoleRepository = userProjectRoleRepository;
+        this.channelService = channelService;
     }
 
     public boolean hasPermissionToAccessResource(
-            int userId, String permission, int resourceId,
-            int projectId
+            int userId, String permission, UUID resourceId,
+            Project project
     ) {
-        return projectRolePermissionResourceOverrideRepository.hasPermissionForResource(projectId,
-                userId,
-                permission,
-                resourceId);
+        if(project.getUser().getId() == userId) return true;
+
+        if(resourceId == null){
+            return projectRolePermissionResourceOverrideRepository.hasGlobalPermission(permission,project.getId(),userId);
+        }else {
+            return projectRolePermissionResourceOverrideRepository.hasPermissionForResource(project.getId(), userId,permission,resourceId);
+        }
+
+
     }
 
     public List<ProjectRole> getRolesForDeveloperInProject(BBUser user, Project project) {
@@ -67,10 +75,7 @@ public class ProjectAccessManagementService {
         return permissions
                 .stream()
                 .map(p -> new ProjectRolePermission(
-                        new ProjectRolePermissionId(
-                                p,
-                                role
-                        )
+                        new ProjectRolePermissionId(p, role)
                 ))
                 .toList();
     }
@@ -90,18 +95,19 @@ public class ProjectAccessManagementService {
     }
 
     private List<ProjectRolePermissionResourceOverride> mapToResourceOverrides(
-            List<ProjectResource> resources,
+            List<Channel> channels,
             List<ProjectRolePermission> rolePermissions
 
     ) {
         List<ProjectRolePermissionResourceOverride> overrides = new ArrayList<>();
 
-        for (int i = 0; i < resources.size(); i++) {
+
+        for (int i = 0; i < channels.size(); i++) {
             overrides.add(
                     new ProjectRolePermissionResourceOverride(
                             new ProjectRolePermissionResourceOverrideId(
                                     rolePermissions.get(i),
-                                    resources.get(i)
+                                    channels.get(i)
                             )
                     )
             );
@@ -110,8 +116,8 @@ public class ProjectAccessManagementService {
         return overrides;
     }
 
-    private List<ProjectResource> getResources(List<PermissionResourceWrapper> rolePermissions) {
-        return rolePermissions.stream().map(PermissionResourceWrapper::getResource).toList();
+    private List<Channel> getResources(List<PermissionResourceWrapper> rolePermissions) {
+        return rolePermissions.stream().map(PermissionResourceWrapper::getChannel).toList();
     }
 
 
@@ -157,7 +163,9 @@ public class ProjectAccessManagementService {
     }
 
     public void deleteRole(ProjectRole role) {
-        projectRoleRepository.deleteById(role.getId());
+        if(!role.getName().equals("Admin")) {
+            projectRoleRepository.deleteById(role.getId());
+        }
     }
 
     public void addRolesToUser(BBUser user, List<ProjectRole> roles) {
@@ -170,8 +178,9 @@ public class ProjectAccessManagementService {
 
     }
 
+
     public void deleteRoleForUser(BBUser user, Project project, String roleName) {
-        ProjectRole role = new ProjectRole(project, roleName);
+        ProjectRole role = projectRoleRepository.findByNameAndProject(roleName,project);
         userProjectRoleRepository.deleteById(new UsersProjectRolesId(role, user));
     }
 

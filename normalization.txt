@@ -1,0 +1,155 @@
+= Нормализација и Подобрување на дизајн 
+== Функционални зависности(ФЗ)  
+Со цел целосно репрезентирање на атрибутите присутни во релациското мапирање, одредени атрибути со исти имиња ќе бидат преименувани. Лесно се заприметуваат таквите атрибути во релацијата R, на пр. **user(id) -> user_id** и **permission(name) -> permission_name**.
+{{{ 
+R(
+   user: username, description, password, register_at, email,sex,is_active,user_id,name,
+   blacklisted_user: start_date,end_date,reason,moderator_id
+   tag: tag_name
+   thread: thread_created_at,content,thread_id,parent 
+   topic_thread: topic_title, guidelines,
+   project_thread: project_title, repo_url 
+   permission: permission_name,
+   custom_role: custom_role_name 
+   channel: channel_name, channel_description
+   submission: status, submission_id,
+   feedback: submission_type, feedback_created_at
+   sent_at, start_at_developer, end_at_developer, message_content,
+   moderator_started_at,
+   submission_description, submission_created_at,
+   feedback_description,
+   custom_role_description,
+   submission_creator_id,
+   feedback_creator_id,
+   channel_creator_id,
+   message_sent_by_id
+) 
+}}} 
+
+=== Иницијални ФЗ
+1. {{{ user_id -> username, description, password, register_at, email,sex,is_active,name (user) }}} 
+
+2. {{{ username -> user_id(users) }}} 
+
+3. {{{ thread_id -> project_title,repo_url (project) }}} 
+
+4. {{{ thread_id -> topic_title,guidelines,parent (topic) }}}
+
+5. {{{ thread_id -> thread_created_at,content (thread) }}}
+
+6. {{{ project_title -> repo_url, thread_created_at, content }}} # Ako ojme so thread_id => project_title -> thread_id -> topic_title...; sho nemat smisla da vazhit. 
+
+7. {{{ (parent, topic_title) -> guidelines,created_at,content }}} # (unqiues of topic_title in a given parent)
+
+8. {{{ {thread_id, channel_name} -> channel_description,channel_creator_id }}} # (channel)
+
+9. {{{ {thread_id,moderator_id,user_id, start_date} -> end_date,reason }}} #(blacklisted user)  
+
+
+10. {{{ submission_id -> status,submission_description,submission_created_at, submission_creator_id  }}} #(submission)
+
+11 {{{ submission_id -> submission_type,feedback_created_at,feedback_description,feedback_creator_id }}} #(feedback)
+
+12 {{{ {thread_id,user_id, start_at_developer} -> end_at_developer }}} #(associated_with)
+
+13 {{{ {thread_id, channel_name, user_id, sent_at} -> message_content,message_sent_by_id }}} #(message)
+
+14 {{{ custom_role_name, thread_id -> custom_role_description }}} 
+
+
+15. {{{ {moderator_id, thread_id} -> moderator_started_at }}} 
+
+
+16. {{{ moderator_id -> user_id }}} 
+
+=== Изведени ФЗ
+1. {{{ username -> description, password, register_at, email,sex,is_active,name }}} #(transitive)
+
+2. {{{ moderator_id -> username, description, password, register_at, email,sex,is_active,name (transitive) }}} 
+
+3. {{{ submission_id -> status,submission_description,submission_created_at, submission_type,feedback_created_at,feedback_description (union) }}} 
+
+=== Анализа на функционални зависности
+За анализата на функционални зависности ќе го користиме методот на LHS/RHS поделба. Според овај метод потребно е да ги поделиме атрибутите во 3 групи, односно атрибути што се среќаваат на лева страна од Функционалните зависности(LHS) и според истата логика атрибути на десна страна и атрибути кои се среќаваат на 2те страни. 
+
+> **LHS**: 
+>> {{{ user_id, channel_name, moderator_id, start_date, submission_id, start_at_developer, sent_at, custom_role_name, thread_id }}}
+
+> **RHS**: 
+>> {{{ description, password, register_at, email, sex, is_active, name, repo_url, thread_created_at, content, created_at, channel_description, end_date, reason, status, submission_description, submission_created_at, submission_type, feedback_created_at, feedback_description, end_at_developer, message_content, custom_role_description, moderator_started_at, submission_creator_id, feedback_creator_id, channel_creator_id, message_sent_by_id }}} 
+
+> **LHS & RHS**: 
+>> {{{ username, project_title, parent, topic_title }}} 
+
+== Нормализација 
+
+=== Сегашна нормална форма 
+
+Имајќи предвид дека guidelines e повеќе вредносен атрибути, доаѓаме до заклучок дека сегашната имплементација на релација не е ни во 1NF форма.
+
+=== Декомпозиција на R во 1NF 
+Со оделување на guidelines во посебна релација {{{ R1(thread_id, guideline) }}} и {{{ R2(username, thread_id, passowrd...) }}} постигнуваме релациите да се во 1NF. 
+
+Според досега разгледаното за R1(thread_id, guideline) ги имаме следниве ФЗ: 
+
+1. {{{ thread_id -> thread_id }}}
+2. {{{ guideline -> guideline }}} 
+
+Според функционалните зависимости, единствената комбинација на атрибути која го задоволува условот за супер клуч е {{{ {thread_id, guideline} }}}, бидејќи {{{ {thread_id, guideline}+ = {thread_id, guideline} }}}. Сепак, со цел да оптимизираме операциите на базата (особено внесување и пребарување), ќе воведеме нов сурогат клуч **id** како примарен клуч. Заедно со него ги додаваме и следниве ФЗ {{{ id -> thread_id, guideline }}}.
+
+Ова е практично бидејќи природниот клуч {{{ {thread_id, guideline} }}} содржи guideline, која е varchar атрибут со променлива големина. Ако се користеше само природниот клуч, PostgreSQL ќе креираше B-tree индекс врз guideline, кој е поголем по големина и поради тоа побавно ќе се ажурира при **DRU** операции (потребни се повеќе IO страници за индексирање и податоци). Со воведување на сурогат клуч **id** како мал фиксно-димензионален атрибут (на пр. serial или bigserial), индексите се помали и операциите се поефикасни.
+
+# Не сум најсигурен за ова, имат смисла. Аргумент против ова е дека според вака дефинираното значит дека не смет некој guideline да се повторвит, шо да ќе клајме unqiue constraint, ама тогаш немат нешто шо оптимизиравме и падвит во вода нештово. Така да можда ке требат да се препишит имајќи го во предвид фактот дека некоја уникатност без id. 
+
+Со ова R1 ни се совпаѓат со релацијата **topic_guidelines**, отсега понатаму ќе ја референцираме како таква. 
+
+=== Декомпозиција R1 до BCNF 
+Според следниве ФЗ за R1: 
+1. {{{ thread_id -> thread_id }}}
+2. {{{ guideline -> guideline }}}
+3. {{{ id -> thread_id, guideline }}}
+
+Според тоа што само **id** ги определува сите атрибути({{{ id+ -> id,thread_id,guideline}}}) следува дека единствен супер клуч е **id**. 
+
+Клуч за оваа релациja би бил **id**, бидејќи неговиот затварач е {{{ id+ = {thread_id, guideline} }}} и е најмал затварач кој ја определува целата релација. 
+
+Според 2NF релацијата не смеe да содржи парцијални зависности. Ова веќе е задоволено од ФЗ за R1. 
+Според 3NF релацијата потребно е секоја ФЗ(X->A) да ги задоволи следниве својства: 
+
+1. X e супер клуч на R 
+2. А е примарен атрибут во R. 
+
+Според ова релацијата е веќе во 3NF. 
+Според BCNF секоја релација потребно е да го задоволува следново својство: 
+   "За секое нетривијално (X->A) важи дека X е суперклуч на R". 
+Според тоа што **id** e клуч на R1, следува дека релацијата е во BCNF. 
+
+=== Декомпозиција R2 во 2NF 
+Најпрвин да согледаме дека во било кој супер клуч атрибутите кои се присутни само на левата страна мора да бидат вклучени. Најпрвин да започниме само со тие атрибути: 
+
+{{{
+   {user_id, channel_name, moderator_id, start_date, submission_id, start_at_developer, sent_at, custom_role_name , thread_id} = { 
+user_id, channel_name, moderator_id, start_date, submission_id, start_at_developer, sent_at, custom_role_name , thread_id, username, description, password, register_at, email,sex,is_active,name, project_title,repo_url, topic_title, guidelines, parent, thread_created_at, content, channel_description, end_date, status, submission_description, submission_created_at, submission_type,feedback_created_at,feedback_description, end_at_developer, message_content, custom_role_description, moderator_started_at, 
+}
+}}}
+
+Според тоа што затворачот ги опфаќа сите атрибути може да се заклучи дека ова е најминималното множество чиишто покривач ја дава целата релација, што значи дека е примарен клуч. 
+
+Имајќи во предвид примарниот клуч можит да ги изведиме следниве релации, притоа кај релациите кај кои има совпаѓање со некоја релација од релационото мапирање, ќе ги додаваме нивните имиња. 
+
+
+{{{ R21(user_id,username, description, password, register_at, email,sex,is_active,name) ==  users }}} 
+R22(project_title,repo_url,topic_title,guidelines,parent,thread_created_at,content)
+{{{ R23(thread_id,channel_name,channel_description, channel_creator_id) == channel }}}
+{{{ R24(thread_id,moderator_id,user_id,start_date,end_date) }}}
+{{{ R25(submission_id,status,submission_description,submission_created_at, submission_type,feedback_created_at,feedback_description, feedback_creator_id, submission_creator_id) }}} #Tuka ke imame problem, ama mozhit da rechime deka procenavme deka ke imat dosta nullki pa zaradi to rekovme da se odelat vo posebna relacija. 
+{{{ R26(thread_id,user_id, start_at_developer,end_at_developer) == developer_associated_with_project }}}
+{{{ R27(thread_id, channel_name, message_sent_by_id, sent_at, message_content) === messages}}} 
+{{{ R28(thread_id,custom_role_name,custom_role_description) == project_roles }}}
+{{{ R29(thread_id,moderator_id,moderator_started_at) == topic_threads_moderators}}} 
+
+
+
+
+ 
+

@@ -18,7 +18,7 @@ public interface ProjectRequestRepo extends JpaRepository<ProjectRequests,Long> 
     @Query(value = """
             select *
             from project_request pr
-            join submission s 
+            join submission s
             on s.id = pr.id
             where (:latest is null or (s.created_by,s.created_at) IN ( select created_by,max(created_at) from submission pr group by created_by)) 
                         and pr.project_id=:projectId

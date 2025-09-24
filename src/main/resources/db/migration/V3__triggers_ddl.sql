@@ -107,16 +107,13 @@ create or replace function fn_insert_general_for_project()
 as $$
 DECLARE
     developer_id INT;
-    project_resource_id INT;
 BEGIN
     select user_id
     into developer_id
     from thread t
     where t.id=NEW.id;
-    insert into project_resource default values returning id into project_resource_id;
-
-    insert into channel(name,description,project_id,developer_id,project_resource_id)
-    values ('General','General',NEW.id,developer_id,project_resource_id);
+    insert into channel(name,description,project_id,developer_id)
+    values ('General','General',NEW.id,developer_id);
 
     return new;
 end;
@@ -169,18 +166,6 @@ END;
 $$;
 
 
-create or replace function fn_add_project_resource()
-    returns trigger
-    language plpgsql
-as $$
-DECLARE
-    project_resource_id INT;
-BEGIN
-    insert into project_resource default values returning id into project_resource_id;
-    new.project_resource_id := project_resource_id;
-    return new;
-end;
-$$;
 
 CREATE OR REPLACE FUNCTION fn_change_status_on_pending_reports()
     RETURNS TRIGGER
@@ -218,6 +203,21 @@ RETURN NULL;
 END;
 $$;
 
+create or replace function fn_delete_dangling_tags()
+    RETURNS trigger
+    LANGUAGE plpgsql
+AS $$
+BEGIN
+    IF NOT EXISTS(select 1
+                  from tag_threads
+                  where tag_name = OLD.tag_name
+                  group by tag_name) THEN
+        delete from tag where name = OLD.tag_name;
+    end if;
+    RETURN OLD;
+END;
+$$;
+
 ------------------------------------------------------------
 
 CREATE OR REPLACE TRIGGER tr_check_topic_name --RADI
@@ -243,12 +243,6 @@ CREATE OR REPLACE TRIGGER tr_a_insert_project_manager --RADI
     FOR EACH ROW
 EXECUTE FUNCTION fn_insert_project_manager();
 
-create or replace trigger tr_remove_unused_tags --RADI
-    after delete
-    on tag_threads
-    for each row
-execute function fn_remove_unused_tags();
-
 create or replace trigger tr_add_dev_if_not_exist --RADI
     before insert on developer_associated_with_project
     for each row
@@ -265,12 +259,6 @@ create or replace trigger tr_rm_orphan_disc
     for each row
 execute function fn_aa_rm_orphan_dics();
 
-create or replace trigger tr_add_project_resource_channel
-    before insert
-    on channel
-    for each row
-execute function fn_add_project_resource();
-
 create or replace trigger tr_add_blacklisted_user
 before insert on blacklisted_user
 for each row
@@ -281,3 +269,9 @@ CREATE OR REPLACE TRIGGER tr_change_status_on_pending_reports
     ON blacklisted_user
     FOR EACH ROW
 EXECUTE FUNCTION fn_change_status_on_pending_reports();
+
+create or replace trigger tr_delete_dangling_tags
+    after delete
+    on tag_threads
+    for each row
+    execute function fn_delete_dangling_tags();

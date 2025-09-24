@@ -12,24 +12,24 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
-@IdClass(BlacklistedUserId.class)
 public class BlacklistedUser {
-    @ManyToOne
+
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "blacklisted_user_id_gen")
+    @SequenceGenerator(name = "blacklisted_user_id_gen",sequenceName = "blacklisted_user_id_seq",allocationSize=1)
+    private Integer id;
+    @ManyToOne
     @JoinColumn(name = "topic_id")
     Topic topic;
 
     @ManyToOne
-    @Id
     @JoinColumn(name = "moderator_id")
     Moderator moderator;
 
-    @Id
     @Column(name = "start_date")
     LocalDateTime startTime;
 
     @ManyToOne
-    @Id
     @JoinColumn(name = "user_id")
     BBUser refersTo;
 

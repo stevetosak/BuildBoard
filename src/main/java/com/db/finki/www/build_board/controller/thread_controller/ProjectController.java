@@ -52,6 +52,7 @@ public class ProjectController {
 
     @GetMapping("/{title}")
     public String getProjectPage(
+            @SessionAttribute BBUser user,
             @PathVariable(name = "title") Project project, Model model, RedirectAttributes redirectAttributes,
             @RequestParam(required = false) String duplicateTitle
                                 ) {
@@ -62,6 +63,11 @@ public class ProjectController {
         model.addAttribute("developers",
                 projectService.getAllDevelopersForProject(project));
         String error = (String) redirectAttributes.getAttribute("error");
+        boolean canCreateChannel = false;
+        if(user != null){
+            canCreateChannel = projectAccessManagementService.hasPermissionToAccessResource(user.getId(),"CREATE",null,project);
+
+        }
 
         if (error != null) {
             model.addAttribute("error",
@@ -71,6 +77,8 @@ public class ProjectController {
             model.addAttribute("errMsg",
                     "There already exists a project with the provided title");
         }
+
+        model.addAttribute("canCreateChannel", canCreateChannel);
 
         Hibernate.initialize(project.getTags());
 

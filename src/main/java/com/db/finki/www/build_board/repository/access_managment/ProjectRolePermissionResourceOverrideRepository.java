@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 //todo override_type vo project_role
 import java.util.List;
+import java.util.UUID;
 
 @Repository
 public interface ProjectRolePermissionResourceOverrideRepository extends JpaRepository<ProjectRolePermissionResourceOverride, ProjectRolePermissionResourceOverrideId> {
@@ -28,19 +29,37 @@ public interface ProjectRolePermissionResourceOverrideRepository extends JpaRepo
                                    LEFT JOIN role_permissions_overrides rpo
                                              ON pr.id = rpo.role_id
                                                  AND rpo.permission_name = rp.permission_name
-                                                 AND rpo.project_resource_id = :resourceId
+                                                 AND rpo.channel_id = :resourceId
    
                           WHERE upr.user_id = :userId
                             AND pr.project_id = :projectId
                             AND rp.permission_name = :permissionName
                             AND (
-                              (pr.override_type = 'INCLUDE' AND rpo.project_resource_id IS NOT NULL)
-                                  OR (pr.override_type = 'EXCLUDE' AND rpo.project_resource_id IS NULL)
+                              (pr.override_type = 'INCLUDE' AND rpo.channel_id IS NOT NULL)
+                                  OR (pr.override_type = 'EXCLUDE' AND rpo.channel_id IS NULL)
                               )), FALSE
           ) AS has_access;
           """, nativeQuery = true)
-    boolean hasPermissionForResource(int projectId,int userId,String permissionName,int resourceId);
+    boolean hasPermissionForResource(int projectId, int userId, String permissionName, UUID resourceId);
     List<ProjectRolePermissionResourceOverride> findAllByIdProjectRolePermissionIdRole(ProjectRole role);
+
+    @Query(nativeQuery = true,value = """
+   SELECT COALESCE(
+                  EXISTS (SELECT 1
+                          FROM users_project_roles upr
+                                   JOIN project_role pr
+                                        ON upr.role_id = pr.id
+                                   LEFT JOIN role_permissions rp
+                                             ON pr.id = rp.role_id AND rp.permission_name = :permissionName
+                          WHERE upr.user_id = :userId
+                            AND pr.project_id = :projectId
+                            AND (
+                              (pr.override_type = 'INCLUDE' AND rp.permission_name IS NOT NULL)
+                                  OR (pr.override_type = 'EXCLUDE' AND rp.permission_name IS NULL)
+                              )), FALSE
+          ) AS has_access;
+""")
+    boolean hasGlobalPermission(String permissionName,int projectId,int userId);
 
     @Modifying(clearAutomatically = true)
     void deleteAllByIdProjectRolePermissionIdRole(ProjectRole role);

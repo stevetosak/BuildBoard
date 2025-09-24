@@ -1,0 +1,365 @@
+= Нормализација и Подобрување на дизајн 
+== Функционални зависности(ФЗ)  
+Со цел целосно репрезентирање на атрибутите присутни во релациското мапирање, одредени атрибути со исти имиња ќе бидат преименувани. Лесно се заприметуваат таквите атрибути во релацијата R, на пр. **user(id) -> user_id** и **permission(name) -> permission_name**.
+{{{ 
+R(
+  user: username, description, password, registered_at, email, sex,is_active,name, user_id
+  feedback: feedback_submission_type, feedback_created_at, feedback_description 
+  submission: submission_id, submission_status, submission_created_at, submission_description,
+  blacklisted_user: blacklisted_id,blacklisted_start_date, blacklisted_end_date, reason,blacklisted_about_user
+  tag: tag_name, 
+  thread: thread_id, thread_created_at, thread_content 
+  topic_thread: guidelines, topic_title, parent_id  
+  project_thread: repo_url, project_title, 
+  associated_with: asc_started_at, asc_ended_at, 
+  channel: channel_name, channel_description, channel_id
+  permissions: perm_name, 
+  project_roles: pr_name, pr_id, pr_override_type,
+  sends_message_in: msg_send_at, msg_content,
+) 
+}}} 
+
+=== Иницијални ФЗ
+
+1. {{{ user_id ->  username, description, password, registered_at, email, sex,is_active,name }}}  
+
+2. {{{ username -> user_id, description, password, registered_at, email, sex,is_active,name }}} 
+
+3. {{{ submission_id -> feedback_submission_type, feedback_created_at, feedback_description }}} 
+
+4. {{{ submission_id ->  submission_status, submission_created_at, submission_description }}} 
+
+5. {{{ blacklisted_id -> blacklisted_about_user,user_id, thread_id, blacklisted_start_date,  blacklisted_end_date, reason }}} 
+
+6. {{{ thread_id -> thread_created_at, thread_content }}} 
+
+7. {{{ thread_id -> guidelines, topic_title, parent_id }}} 
+
+8. {{{ thread_id -> repo_url, project_title }}} 
+
+9. {{{ {thread_id, user_id } -> asc_started_at, asc_ended_at }}} 
+
+10. {{{ channel_id ->  channel_name,channel_description}}}  
+
+12. {{{ {channel_id, msg_send_at, user_id } -> msg_content }}} 
+
+13. {{{ pr_id -> pr_name, pr_override_type }}} 
+
+14. {{{ parent_id -> thread_id }}} 
+
+15. {{{ project_title -> repo_url, thread_created_at, thread_content  }}} 
+
+16. {{{ {parent_id, topic_title} -> guidelines, thread_created_at, thread_content }}} 
+
+17. {{{ {pr_name, thread_id} -> pr_override_type }}} 
+
+18. {{{ blacklisted_about_user -> user_id  }}} 
+
+19. {{{ { blacklisted_about_user,user_id, thread_id, blacklisted_start_date } -> blacklisted_end_date,reason,blacklisted_id }}}
+
+=== Изведени ФЗ
+
+1. {{{ parent_id -> thread_created_at, thread_content }}}
+
+2. {{{ parent_id -> guidelines, topic_title, parent_id }}}
+
+3. {{{ parent_id -> repo_url, project_title }}}
+
+4. {{{ blacklisted_about_user -> username, description, password, registered_at, email, sex,is_active,name,user_id }}}
+
+=== Анализа на функционални зависности
+За анализата на функционални зависности ќе го користиме методот на LHS/RHS поделба. Според овој метод потребно е да се поделат атрибутите во 3 групи, односно атрибути што се среќаваат на лева страна од Функционалните зависности(LHS) и според истата логика атрибути на десна страна и атрибути кои се среќаваат на 2те страни. 
+
+> **LHS**: 
+>> {{{ submission_id,blacklisted_start_date, msg_send_at,pr_id,tag_name,perm_name,blacklisted_about_user, channel_id}}}
+
+> **RHS**: 
+>> {{{ description, password, registered_at, email, sex,is_active,name, feedback_submission_type, feedback_created_at, feedback_description, submission_status, submission_created_at, submission_description,blacklisted_end_date, reason, tag_name,thread_created_at, thread_content, guidelines,repo_url, asc_started_at, channel_description, perm_name, pr_override_type, msg_content, channel_name }}} 
+
+> **LHS & RHS**: 
+>> {{{ user_id,thread_id,username,parent_id,project_title,topic_title, pr_name,blacklisted_id}}} 
+
+== Нормализација 
+
+=== Сегашна нормална форма 
+
+Имајќи во предвид дека **guidelines** e повеќе вредносен атрибут, доаѓаме до заклучок дека сегашната имплементација на релацијата не е ни во 1NF форма.
+
+=== Декомпозиција на R во 1NF 
+Со оделување на **guidelines** во посебна релација {{{ R1(thread_id, guideline) }}} и {{{ R2(username, thread_id, password...) }}} постигнуваме релациите да се во 1NF. 
+
+Според досега разгледаното за R1(thread_id, guideline) ги имаме следниве ФЗ: 
+
+1. {{{ thread_id -> thread_id }}}
+2. {{{ guideline -> guideline }}} 
+
+Според функционалните зависности, единствената комбинација на атрибути која го задоволува условот за супер клуч е {{{ {thread_id, guideline} }}}, бидејќи {{{ {thread_id, guideline}+ = {thread_id, guideline} }}}. Сепак, со цел да се оптимизираат операциите на базата (особено внесување и пребарување), ќе воведеме нов сурогат клуч **id** како примарен клуч. Заедно со него ги додаваме и следниве ФЗ {{{ id -> thread_id, guideline }}}.
+
+Ова е практично, бидејќи природниот клуч {{{ {thread_id, guideline} }}} содржи guideline, која е varchar атрибут со променлива големина. Ако се користеше само природниот клуч, PostgreSQL ќе креираше B-tree индекс врз guideline, кој е поголем по големина и поради тоа побавно ќе се ажурира при **DRU** операции (потребни се повеќе IO страници за индексирање и податоци). Со воведување на сурогат клуч **id** како мал фиксно-димензионален атрибут (на пр. serial или bigserial), индексите се помали и операциите се поефикасни.
+
+Со ова R1 ни се совпаѓа со релацијата **topic_guidelines**, па понатаму ќе ја референцираме како таква. 
+
+=== Декомпозиција R1 до BCNF 
+Според следниве ФЗ за R1: 
+1. {{{ thread_id -> thread_id }}}
+2. {{{ guideline -> guideline }}}
+3. {{{ id -> thread_id, guideline }}}
+
+Според тоа што само **id** ги определува сите атрибути({{{ id+ -> id,thread_id,guideline}}}) следува дека единствен кандидат клуч е **id**. 
+
+Примарен клуч за оваа релациja би бил **id**, бидејќи неговиот затварач е {{{ id+ = {thread_id, guideline} }}} и е најмал затварач кој ја определува целата релација. 
+
+Според 2NF релацијата не смеe да содржи парцијални зависности. Ова веќе е задоволено од ФЗ за R1. 
+Според 3NF релацијата потребно е секоја ФЗ(X->A) да ги задоволи следниве својства: 
+
+1. X e супер клуч на R 
+2. А е примарен атрибут во R. 
+
+Според ова релацијата е веќе во 3NF. 
+Според BCNF секоја релација потребно е да го задоволува следното својство: 
+   "За секое нетривијално (X->A) важи дека X е суперклуч на R". 
+Според тоа што **id** e клуч на R1, следува дека релацијата е во BCNF. 
+
+=== Декомпозиција R во 2NF 
+Доколку би ги избрале само атрибутите на левата страна, во таков случај не би можеле да пристапиме до сите ФЗ во кои е вклучен thread_id. Заради тоа ќе го избериме thread_id. Со него имаме:
+{{{
+    { 
+submission_id,
+blacklisted_start_date,
+msg_send_at,
+pr_id,
+tag_name,
+perm_name,
+blacklisted_about_user,
+channel_id 
+} = { 
+submission_id
+blacklisted_start_date
+msg_send_at
+pr_id
+tag_name
+perm_name
+blacklisted_about_user
+channel_id, 
+feedback_submission_type, feedback_created_at, feedback_description,
+submission_status, submission_created_at, submission_description ,
+channel_name,channel_description, 
+pr_name, pr_override_type, 
+user_id, 
+username, description, password, registered_at, email, sex,is_active,name,
+blacklisted_end_date, reason,
+thread_created_at, thread_content,
+topic_title, parent_id,
+repo_url, project_title,
+asc_started_at, asc_ended_at,
+msg_send_at,msg_content,
+thread_id,
+pr_override_type
+}
+}}}
+
+{{{ R1(user_id,username, description, password, registered_at, email, sex,is_active,name) }}} 
+
+{{{ R2(submission_id,feedback_submission_type, feedback_created_at, feedback_description,submission_status, submission_created_at, submission_description)}}}
+
+{{{ R3(blacklisted_about_user,user_id, thread_id, blacklisted_start_date,blacklisted_end_date, reason) }}} 
+
+
+{{{ R4(thread_id,thread_created_at, thread_content,topic_title, parent_id,repo_url, project_title) }}}
+
+{{{ R5(channel_id,channel_name,channel_description) }}}
+
+{{{ R6(pr_id,pr_name, pr_override_type) }}}
+
+{{{ R7(channel_id, msg_send_at, user_id,msg_content) }}}
+
+ 
+{{{ R8(thread_id,user_id,asc_started_at, asc_ended_at) }}}
+
+{{{ (Останати) : R9(perm_name,tag_name) }}}
+
+=== Нормализација на R1 до 3NF 
+Може да се запримети дека оваа релација е устaри релацијата **users**. 
+За оваа релација важат следниве ФЗс:
+1. {{{user_id ->  username, description, password, registered_at, email, sex,is_active,name}}}
+
+2. {{{username -> user_id, description, password, registered_at, email, sex,is_active,name }}}
+
+Од тоа што немаме транзитивни зависности во оваа релациja, следува дека **R1** e веќе во 3NF. 
+
+=== Нормализација на R1 до BCNF
+
+Oд претходниот чекор согледуваме дека секоја ФЗс вклучува супер клуч, што значи дека релацијта **R1** e веќе во BCNF. 
+
+=== Нормализација на R2 до 3NF 
+Единствени ФЗс за оваа релација се: 
+1. {{{ submission_id -> feedback_submission_type, feedback_created_at, feedback_description }}} 
+
+2. {{{ submission_id ->  submission_status, submission_created_at, submission_description }}} 
+
+Со користење правилото !Унија/Декомпозиција од привалата за изведување на Армстронг добиваме: 
+
+1. {{{ submission_id ->  submission_status, submission_created_at, submission_description, feedback_submission_type, feedback_created_at, feedback_description}}}
+
+Од тоа што немаме транзитивни зависности, следува дека **R2** е веќе во 3NF. 
+
+=== Нормализација на R2 до BCNF 
+
+Од претходниот чекор, може да согледаме дека имаме само една ФЗ, што значи дека таа ФЗ мора да содржи суперклуч за релациjaта. Според претходно спомнатото може да се заклучи дека **R2** e веќе во BCNF.
+
+=== Подобрување на нормализација на R2 
+
+Oд доменот на апликацијата се согледува дека не секој submission мора да има feedback, тоа значи дека доста инстанци ќе имат null вредности за колоните feedback_submission_type, feedback_created_at, feedback_description. Со цел одбегнување на записи со голем број null вредности ќе изведиме 2 нови релации. 
+
+1. {{{ R21(submission_id,submission_status, submission_created_at, submission_description) }}}  
+2. {{{ R22(submission_id,feedback_submission_type, feedback_created_at, feedback_description) }}} 
+
+На овој начин доколку некој submission нема feedback тогаш нема да има запис во **R22** и нема да има null вредности во записите. За разлика од претходното решение доста каде што feedback колоните би биле полни со null вредности. 
+
+Притоа да согледаме дека **R21** e релациjaта **submission** и **R22** е **feedback**. 
+
+=== Нормализација на R3 до 3NF
+
+ФЗ присутни во оваа релациja се:
+
+
+1. {{{blacklist_id-> blacklisted_about_user,user_id,thread_id,blacklisted_start_date,blacklisted_end_date,reason}}}
+
+2. {{{{ blacklisted_about_user,user_id, thread_id, blacklisted_start_date } -> blacklisted_end_date,reason,blacklisted_id }}}
+
+
+R3 е веќе во 3NF, заради тоа што во секоја Ф3 на левата страна е супер клуч и нема транзитивни зависности. 
+
+=== Нормализација до BCNF 
+
+
+{{{R31(blacklisted_about_user,user_id, thread_id, blacklisted_start_date,blacklisted_id)}}}
+{{{R32(blacklisted_about_user,user_id, thread_id,blacklisted_start_date,blacklisted_end_date,reason)}}}
+
+
+Сметаме дека нормализацијата до BCNF за оваа релација **не е потребна**, бидејќи **R31** нема корисни информации што не може да се извлечат од R32, и постојано би требало да се користи **R32** заради тоа што сите потребни информации од R31 веќе се присутни во R32 како и дополнителни информации како blacklisted_end_date кои се клучни за бизнис логиката на апликацијата. 
+
+
+
+=== Нормализација на R4 до 3NF 
+ФЗс присутни во оваа релација се: 
+
+1. {{{ thread_id -> thread_created_at, thread_content, topic_title, parent_id, repo_url, project_title }}}
+2. {{{ project_title -> thread_created_at, thread_content, repo_url }}}
+3. {{{ {parent_id, topic_title} -> thread_content, thread_created_at }}}
+4. {{{ parent_id ->  thread_created_at, thread_content, topic_title, parent_id, repo_url, project_title, thread_id }}}
+
+{{{ R41(project_title, thread_created_at, thread_content, repo_url) }}} 
+{{{ R42(parent_id, topic_title,thread_content, thread_created_at) }}} 
+{{{ R43(thread_id, project_title, topic_title, parent_id) }}} 
+
+ **thread_created_at** и **thread_content** се повторуваат во **R41** и **R42**, па според тоа може да се изведат во една заедничка релација, односно релацијата **R43**. 
+Според тоа се добиваат следните релации: 
+
+{{{ R41(project_title, repo_url) }}} 
+{{{ R42(parent_id, topic_title) }}}  
+{{{ R43(thread_id, project_title, topic_title, parent_id, thread_created_at, thread_content) }}} 
+
+Од тоа што **thread** може да е или проект или topic, но не и двете. Tоа повлекува дека: 
+
+- **thread** е проект -> **topic_title**, **parent_id** се null вредности. 
+- **thread** е  topic -> **project_title** е null вредност. 
+
+Со цел да избегнеме null вредности и да обезбедиме **lossless join** ќе го направиме следното: 
+
+- **R41** ќе додадеме **thread_id** (за постигнување на  **lossless join**), додека од **R43** ќе отстраниме **project_title**. 
+- **R42** ќе додадеме **thread_id** (за постигнување на  **lossless join**), додека од **R43** ќе остраниме  **topic_title**, **parent_id**. 
+
+Со тоа се добиваат следните релации: 
+
+{{{ R41(project_title, repo_url, thread_id) }}} 
+{{{ R42(parent_id, topic_title, thread_id) }}}  
+{{{ R43(thread_id, thread_created_at, thread_content) }}} 
+
+=== Нормализација на R41 до BCNF 
+Eдинстевни ФЗ присутни во оваа релација се: 
+1. {{{ thread_id -> repo_url,project_title }}}
+2. {{{ project_title -> repo_url, thread_id }}}
+
+Лесно се согледува дека {{{ thread_id }}} и {{{project_title}}} се кандидат клучеви, па според тоа бидејќи немаме ниту еден атрибут на левата старна во ФЗти, кој не е кандидат клуч, релацијата е во BCNF. 
+
+Притоа да согледаме дека **R41** е релацијата **project_thread**.
+
+=== Нормализација на R42 до BCNF 
+Eдинстевни ФЗ присутни во оваа релација се: 
+1. {{{ thread_id channel_id-> topic_title,parent_id }}}
+2. {{{ {topic_title,parent_id} -> thread_id }}}
+3. {{{ parent_id -> topic_title, thread_id }}}
+
+Бијдеќи {{{ parent_id }}} и {{{thread_id}}} се кандидат клучеви( {{{ {parent_id, topic_title} }}} е супер клуч) не постои ФЗ во која левата страна не е супер клуч. Тоа значи дека **R42** e во BCNF. 
+
+Притоа да согледаме дека **R42** е релацијата **topic_thread**. 
+
+=== Нормализација на R43 до BCNF 
+Eдинстевни ФЗ присутни во оваа релација се: 
+1. {{{ thread_id -> thread_created_at, thread_content }}}
+
+Бидејќи само {{{ thread_id }}} e кандидат клуч, не постои ФЗ во која левата страна не е супер клуч. Според тоа **R43** е во BCNF. 
+
+Притоа да согледаме дека **R43** е релацијата **thread**. 
+
+=== Нормализација на R5 до BCNF
+Единствена ФЗ присутна во оваа релациja е: 
+
+{{{channel_id -> channel_name,channel_description}}}
+
+R6 е веќе во BCNF, заради тоа што единствената ФЗ го вклучува суперклучот и нема транзитивни зависности. 
+
+Притоа да согледаме дека **R5** е релацијата **channel**.
+
+=== Нормализација на R6 до BCNF
+Единствена ФЗ присутна во оваа релациja е: 
+
+{{{pr_id -> pr_name, pr_override_type}}}
+
+**R6** е веќе во BCNF, заради тоа што единствената ФЗ го вклучува суперклучот и нема транзитивни зависности. 
+
+Може да се согледа дека **R6** е всушност **project_role**.
+
+=== Нормализација на R7 до BCNF
+Единствена ФЗ присутна во оваа релациja е: 
+
+{{{ {channel_id, msg_send_at, user_id} -> msg_content}}}
+
+**R7** е веќе во BCNF, заради тоа што единствената ФЗ го вклучува суперклучот и нема транзитивни зависности. 
+
+Притоа да согледаме дека **R7** е релацијата **messages**. 
+
+=== Нормализација на R8 до BCNF 
+Единствена ФЗ присутна во оваа релациja е: 
+
+{{{{thread_id,user_id} -> asc_started_at, asc_ended_at}}}
+
+**R8** е веќе во BCNF, заради тоа што единствената ФЗ го вклучува суперклучот и нема транзитивни зависности. 
+
+Пртиоа да согледаме дека **R8** е релацијата ** developer_associated_with_project**.
+
+=== Нормализација на R9 до 3NF
+Единствена ФЗ присутна во оваа релациja е: 
+
+{{{{perm_name} -> perm_name}}}
+
+{{{{tag_name} -> tag_name}}}
+
+Оваа релација нема транзитивни зависности, па тоа значи дека е во 3NF.
+
+=== Нормализација на R9 до BCNF
+
+Според горенаведеното, лесно се согледува дека во сите ФЗ  на левата страна не е присутен кандидат клуч.
+
+Со цел да се нормализира релацијата до BCNF релацијата ќе ја декомпозираме во
+ - {{{R91(tag_name)}}}
+ - {{{R92(perm_name)}}}
+
+Притоа може да се согледа дека **R91** e релацијата **tag** и **R92** релацијата **permission**
+
+
+
+
+
+

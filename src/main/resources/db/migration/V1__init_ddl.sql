@@ -1,8 +1,3 @@
---- Trigger before update/insert za check na iminjata topic/discussion -> OK
---- Trigger za ko ke adnit dete na topic thread sho e vo proekt, da go dodajt kako belongs_to vo proektot
---- Trigger za check dali reply na discussion thread pripagjat na ist topic thread kako na toj so mu pret reply
---- IMENUVANJE: triggeri so provervat nesto prefix = check, funkcii za istite prefix = validate
---- Nemame contraint sho velit deka sekoj topic thread trebat da e moderiran
 DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS moderator CASCADE;
 DROP TABLE IF EXISTS developer CASCADE;
@@ -44,6 +39,8 @@ drop table if exists submission cascade;
 drop table if exists feedback;
 drop table if exists embeddable_thread;
 
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 
 ---- DDL
 CREATE TABLE users
@@ -53,10 +50,10 @@ CREATE TABLE users
     email         varchar(60)             not null,
     name          varchar(32)             not null,
     is_activate   bool      DEFAULT true,
-    password      VARCHAR(72),
+    password      VARCHAR(72) NOT NULL,
     description   VARCHAR(200),
     registered_at TIMESTAMP DEFAULT NOW() NOT NULL,
-    sex           VARCHAR(1)
+    sex           VARCHAR(1) NOT NULL
 );
 CREATE TABLE moderator
 (
@@ -92,7 +89,8 @@ CREATE TABLE topic_thread
 (
     title     VARCHAR(256) NOT NULL,
     id        INT PRIMARY KEY REFERENCES embeddable_thread (id) on delete cascade, --INHERITANCE
-    parent_id int REFERENCES project_thread (id) on delete CASCADE                 --PARENT
+    parent_id int REFERENCES project_thread (id) on delete CASCADE,                 --PARENT
+    UNIQUE (parent_id, title)
 );
 create table topic_guidelines
 (
@@ -115,15 +113,15 @@ CREATE TABLE likes
 );
 CREATE TABLE topic_threads_moderators
 (
-    thread_id  INT REFERENCES topic_thread (id) ON DELETE CASCADE,
-    user_id    INT REFERENCES moderator (id) ON DELETE CASCADE,
+    thread_id  INT REFERENCES topic_thread (id) ON DELETE CASCADE NOT NULL,
+    user_id    INT REFERENCES moderator (id) ON DELETE CASCADE NOT NULL,
     started_at TIMESTAMP DEFAULT NOW() NOT NULL,
     PRIMARY KEY (thread_id, user_id)
 );
 CREATE TABLE tag
 (
     name       VARCHAR(64) PRIMARY KEY,
-    creator_id int REFERENCES moderator (id) on delete CASCADE not null
+    creator_id int REFERENCES users (id) on delete CASCADE not null
 );
 CREATE TABLE tag_threads
 (
@@ -134,15 +132,15 @@ CREATE TABLE tag_threads
 
 CREATE TABLE blacklisted_user
 (
-    topic_id     INT REFERENCES topic_thread (id) ON DELETE CASCADE, --BLACLISTED_FROM
-    user_id      INT REFERENCES users (id) ON DELETE CASCADE,        --REFERS_TO
-    moderator_id INT REFERENCES moderator (id) ON DELETE CASCADE,    --BLACKLISTED_BY
+    id serial primary key,
+    topic_id     INT REFERENCES thread (id) ON DELETE CASCADE,
+    user_id      INT REFERENCES users (id) ON DELETE CASCADE,
+    moderator_id INT REFERENCES users (id) ON DELETE CASCADE,
     start_date   TIMESTAMP,
     end_date     TIMESTAMP,
     reason       TEXT,
-    PRIMARY KEY (user_id, moderator_id, topic_id, start_date)
+    UNIQUE (user_id, moderator_id, topic_id, start_date)
 );
-
 CREATE TABLE developer_associated_with_project
 (
     project_id   INT REFERENCES project_thread (id) on delete cascade,
@@ -151,49 +149,50 @@ CREATE TABLE developer_associated_with_project
     ended_at     TIMESTAMP,
     PRIMARY KEY (project_id, developer_id, started_at)
 );
----DO TUKA
+CREATE TABLE channel
+(
+    id uuid primary key default uuid_generate_v4(),
+    name                VARCHAR(64) NOT NULL,
+    description         VARCHAR(200),
+    project_id          INT REFERENCES project_thread (id) ON DELETE CASCADE NOT NULL, --HAS
+    developer_id        INT REFERENCES developer (id)                        NOT NULL, --CONSTRUCTS
+    UNIQUE (name,project_id)
+);
 CREATE TABLE permissions
 (
     name VARCHAR(32) PRIMARY KEY
 );
 
-CREATE TABLE project_resource
-(
-    id serial primary key
-);
 
 create table project_role
 (
     id serial PRIMARY KEY ,
     name       varchar(32) NOT NULL,
-    project_id int references project_thread (id) ON DELETE CASCADE,
+    project_id int references project_thread (id) ON DELETE CASCADE NOT NULL,
     override_type varchar(20) check ( override_type in ('INCLUDE','EXCLUDE')) NOT NULL DEFAULT 'EXCLUDE'
 );
 
 CREATE TABLE role_permissions
 (
-    permission_name VARCHAR(32),
+    permission_name VARCHAR(32) NOT NULl,
     role_id INT REFERENCES project_role(id) ON DELETE CASCADE NOT NULL,
     FOREIGN KEY (permission_name) REFERENCES permissions(name),
     PRIMARY KEY (permission_name, role_id)
 );
 
--- ova sa exceptions, primer ako vo role permissions imat entry ("READ","GUEST",5),
--- a vo roles_permissions overrides imat ("READ","GUEST",5,3) kade 3 da recime deka e Channel3
--- togas role GUEST mozit da citat vo site kanali osven Channel3
 CREATE TABLE role_permissions_overrides
 (
-    permission_name VARCHAR(32),
+    channel_id uuid references channel(id) on delete cascade ,
+    permission_name VARCHAR(32) NOT NULL,
     role_id INT REFERENCES project_role(id) ON DELETE CASCADE NOT NULL,
-    project_resource_id int references project_resource(id) NOT NULL,
     FOREIGN KEY (role_id,permission_name) REFERENCES role_permissions (role_id,permission_name) ON DELETE CASCADE,
-    PRIMARY KEY (role_id,permission_name,project_resource_id)
+    PRIMARY KEY (role_id,permission_name,channel_id)
 );
 
 CREATE TABLE users_project_roles
 (
-    user_id    INT REFERENCES developer (id) on delete cascade,
-    role_id    INT REFERENCES project_role(id) on delete cascade,
+    user_id    INT REFERENCES developer (id) on delete cascade NOT NULL,
+    role_id    INT REFERENCES project_role(id) on delete cascade NOT NULL,
     PRIMARY KEY (user_id, role_id)
 );
 
@@ -201,10 +200,10 @@ CREATE TABLE users_project_roles
 create table submission
 (
     id          serial primary key,
-    created_at  TIMESTAMP   default now()                                                         not null,
-    description VARCHAR(200)                                                                      NOT NULL,
+    created_at  TIMESTAMP   default now() NOT NULL                                                    ,
+    description VARCHAR(200) NOT NULL,
     status      varchar(32) default 'PENDING' CHECK (status IN ('ACCEPTED', 'DENIED', 'PENDING')) NOT NULL,
-    created_by  int REFERENCES users (id)                                                         not null
+    created_by  int REFERENCES users (id) NOT NULL
 );
 
 CREATE TABLE project_request
@@ -216,7 +215,7 @@ CREATE TABLE project_request
 create table feedback
 (
     description     TEXT,
-    submission_type varchar(1) CHECK (submission_type IN ('P', 'R')),
+    submission_type varchar(1) CHECK (submission_type IN ('P', 'R')) NOT NULL,
     created_at      timestamp default now()   not null,
     created_by      int references users (id) NOT NULL, --WRITTEN_BY
     submission_id   int PRIMARY KEY references submission (id) on delete cascade
@@ -225,98 +224,17 @@ create table feedback
 CREATE TABLE report
 (
     id          int PRIMARY KEY REFERENCES submission (id),
-    thread_id   INT REFERENCES topic_thread (id) on delete cascade not null, --FOR_MISCONDUCT
-    for_user_id INT REFERENCES users (id) on delete cascade        not null  --ABOUT
+    thread_id   INT REFERENCES topic_thread (id) on delete cascade NOT NULL, --FOR_MISCONDUCT
+    for_user_id INT REFERENCES users (id) on delete cascade        NOT NULL  --ABOUT
 );
-CREATE TABLE channel
-(
-    name                VARCHAR(64),
-    description         VARCHAR(200),
-    project_id          INT REFERENCES project_thread (id) ON DELETE CASCADE NOT NULL, --HAS
-    project_resource_id INT REFERENCES project_resource (id) UNIQUE          NOT NULL,
-    developer_id        INT REFERENCES developer (id)                        NOT NULL, --CONSTRUCTS
-    PRIMARY KEY (name, project_id)
-);
+
 CREATE TABLE messages
 (
-    sent_at      TIMESTAMP,
+    sent_at      TIMESTAMP NOT NULL,
     content      VARCHAR(200) NOT NULL,
-    sent_by      INT REFERENCES developer (id),
-    project_id   INT,
-    channel_name VARCHAR(64),
-    FOREIGN KEY (channel_name, project_id)
-        REFERENCES channel (name, project_id) ON DELETE CASCADE,
-    PRIMARY KEY (channel_name, project_id, sent_at, sent_by)
+    sent_by      INT REFERENCES developer (id) on delete no action NOT NULL,
+    channel_id   uuid references channel(id) ON DELETE CASCADE NOT NULL,
+    PRIMARY KEY (channel_id,sent_by,sent_at)
 );
-
-
-------------------------VIEWS-----------------------------
-CREATE OR REPLACE VIEW v_project_thread
-AS
-SELECT thread.id, content, user_id, title, repo_url
-FROM project_thread project
-         JOIN thread
-              ON project.id = thread.id;
-CREATE OR REPLACE VIEW v_topic_thread
-AS
-SELECT thread.id, content, user_id, title, parent_id
-FROM topic_thread topic
-         JOIN thread
-              ON topic.id = thread.id;
-CREATE OR REPLACE VIEW v_moderator
-AS
-SELECT users.id, username, is_activate, password, description, registered_at, sex
-FROM moderator
-         JOIN users ON moderator.id = users.id;
-
-create or replace view v_discussion_thread
-as
-with recursive
-    depth_table as
-        (select parent_id, id, 0 as depth
-         from discussion_thread
-         UNION ALL
-         select discuss.parent_id, dpth.id, dpth.depth + 1
-         from depth_table dpth
-                  join discussion_thread discuss
-                       on dpth.parent_id = discuss.id),
-    tmp as (select id, max(depth) as depth
-            from depth_table
-            group by id)
-select d.id as id, t.user_id as user_id, d.depth as depth, d1.parent_id as parent_id, t.created_at as "created_at"
-from tmp d
-         join depth_table d1
-              on d.id = d1.id and d1.depth = d.depth
-         join thread t
-              on t.id = d.id;
-
-
-CREATE OR REPLACE VIEW role_channel_permissions AS
-SELECT
-    c.project_resource_id,
-    c.name,
-    pr.id as role_id,
-    COALESCE(
-                    STRING_AGG(
-                    DISTINCT rp.permission_name, ',' ORDER BY rp.permission_name
-                              ) FILTER (
-                        WHERE
-                        (pr.override_type = 'INCLUDE' AND rpo.project_resource_id IS NOT NULL)
-                            OR
-                        (pr.override_type = 'EXCLUDE' AND rpo.project_resource_id IS NULL)
-                        ),
-                    ''
-    ) AS permissions
-FROM channel c
-         JOIN project_role pr
-              ON pr.project_id = c.project_id
-         LEFT JOIN role_permissions rp
-                   ON rp.role_id = pr.id
-                       AND rp.permission_name IN ('READ','WRITE')
-         LEFT JOIN role_permissions_overrides rpo
-                   ON rpo.role_id = pr.id
-                       AND rpo.permission_name = rp.permission_name
-                       AND rpo.project_resource_id = c.project_resource_id
-GROUP BY c.project_resource_id, c.name,pr.id
 
 

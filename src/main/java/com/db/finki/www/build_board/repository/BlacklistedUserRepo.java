@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface BlacklistedUserRepo extends JpaRepository<BlacklistedUser, BlacklistedUserId> {
@@ -16,7 +17,7 @@ public interface BlacklistedUserRepo extends JpaRepository<BlacklistedUser, Blac
         select exists(
                 select *
                 from blacklisted_user bu
-                where bu.end_date is NULL and bu.user_id=:userId and bu.topic_id = :topicId 
+                where bu.end_date is NULL and bu.user_id=:userId and bu.topic_id = :topicId
         ) 
     """)
     boolean isUserInBlacklist(@Param("userId") long userId, @Param("topicId") long topicId);
@@ -31,5 +32,5 @@ public interface BlacklistedUserRepo extends JpaRepository<BlacklistedUser, Blac
 """)
     void revoke(@Param("topic") long topicId, @Param("user") int blacklistedUserId);
 
-    List<BlacklistedUser> findAllByTopicId(Integer topicId);
+    List<BlacklistedUser> findAllByTopicIdAndEndTimeIsNull(Integer topicI);
 }

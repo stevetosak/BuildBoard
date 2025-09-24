@@ -204,13 +204,13 @@
                                         <div class="form-check">
                                             <input class="form-check-input perm-checkbox"
                                                    type="checkbox"
-                                                   th:id="${permission + '-' + channel.getProjectResource().getId()}"
+                                                   th:id="${permission + '-' + channel.getId()}"
                                                    name="per-resource-permission"
                                                    th:value="${permission}"
-                                                   th:attr="data-resource-id=${channel.getProjectResource().getId()}"
+                                                   th:attr="data-resource-id=${channel.getId()}"
                                                    th:checked="${overrideTypeDefault == 'EXCLUDE'}">
                                             <label class="form-check-label"
-                                                   th:for="${permission + '-' + channel.getProjectResource().getId()}"
+                                                   th:for="${permission + '-' + channel.getId()}"
                                                    th:text="${channel.getName()}">Resource
                                                 Name</label>
                                         </div>
@@ -287,7 +287,7 @@
                 globalPermissions: globalSelectedPermissions,
                 permissionResourceDTOS: perResourceSelectedPermissions.map(p => ({
                     permissionName: p.name,
-                    projectResourceID: p.resourceId
+                    channelId: p.resourceId
                 }))
             }),
             credentials: "include"
