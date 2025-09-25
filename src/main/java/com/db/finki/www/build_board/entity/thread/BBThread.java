@@ -28,7 +28,7 @@ public class BBThread {
 
     @ManyToMany
     @JoinTable(
-            name = "tag_threads",
+            name = "tag_assigned_to_thread",
             joinColumns = @JoinColumn(name = "thread_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_name")
     )

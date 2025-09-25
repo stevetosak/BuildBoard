@@ -6,20 +6,20 @@ $$
 BEGIN
     IF new.title IN
        (SELECT title
-        FROM topic_thread
-                 AS t
-        WHERE t.parent_id = new.parent_id
-           OR (t.parent_id IS NULL AND new.parent_id IS NULL)
+        FROM topic_thread AS t
+        WHERE t.referenced_by = new.referenced_by
+           OR (t.referenced_by IS NULL AND new.referenced_by IS NULL)
        )
     THEN
-        RAISE EXCEPTION 'There already exists a topic with title % in parent topic with id %',new.title,new.parent_id;
+        RAISE EXCEPTION 'There already exists a topic with title % in parent topic with id %', new.title, new.referenced_by;
     END IF;
     RETURN new;
 END;
 $$;
-create or replace function check_if_user_exists_in(table_name text, field_name text, field_value text) returns boolean
-    language plpgsql
-as
+
+CREATE OR REPLACE FUNCTION check_if_user_exists_in(table_name text, field_name text, field_value text) RETURNS boolean
+    LANGUAGE plpgsql
+AS
 $$
 DECLARE
     result BOOL;
@@ -27,8 +27,9 @@ BEGIN
     EXECUTE format('SELECT EXISTS (SELECT 1 FROM %I WHERE %I = %L)', table_name, field_name, field_value)
         INTO result;
     RETURN result;
-END
+END;
 $$;
+
 CREATE OR REPLACE FUNCTION fn_insert_topics_creator_as_moderator()
     RETURNS TRIGGER
     LANGUAGE plpgsql
@@ -37,16 +38,18 @@ $$
 DECLARE
     v_user_id INT;
 BEGIN
-    SELECT v_topic_thread.user_id
+    SELECT v_topic_thread.is_created_by
     INTO v_user_id
     FROM v_topic_thread
-    WHERE v_topic_thread.id = new.id;
-    IF not check_if_user_exists_in('moderator', 'id', v_user_id::text) THEN
-        INSERT INTO moderator values (v_user_id);
+    WHERE v_topic_thread.id = NEW.id;
+
+    IF NOT check_if_user_exists_in('moderator', 'id', v_user_id::text) THEN
+        INSERT INTO moderator VALUES (v_user_id);
     END IF;
-    INSERT INTO topic_threads_moderators(thread_id, user_id) VALUES (new.id, v_user_id);
+
+    INSERT INTO topic_thread_is_moderated_by_moderator(thread_id, user_id) VALUES (NEW.id, v_user_id);
     RETURN NEW;
-END
+END;
 $$;
 
 CREATE OR REPLACE FUNCTION fn_insert_project_manager()
@@ -55,214 +58,231 @@ CREATE OR REPLACE FUNCTION fn_insert_project_manager()
 AS
 $$
 DECLARE
-    usrId      INT;
+    usrId INT;
     new_project_id INT;
 BEGIN
-    SELECT user_id, id
-    into usrId,new_project_id
+    SELECT is_created_by, id
+    INTO usrId, new_project_id
     FROM v_project_thread p
     WHERE NEW.id = p.id;
-    IF not EXISTS(
-        select 1
-        from developer_associated_with_project dawp
-        where dawp.project_id=new_project_id and dawp.developer_id=usrId
+
+    IF NOT EXISTS(
+        SELECT 1
+        FROM developer_associated_with_project dawp
+        WHERE dawp.in_project = new_project_id
+          AND dawp.about_dev = usrId
     ) THEN
-        INSERT INTO developer_associated_with_project(project_id, developer_id, started_at)
-        values (new_project_id, usrId, NOW());
-    end if;
-    IF not check_if_user_exists_in('project_manager', 'id', usrId::text) THEN
+        INSERT INTO developer_associated_with_project(in_project, about_dev, started_at)
+        VALUES (new_project_id, usrId, NOW());
+    END IF;
+
+    IF NOT check_if_user_exists_in('project_manager', 'id', usrId::text) THEN
         INSERT INTO project_manager VALUES (usrId);
-    end if;
+    END IF;
+
     RETURN NEW;
-END
-$$;
-create or replace function fn_remove_unused_tags()
-    returns trigger
-    language plpgsql
-as
-$$
-BEGIN
-    IF not check_if_user_exists_in('tag_threads', 'tag_name', old.tag_name)
-    THEN
-        delete from tag t where t.name = old.tag_name;
-    end if;
-    return old;
-end;
-$$;
-create or replace function fn_add_dev_if_not_exist()
-    returns trigger
-    language plpgsql
-as $$
-BEGIN
-    IF NOT check_if_user_exists_in('developer','id',new.developer_id::text) THEN
-        INSERT INTO developer values (NEW.developer_id);
-    end if;
-    RETURN new;
-end;
+END;
 $$;
 
-create or replace function fn_insert_general_for_project()
-    returns trigger
-    language plpgsql
-as $$
+CREATE OR REPLACE FUNCTION fn_remove_unused_tags()
+    RETURNS TRIGGER
+    LANGUAGE plpgsql
+AS
+$$
+BEGIN
+    IF NOT check_if_user_exists_in('tag_assigned_to_thread', 'tag_name', OLD.tag_name) THEN
+        DELETE FROM tag WHERE name = OLD.tag_name;
+    END IF;
+    RETURN OLD;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION fn_add_dev_if_not_exist()
+    RETURNS TRIGGER
+    LANGUAGE plpgsql
+AS
+$$
+BEGIN
+    IF NOT check_if_user_exists_in('developer', 'id', NEW.about_dev::text) THEN
+        INSERT INTO developer VALUES (NEW.about_dev);
+    END IF;
+    RETURN NEW;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION fn_insert_general_for_project()
+    RETURNS TRIGGER
+    LANGUAGE plpgsql
+AS
+$$
 DECLARE
     developer_id INT;
 BEGIN
-    select user_id
-    into developer_id
-    from thread t
-    where t.id=NEW.id;
-    insert into channel(name,description,project_id,developer_id)
-    values ('General','General',NEW.id,developer_id);
+    SELECT is_created_by
+    INTO developer_id
+    FROM thread t
+    WHERE t.id = NEW.id;
 
-    return new;
-end;
+    INSERT INTO channel(name, description, project_has, constructed_by)
+    VALUES ('General', 'General', NEW.id, developer_id);
+
+    RETURN NEW;
+END;
 $$;
-
 
 CREATE OR REPLACE FUNCTION fn_remove_orphan_moderator()
-    RETURNS trigger
+    RETURNS TRIGGER
     LANGUAGE plpgsql
-AS $function$
-BEGIN
-    IF not exists (
-        select 1
-        from topic_threads_moderators t
-        where t.user_id = OLD.user_id
-    )
-    THEN
-        DELETE FROM moderator where id=OLD.user_id;
-    END IF;
-    IF not exists (
-        select 1
-        from topic_threads_moderators t
-        where t.thread_id = OLD.thread_id
-    )
-    THEN
-        delete from discussion_thread where parent_id=OLD.thread_id;
-        DELETE FROM topic_thread where id = OLD.thread_id;
--- 	delete from thread where id =  OLD.thread_id;
-    END IF;
-    RETURN OLD;
-END;
-$function$
-;
-create or replace function fn_aa_rm_orphan_dics()
-    returns trigger
-    language plpgsql
-as
+AS
 $$
 BEGIN
-    --     RAISE NOTICE '%',OLD.id;
+    IF NOT EXISTS (
+        SELECT 1
+        FROM topic_thread_is_moderated_by_moderator t
+        WHERE t.user_id = OLD.user_id
+    ) THEN
+        DELETE FROM moderator WHERE id = OLD.user_id;
+    END IF;
 
-    delete from discussion_thread dt
-    where dt.parent_id=OLD.id;
-    delete from embeddable_thread
-    where id = OLD.id;
-    delete from thread t
-    where t.id=OLD.id;
+    IF NOT EXISTS (
+        SELECT 1
+        FROM topic_thread_is_moderated_by_moderator t
+        WHERE t.thread_id = OLD.thread_id
+    ) THEN
+        DELETE FROM discussion_thread WHERE contained_in = OLD.thread_id;
+        DELETE FROM topic_thread WHERE id = OLD.thread_id;
+    END IF;
+
     RETURN OLD;
 END;
 $$;
 
+CREATE OR REPLACE FUNCTION fn_aa_rm_orphan_dics()
+    RETURNS TRIGGER
+    LANGUAGE plpgsql
+AS
+$$
+BEGIN
+    DELETE FROM discussion_thread dt
+    WHERE dt.contained_in = OLD.id;
 
+    DELETE FROM embeddable_thread
+    WHERE id = OLD.id;
+
+    DELETE FROM thread t
+    WHERE t.id = OLD.id;
+
+    RETURN OLD;
+END;
+$$;
 
 CREATE OR REPLACE FUNCTION fn_change_status_on_pending_reports()
     RETURNS TRIGGER
     LANGUAGE plpgsql
-AS $$
+AS
+$$
 BEGIN
-    RAISE NOTICE 'user_id: %, topic_id: %', NEW.user_id, NEW.topic_id;
+    RAISE NOTICE 'user_id: %, topic_id: %', NEW.refers_to, NEW.blacklisted_from;
 
-UPDATE submission
-SET status = 'ACCEPTED'
-WHERE id in (
-    select id
-    from report r
-    where r.for_user_id = NEW.user_id and r.thread_id = NEW.topic_id
-);
+    UPDATE submission
+    SET status = 'ACCEPTED'
+    WHERE id IN (
+        SELECT id
+        FROM report r
+        WHERE r.about = NEW.refers_to
+          AND r.for_misconduct_in = NEW.blacklisted_from
+    );
 
-RETURN NEW;
+    RETURN NEW;
 END;
 $$;
 
-create or replace function fn_add_blacklisted_user()
-RETURNS trigger
-LANGUAGE plpgsql
-AS $$
-BEGIN
-	IF NOT EXISTS(
-		select 1
-		from blacklisted_user
-		where  topic_id = NEW.topic_id and user_id = NEW.user_id and end_date is NULL
-	)
-	THEN
-		RETURN NEW;
-END IF;
-RETURN NULL;
-END;
-$$;
-
-create or replace function fn_delete_dangling_tags()
-    RETURNS trigger
+CREATE OR REPLACE FUNCTION fn_add_blacklisted_user()
+    RETURNS TRIGGER
     LANGUAGE plpgsql
-AS $$
+AS
+$$
 BEGIN
-    IF NOT EXISTS(select 1
-                  from tag_threads
-                  where tag_name = OLD.tag_name
-                  group by tag_name) THEN
-        delete from tag where name = OLD.tag_name;
-    end if;
+    IF NOT EXISTS (
+        SELECT 1
+        FROM blacklisted_user
+        WHERE blacklisted_from = NEW.blacklisted_from
+          AND refers_to = NEW.refers_to
+          AND end_date IS NULL
+    ) THEN
+        RETURN NEW;
+    END IF;
+    RETURN NULL;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION fn_delete_dangling_tags()
+    RETURNS TRIGGER
+    LANGUAGE plpgsql
+AS
+$$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM tag_assigned_to_thread
+        WHERE tag_name = OLD.tag_name
+        GROUP BY tag_name
+    ) THEN
+        DELETE FROM tag WHERE name = OLD.tag_name;
+    END IF;
     RETURN OLD;
 END;
 $$;
 
 ------------------------------------------------------------
 
-CREATE OR REPLACE TRIGGER tr_check_topic_name --RADI
+CREATE OR REPLACE TRIGGER tr_check_topic_name
     BEFORE INSERT OR UPDATE
     ON topic_thread
     FOR EACH ROW
 EXECUTE FUNCTION fn_validate_topic_title();
-CREATE OR REPLACE TRIGGER tr_insert_topics_creator_as_moderator --RADI
+
+CREATE OR REPLACE TRIGGER tr_insert_topics_creator_as_moderator
     AFTER INSERT
     ON topic_thread
     FOR EACH ROW
 EXECUTE FUNCTION fn_insert_topics_creator_as_moderator();
 
-CREATE OR REPLACE TRIGGER tr_remove_orphan_moderator --RADI
+CREATE OR REPLACE TRIGGER tr_remove_orphan_moderator
     AFTER DELETE
-    ON topic_threads_moderators
+    ON topic_thread_is_moderated_by_moderator
     FOR EACH ROW
 EXECUTE FUNCTION fn_remove_orphan_moderator();
 
-CREATE OR REPLACE TRIGGER tr_a_insert_project_manager --RADI
+CREATE OR REPLACE TRIGGER tr_a_insert_project_manager
     AFTER INSERT
     ON project_thread
     FOR EACH ROW
 EXECUTE FUNCTION fn_insert_project_manager();
 
-create or replace trigger tr_add_dev_if_not_exist --RADI
-    before insert on developer_associated_with_project
-    for each row
-execute function fn_add_dev_if_not_exist();
+CREATE OR REPLACE TRIGGER tr_add_dev_if_not_exist
+    BEFORE INSERT
+    ON developer_associated_with_project
+    FOR EACH ROW
+EXECUTE FUNCTION fn_add_dev_if_not_exist();
 
-create or replace trigger tr_insert_general_for_project --RADI
-    after insert on project_thread
-    for each row
-execute function fn_insert_general_for_project();
+CREATE OR REPLACE TRIGGER tr_insert_general_for_project
+    AFTER INSERT
+    ON project_thread
+    FOR EACH ROW
+EXECUTE FUNCTION fn_insert_general_for_project();
 
-create or replace trigger tr_rm_orphan_disc
-    after delete
-    on discussion_thread
-    for each row
-execute function fn_aa_rm_orphan_dics();
+CREATE OR REPLACE TRIGGER tr_rm_orphan_disc
+    AFTER DELETE
+    ON discussion_thread
+    FOR EACH ROW
+EXECUTE FUNCTION fn_aa_rm_orphan_dics();
 
-create or replace trigger tr_add_blacklisted_user
-before insert on blacklisted_user
-for each row
-execute function fn_add_blacklisted_user();
+CREATE OR REPLACE TRIGGER tr_add_blacklisted_user
+    BEFORE INSERT
+    ON blacklisted_user
+    FOR EACH ROW
+EXECUTE FUNCTION fn_add_blacklisted_user();
 
 CREATE OR REPLACE TRIGGER tr_change_status_on_pending_reports
     AFTER INSERT
@@ -270,8 +290,8 @@ CREATE OR REPLACE TRIGGER tr_change_status_on_pending_reports
     FOR EACH ROW
 EXECUTE FUNCTION fn_change_status_on_pending_reports();
 
-create or replace trigger tr_delete_dangling_tags
-    after delete
-    on tag_threads
-    for each row
-    execute function fn_delete_dangling_tags();
+CREATE OR REPLACE TRIGGER tr_delete_dangling_tags
+    AFTER DELETE
+    ON tag_assigned_to_thread
+    FOR EACH ROW
+EXECUTE FUNCTION fn_delete_dangling_tags();

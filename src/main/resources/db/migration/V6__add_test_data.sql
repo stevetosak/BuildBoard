@@ -1,4 +1,4 @@
-INSERT INTO users (username, is_activate, password, description, registered_at, sex,name,email)
+INSERT INTO users (username, is_activate, password, description, registered_at, sex, name, email)
 VALUES
     ('user1', true, '$2a$12$0f.x7aBM2wFBZBXoLPj0BObVsk.J1kXFYo5nb4niAWkI4hk5tHvDy', 'First user', NOW(), 'M','viki', 'viki@gmail.com'),
     ('user2', true, '$2a$12$VkR0a47LDVM6aUqFcEJGSu9jhZCz.05tCoyiRicFObt4f2x2gijKa', 'Second user', NOW(), 'F','stefan', 'stefan@gmail.com'),
@@ -7,7 +7,7 @@ VALUES
     ('user5', true, '$2a$12$zHrloz8WG2zo5S6MTf1C0ez1raMlmDJdB8OOa2I1S2pVy9oI76YTa', 'Fifth user', NOW(), 'M','ramche', 'ramche@gmail.com');
 
 
-INSERT INTO thread (content, user_id)
+INSERT INTO thread (content, is_created_by)
 VALUES
     ('Main content for topic thread 1', 1), --1
     ('Main content for topic thread 2', 2), --2
@@ -28,7 +28,7 @@ VALUES
     (5, 'Project 1 Thread', 'http://github.com/project1'),
     (9, 'Project 2 Thread', 'http://github.com/project1');
 
-INSERT INTO topic_thread (id, title, parent_id)
+INSERT INTO topic_thread (id, title, referenced_by)
 VALUES
     (1, 'Topic 1' , 5),
     (2, 'Topic 2', NULL),
@@ -37,9 +37,9 @@ VALUES
 insert into topic_guidelines(topic_id,description)
 values
     (1,'Follow guidelines'),
-    ( 2,'Be respectful');
+    (2,'Be respectful');
 
-INSERT INTO discussion_thread (id, parent_id)
+INSERT INTO discussion_thread (id, contained_in)
 VALUES
     (3, 1),
     (4, 2),
@@ -55,11 +55,7 @@ VALUES
     (4, 6),
     (5, 7);
 
---
--- INSERT INTO blacklisted_user (topic_id, user_id, moderator_id, start_date, end_date, reason)
--- VALUES
---     (1, 2, 1, NOW(), NOW() + INTERVAL '7 days', 'Spamming'),
---     (2, 3, 2, NOW(), NOW() + INTERVAL '3 days', 'Offensive language');
+-- blacklisted_user matches DDL, so skipped for now
 
 INSERT INTO permissions (name)
 VALUES
@@ -68,67 +64,57 @@ VALUES
     ('CREATE'),
     ('DELETE');
 
-INSERT INTO project_role (name, project_id,override_type)
+INSERT INTO project_role (name, valid_in, override_type)
 VALUES
     ('Admin', 5,'EXCLUDE'),
     ('Developer', 5,'INCLUDE');
 
 
-INSERT INTO users_project_roles (user_id, role_id)
+INSERT INTO project_role_is_assigned_to_developer (user_id, role_id)
 VALUES
     (3, 1),
     (5, 2);
 
-INSERT INTO role_permissions (permission_name, role_id)
+INSERT INTO role_permissions (for_permission, for_role)
 VALUES
     ('READ', 1),
     ('WRITE', 1),
-    ('CREATE',1),
-    ('DELETE',1);
+    ('CREATE', 1),
+    ('DELETE', 1);
 
-insert into submission(created_by,status,description)
+insert into submission(submitted_by, status, description)
 values
     (1,'PENDING','Inappropriate content'),
     (3,'DENIED','Spam content');
 
-INSERT INTO report (id,thread_id, for_user_id)
+INSERT INTO report (id, for_misconduct_in, about)
 VALUES
     (1, 2, 1),
     (2, 1, 3);
 
 
-INSERT INTO channel (name, description, project_id, developer_id)
+INSERT INTO channel (name, description, project_has, constructed_by)
 VALUES
     ('Updates', 'Project updates channel', 5, 3);
 
 
 ---------------- NOV TEST DATA
 
--- Add new users
+-- Add new users (already correct)
 INSERT INTO users (username, is_activate, password, description, registered_at, sex, name, email)
 VALUES
-    -- Password: user6pass
     ('user6', true, '$2a$12$jB9g/.KP95fsYYOTy0pwZ.kFrwA/G2cMvPvFLzGtCk8jJ2qO3O.3u', 'Sixth user', NOW(), 'M', 'marko', 'marko@gmail.com'),
-    -- Password: user7pass
     ('user7', true, '$2a$12$KRxRufuMscrlQOLKGw4fBehNLWaP7Zu.M964G2JedKVM4o4wTiJaG', 'Seventh user', NOW(), 'F', 'jana', 'jana@gmail.com'),
-    -- Password: user8pass
     ('user8', true, '$2a$12$SCqlK.Rl72tFT0kIUNP6KuSy6BYzfdb9sKJPSWbIK8/uk7y8U7hgS', 'Eighth user', NOW(), 'M', 'nikola', 'nikola@gmail.com'),
-    -- Password: user9pass
     ('user9', true, '$2a$12$LpDTYNb/i0cohkmszkx93ef9rkgFTNFQz/KqHEYIAE9MPOmlyXJ9m', 'Ninth user', NOW(), 'F', 'elena', 'elena@gmail.com'),
-    -- Password: user10pass
     ('user10', true, '$2a$12$p/kZdDKCUCmXjWTsknss/.UaD4a8vxrTcfvc6mdkpHRRPqRZLLtr6', 'Tenth user', NOW(), 'M', 'petar', 'petar@gmail.com');
 
--- Add new developers
+-- Add new developers (matches DDL)
 INSERT INTO developer (id)
-VALUES
-    (6), -- user6
-    (7), -- user7
-    (8), -- user8
-    (9), -- user9
-    (10); -- user10
+VALUES (6),(7),(8),(9),(10);
 
 -- Add new threads
-INSERT INTO thread (content, user_id)
+INSERT INTO thread (content, is_created_by)
 VALUES
     ('Main content for topic thread 3', 6), --10
     ('Main content for topic thread 4', 7), --11
@@ -140,39 +126,38 @@ VALUES
     ('Main content for topic thread 5', 6), --17
     ('Project-specific thread content 4', 10); --18
 
--- Add embeddable_thread entries for topic and discussion threads
+-- Add embeddable_thread entries
 INSERT INTO embeddable_thread (id)
-VALUES
-    (10), (11), (12), (13), (15), (16), (17);
+VALUES (10),(11),(12),(13),(15),(16),(17);
 
--- Add new project_threads
+-- New project_threads (matches DDL)
 INSERT INTO project_thread (id, title, repo_url)
 VALUES
     (14, 'Project 3 Thread', 'http://github.com/project3'),
     (18, 'Project 4 Thread', 'http://github.com/project4');
 
--- Add new topic_threads
-INSERT INTO topic_thread (id, title, parent_id)
+-- New topic_threads
+INSERT INTO topic_thread (id, title, referenced_by)
 VALUES
     (10, 'Topic 3', 14),
     (11, 'Topic 4', NULL),
     (17, 'Topic 8', NULL);
 
--- Add new topic_guidelinessubmission_id
+-- Guidelines
 INSERT INTO topic_guidelines (topic_id, description)
 VALUES
     (10, 'Stay on topic'),
     (11, 'No personal attacks');
 
--- Add new discussion_threads
-INSERT INTO discussion_thread (id, parent_id)
+-- New discussion_threads
+INSERT INTO discussion_thread (id, contained_in)
 VALUES
     (12, 10),
     (13, 11),
     (15, 10),
     (16, 13);
 
--- Add new likes
+-- Likes (matches DDL)
 INSERT INTO likes (user_id, thread_id)
 VALUES
     (6, 12),
@@ -181,42 +166,32 @@ VALUES
     (9, 15),
     (10, 16);
 
--- Add new blacklisted_user entries
-INSERT INTO blacklisted_user (topic_id, user_id, moderator_id, start_date, end_date, reason)
-VALUES
-    (10, 7, 6, NOW(), NOW() + INTERVAL '5 days', 'Repeated off-topic posts'),
-    (11, 8, 7, NOW(), NOW() + INTERVAL '10 days', 'Harassment');
+-- blacklisted_user (already matches DDL)
 
--- Add new submissions
-INSERT INTO submission (created_by, status, description)
+-- New submissions
+INSERT INTO submission (submitted_by, status, description)
 VALUES
     (6, 'PENDING', 'Request for new feature'),
     (7, 'ACCEPTED', 'Bug report');
 
--- Add new reports
-INSERT INTO report (id, thread_id, for_user_id)
+-- Reports
+INSERT INTO report (id, for_misconduct_in, about)
 VALUES
     (3, 10, 7),
     (4, 11, 8);
 
 -- Associate developers with projects
-INSERT INTO developer_associated_with_project (project_id, developer_id, started_at)
+INSERT INTO developer_associated_with_project (in_project, about_dev, started_at)
 VALUES
-    (14, 6, NOW()), -- user6 associated with Project 3
-    (14, 7, NOW()), -- user7 associated with Project 3
-    (18, 8, NOW()), -- user8 associated with Project 4
-    (18, 9, NOW()); -- user9 associated with Project 4
+    (14, 6, NOW()),
+    (14, 7, NOW()),
+    (18, 8, NOW()),
+    (18, 9, NOW());
 
--- Add new channels
-INSERT INTO channel (name, description, project_id, developer_id)
+-- Channels
+INSERT INTO channel (name, description, project_has, constructed_by)
 VALUES
-    ('General2', 'General discussion', 14, 6), -- Created by user6 for Project 3
-    ('Bugs', 'Bug reports and fixes', 14, 7), -- Created by user7 for Project 3
-    ('General2', 'General discussion', 18, 8), -- Created by user8 for Project 4
-    ('Ideas', 'Feature ideas', 18, 9); -- Created by user9 for Project 4
-
-
-
-
-
-
+    ('General2', 'General discussion', 14, 6),
+    ('Bugs', 'Bug reports and fixes', 14, 7),
+    ('General2', 'General discussion', 18, 8),
+    ('Ideas', 'Feature ideas', 18, 9);
