@@ -20,11 +20,11 @@ import java.time.LocalDateTime;
 @Table(name = "report")
 public class Report extends Submission {
     @ManyToOne
-    @JoinColumn(name = "for_user_id")
+    @JoinColumn(name = "about")
     BBUser user;
 
     @ManyToOne
-    @JoinColumn(name = "thread_id")
+    @JoinColumn(name = "for_misconduct_in")
     Topic topic;
 
     public Report(Topic topic, BBUser creator, String description, BBUser misconductedUser) {

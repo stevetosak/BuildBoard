@@ -1,12 +1,12 @@
 CREATE OR REPLACE VIEW v_project_thread
 AS
-SELECT thread.id, content, user_id, title, repo_url
+SELECT thread.id, content, is_created_by, title, repo_url
 FROM project_thread project
          JOIN thread
               ON project.id = thread.id;
 CREATE OR REPLACE VIEW v_topic_thread
 AS
-SELECT thread.id, content, user_id, title, parent_id
+SELECT thread.id, content, is_created_by, title, topic.referenced_by
 FROM topic_thread topic
          JOIN thread
               ON topic.id = thread.id;
@@ -20,17 +20,17 @@ create or replace view v_discussion_thread
 as
 with recursive
     depth_table as
-        (select parent_id, id, 0 as depth
+        (select contained_in, id, 0 as depth
          from discussion_thread
          UNION ALL
-         select discuss.parent_id, dpth.id, dpth.depth + 1
+         select discuss.contained_in, dpth.id, dpth.depth + 1
          from depth_table dpth
                   join discussion_thread discuss
-                       on dpth.parent_id = discuss.id),
+                       on dpth.contained_in = discuss.id),
     tmp as (select id, max(depth) as depth
             from depth_table
             group by id)
-select d.id as id, t.user_id as user_id, d.depth as depth, d1.parent_id as parent_id, t.created_at as "created_at"
+select d.id as id, t.is_created_by as user_id, d.depth as depth, d1.contained_in as parent_id, t.created_at as "created_at"
 from tmp d
          join depth_table d1
               on d.id = d1.id and d1.depth = d.depth
@@ -45,23 +45,61 @@ SELECT
     pr.id as role_id,
     COALESCE(
                     STRING_AGG(
-                    DISTINCT rp.permission_name, ',' ORDER BY rp.permission_name
+                    DISTINCT rp.for_permission, ',' ORDER BY rp.for_permission
                               ) FILTER (
                         WHERE
-                        (pr.override_type = 'INCLUDE' AND rpo.channel_id IS NOT NULL)
+                        (pr.override_type = 'INCLUDE' AND rpo.for_resource IS NOT NULL)
                             OR
-                        (pr.override_type = 'EXCLUDE' AND rpo.channel_id IS NULL)
+                        (pr.override_type = 'EXCLUDE' AND rpo.for_resource IS NULL)
                         ),
                     ''
     ) AS permissions
 FROM channel c
          JOIN project_role pr
-              ON pr.project_id = c.project_id
+              ON pr.valid_in = c.project_has
          LEFT JOIN role_permissions rp
-                   ON rp.role_id = pr.id
-                       AND rp.permission_name IN ('READ','WRITE')
+                   ON rp.for_role = pr.id
+                       AND rp.for_permission IN ('READ','WRITE')
          LEFT JOIN role_permissions_overrides rpo
-                   ON rpo.role_id = pr.id
-                       AND rpo.permission_name = rp.permission_name
-                       AND rpo.channel_id = c.id
-GROUP BY c.id, c.name,pr.id
+                   ON rpo.for_role_permission_role_id = pr.id
+                       AND rpo.for_role_permission_permission_name = rp.for_permission
+                       AND rpo.for_resource = c.id
+GROUP BY c.id, c.name,pr.id;
+
+create or replace view v_named_threads as
+WITH topics_projects AS (SELECT pr.id,
+                                pr.title,
+                                'projects'::text AS "type"
+                         FROM project_thread pr
+                         UNION
+                         SELECT topic_thread.id,
+                                topic_thread.title,
+                                'topics'::text AS "type"
+                         FROM topic_thread),
+     topics_projects_threads AS (SELECT t.id,
+                                        t.content,
+                                        tp.type,
+                                        tp.title,
+                                        u.username,
+                                        u.id        AS user_id,
+                                        t.created_at
+                                 FROM thread t
+                                          JOIN users u ON u.id = t.is_created_by
+                                          JOIN topics_projects tp ON tp.id = t.id)
+        ,
+     named_threads_tags as (select tt.thread_id           as "id",
+                                   array_agg(tt.tag_name) as "tags"
+                            from tag_assigned_to_thread tt
+                            where tt.thread_id in (select id from topics_projects_threads)
+                            group by tt.thread_id)
+SELECT tpt.id,
+       tpt.content,
+       tpt.title,
+       tpt.type,
+       tpt.username,
+       tpt.user_id,
+       tpt.created_at,
+       coalesce((select ntt.tags as "tags"
+                 from named_threads_tags ntt
+                 where ntt.id = tpt.id),'{}') as "tags"
+FROM topics_projects_threads tpt;

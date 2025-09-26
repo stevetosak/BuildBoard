@@ -20,44 +20,44 @@ public interface ProjectRolePermissionResourceOverrideRepository extends JpaRepo
 
     @Query(value = """
             SELECT COALESCE(
-                  EXISTS (SELECT 1
-                          FROM users_project_roles upr
-                                   JOIN project_role pr
-                               ON upr.role_id = pr.id
-                                   JOIN role_permissions rp
-                                    ON pr.id = rp.role_id
-                                   LEFT JOIN role_permissions_overrides rpo
-                                             ON pr.id = rpo.role_id
-                                                 AND rpo.permission_name = rp.permission_name
-                                                 AND rpo.channel_id = :resourceId
-   
-                          WHERE upr.user_id = :userId
-                            AND pr.project_id = :projectId
-                            AND rp.permission_name = :permissionName
-                            AND (
-                              (pr.override_type = 'INCLUDE' AND rpo.channel_id IS NOT NULL)
-                                  OR (pr.override_type = 'EXCLUDE' AND rpo.channel_id IS NULL)
-                              )), FALSE
-          ) AS has_access;
+                                        EXISTS (SELECT 1
+                                                FROM project_role_is_assigned_to_developer upr
+                                                         JOIN project_role pr
+                                                              ON upr.role_id = pr.id
+                                                         JOIN role_permissions rp
+                                                              ON pr.id = rp.for_role
+                                                         LEFT JOIN role_permissions_overrides rpo
+                                                                   ON pr.id = rpo.for_role_permission_role_id
+                                                                       AND rpo.for_role_permission_permission_name = rp.for_permission
+                                                                       AND rpo.for_resource = :resourceId
+                         
+                                                WHERE upr.user_id = :userId
+                                                  AND pr.valid_in = :projectId
+                                                  AND rp.for_permission = :permissionName
+                                                  AND (
+                                                    (pr.override_type = 'INCLUDE' AND rpo.for_resource IS NOT NULL)
+                                                        OR (pr.override_type = 'EXCLUDE' AND rpo.for_resource IS NULL)
+                                                    )), FALSE
+                                ) AS has_acces
           """, nativeQuery = true)
     boolean hasPermissionForResource(int projectId, int userId, String permissionName, UUID resourceId);
     List<ProjectRolePermissionResourceOverride> findAllByIdProjectRolePermissionIdRole(ProjectRole role);
 
     @Query(nativeQuery = true,value = """
-   SELECT COALESCE(
-                  EXISTS (SELECT 1
-                          FROM users_project_roles upr
-                                   JOIN project_role pr
-                                        ON upr.role_id = pr.id
-                                   LEFT JOIN role_permissions rp
-                                             ON pr.id = rp.role_id AND rp.permission_name = :permissionName
-                          WHERE upr.user_id = :userId
-                            AND pr.project_id = :projectId
-                            AND (
-                              (pr.override_type = 'INCLUDE' AND rp.permission_name IS NOT NULL)
-                                  OR (pr.override_type = 'EXCLUDE' AND rp.permission_name IS NULL)
-                              )), FALSE
-          ) AS has_access;
+  SELECT COALESCE(
+                 EXISTS (SELECT 1
+                         FROM project_role_is_assigned_to_developer upr
+                                  JOIN project_role pr
+                                       ON upr.role_id = pr.id
+                                  LEFT JOIN role_permissions rp
+                                            ON pr.id = rp.for_role AND rp.for_permission = :permissionName
+                         WHERE upr.user_id = :userId
+                           AND pr.valid_in = :projectId
+                           AND (
+                             (pr.override_type = 'INCLUDE' AND rp.for_permission IS NOT NULL)
+                                 OR (pr.override_type = 'EXCLUDE' AND rp.for_permission IS NULL)
+                             )), FALSE
+         ) AS has_access;
 """)
     boolean hasGlobalPermission(String permissionName,int projectId,int userId);
 

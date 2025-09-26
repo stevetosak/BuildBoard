@@ -17,12 +17,14 @@ public interface ProjectRepository extends JpaRepository<Project, Long>, JpaSpec
 
     @Modifying
     @Query(nativeQuery = true,
-    value = "UPDATE developer_associated_with_project dap set ended_at=now() where dap.developer_id=:uid AND dap.project_id=:pid")
+    value = "UPDATE developer_associated_with_project dap set ended_at=now() where dap" +
+            ".about_dev=:uid AND dap.in_project =:pid")
     void removeUserFromProject(int pid,int uid);
 
     @Modifying
     @Query(nativeQuery = true,
-    value = "INSERT INTO developer_associated_with_project (project_id, developer_id, started_at, ended_at) VALUES (:pid,:uid,now(),null)")
+    value = "INSERT INTO developer_associated_with_project (in_project, about_dev, " +
+            "started_at, ended_at) VALUES (:pid,:uid,now(),null)")
     void addUserToProject(int pid,int uid);
 
 }

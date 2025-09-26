@@ -1,7 +1,6 @@
 package com.db.finki.www.build_board.entity.thread;
 
 import com.db.finki.www.build_board.entity.blacklisted_user.BlacklistedUser;
-import com.db.finki.www.build_board.entity.thread.itf.NamedThread;
 import com.db.finki.www.build_board.entity.thread.multi_valued_attribute.Guideline;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -14,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "topic_thread")
-public class Topic extends EmbeddableThread implements NamedThread {
+public class Topic extends EmbeddableThread {
 
     private String title;
 
@@ -23,14 +22,10 @@ public class Topic extends EmbeddableThread implements NamedThread {
     private List<Guideline> guidelines;
 
     @ManyToOne
-    @JoinColumn(name = "parent_id")
+    @JoinColumn(name = "referenced_by")
     private Project parent;
 
     @OneToMany(mappedBy = "topic")
     private List<BlacklistedUser> blacklistedUsers;
 
-    @Override
-    public String getTypeName() {
-        return "topics";
-    }
 }

@@ -19,7 +19,7 @@ public class Feedback {
     private Integer id;
 
     @OneToOne
-    @JoinColumn(name = "submission_id")
+    @JoinColumn(name = "submitted_for")
     @MapsId
     private Submission forSubmission;
 
@@ -29,7 +29,7 @@ public class Feedback {
     private FeedbackFor submissionType;
 
     @ManyToOne
-    @JoinColumn(name = "created_by")
+    @JoinColumn(name = "written_by")
     private BBUser creator;
 
     private LocalDateTime createdAt;

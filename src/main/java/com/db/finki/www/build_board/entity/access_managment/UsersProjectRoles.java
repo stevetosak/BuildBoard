@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "users_project_roles")
+@Table(name = "project_role_is_assigned_to_developer")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter

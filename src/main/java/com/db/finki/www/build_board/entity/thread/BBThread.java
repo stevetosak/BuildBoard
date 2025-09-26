@@ -23,12 +23,12 @@ public class BBThread {
     protected String content;
 
     @ManyToOne
-    @JoinColumn(name="user_id")
+    @JoinColumn(name="is_created_by")
     protected BBUser user;
 
     @ManyToMany
     @JoinTable(
-            name = "tag_threads",
+            name = "tag_assigned_to_thread",
             joinColumns = @JoinColumn(name = "thread_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_name")
     )

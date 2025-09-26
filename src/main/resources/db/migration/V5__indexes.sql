@@ -1,12 +1,1 @@
--- CREATE INDEX idx_messages_channel_sentat -- za fetchot vo channel
---     ON messages(channel_id);
---
--- drop index idx_messages_channel_sentat;
---
---     CREATE UNIQUE INDEX idx_channel_name_project ON channel(project_id,name)
--- --
---  CREATE INDEX idx_discussion_parent ON discussion_thread(parent_id); -- za rekurzivnoto
---  CREATE INDEX idx_project_title ON  project_thread(title)
---  CREATE INDEX idx_project_role_name_project_id ON project_role(name,project_id);
---
---
+

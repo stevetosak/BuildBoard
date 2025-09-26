@@ -13,8 +13,8 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
             from report r
             join submission s
             on s.id = r.id
-            where (:latest is null or (s.created_by,s.created_at) IN ( select created_by,max(created_at) from submission r  group by created_by))
-                        and r.thread_id =:topicId
+            where (:latest is null or (s.submitted_by ,s.created_at) IN ( select submitted_by,max(created_at) from submission r  group by submitted_by))
+                        and r.for_misconduct_in =:topicId
                         and (:status is null or s.status=:status)
             """,
             nativeQuery = true
@@ -32,7 +32,7 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
                         from report r
                         join submission s
                         on s.id = r.id
-                        where s.created_by = :user_id and (:status is null or s.status= :status)
+                        where s.submitted_by = :user_id and (:status is null or s.status= :status)
                     """
     )
     List<Report> findAllBySendByUsernameAndStatus(@Param("user_id") long userId,

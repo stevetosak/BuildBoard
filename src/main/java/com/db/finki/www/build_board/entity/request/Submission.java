@@ -32,6 +32,6 @@ public class Submission {
     Status status;
 
     @ManyToOne
-    @JoinColumn(name = "created_by")
+    @JoinColumn(name = "submitted_by")
     BBUser creator;
 }

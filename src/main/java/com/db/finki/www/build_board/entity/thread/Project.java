@@ -3,7 +3,6 @@ package com.db.finki.www.build_board.entity.thread;
 import com.db.finki.www.build_board.entity.request.ProjectRequests;
 import com.db.finki.www.build_board.entity.channel.Channel;
 import com.db.finki.www.build_board.entity.user_type.BBUser;
-import com.db.finki.www.build_board.entity.thread.itf.NamedThread;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,7 +17,7 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = false)
 @Entity
 @Table(name = "project_thread")
-public class Project extends BBThread implements NamedThread {
+public class Project extends BBThread {
 
     private String title;
 
@@ -38,8 +37,8 @@ public class Project extends BBThread implements NamedThread {
     @ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.MERGE})
     @JoinTable(
             name ="developer_associated_with_project",
-            joinColumns = @JoinColumn(name = "project_id"),
-            inverseJoinColumns = @JoinColumn(name = "developer_id")
+            joinColumns = @JoinColumn(name = "in_project"),
+            inverseJoinColumns = @JoinColumn(name = "about_dev")
     )
     private Set<BBUser> developers = new HashSet<>(); // NE GO KORISTI GETTEROT OVDE
 
@@ -49,12 +48,6 @@ public class Project extends BBThread implements NamedThread {
     @OneToMany(mappedBy = "project")
     @OrderBy("name")
     private Set<Channel> channels;
-
-    @Override
-    public String getTypeName() {
-        return "projects";
-    }
-
 
     public String getDescription() {return content;}
     public void setDescription(String description) {this.content = description;}

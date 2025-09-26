@@ -51,7 +51,8 @@ public class BBUser implements UserDetails {
     private List<BBThread> threads;
 
     @ManyToMany(mappedBy = "developers")
-private List<Project> projects = new ArrayList<>();
+    private List<Project> projects = new ArrayList<>();
+
     @Override
     public boolean isEnabled() {
         return isEnabled;
