@@ -18,19 +18,20 @@ public class BlacklistedUser {
     @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "blacklisted_user_id_gen")
     @SequenceGenerator(name = "blacklisted_user_id_gen",sequenceName = "blacklisted_user_id_seq",allocationSize=1)
     private Integer id;
+
     @ManyToOne
-    @JoinColumn(name = "topic_id")
+    @JoinColumn(name = "blacklisted_from")
     Topic topic;
 
     @ManyToOne
-    @JoinColumn(name = "moderator_id")
+    @JoinColumn(name = "blacklisted_by")
     Moderator moderator;
 
     @Column(name = "start_date")
     LocalDateTime startTime;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "refers_to")
     BBUser refersTo;
 
     String reason;

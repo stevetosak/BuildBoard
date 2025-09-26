@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @Table(name = "project_request")
 public class ProjectRequests extends Submission {
     @ManyToOne
-    @JoinColumn(name = "project_id")
+    @JoinColumn(name = "project_receives")
     private Project project;
 
     public ProjectRequests(Project project, BBUser creator, String description) {

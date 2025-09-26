@@ -11,6 +11,6 @@ import lombok.Setter;
 @Setter
 public class Discussion extends EmbeddableThread {
     @ManyToOne
-    @JoinColumn(name = "parent_id")
+    @JoinColumn(name = "contained_in")
     private EmbeddableThread parent;
 }

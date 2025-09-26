@@ -17,7 +17,7 @@ public interface BlacklistedUserRepo extends JpaRepository<BlacklistedUser, Blac
         select exists(
                 select *
                 from blacklisted_user bu
-                where bu.end_date is NULL and bu.user_id=:userId and bu.topic_id = :topicId
+                where bu.end_date is NULL and bu.refers_to=:userId and bu.blacklisted_from = :topicId
         ) 
     """)
     boolean isUserInBlacklist(@Param("userId") long userId, @Param("topicId") long topicId);
@@ -28,7 +28,7 @@ public interface BlacklistedUserRepo extends JpaRepository<BlacklistedUser, Blac
     value = """
     update blacklisted_user
     set end_date = now()
-    where topic_id=:topic and user_id = :user
+    where blacklisted_from=:topic and refers_to = :user
 """)
     void revoke(@Param("topic") long topicId, @Param("user") int blacklistedUserId);
 

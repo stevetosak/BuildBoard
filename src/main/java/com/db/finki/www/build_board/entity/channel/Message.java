@@ -22,12 +22,14 @@ public class Message {
 
     @Id
     @ManyToOne
-    @JoinColumn(name = "channel_id",referencedColumnName = "id")
+    @JoinColumn(name = "sent_in",referencedColumnName = "id")
     private Channel channel;
+
     @Id
     @ManyToOne
     @JoinColumn(name = "sent_by",referencedColumnName = "id",nullable = false)
     private Developer sentBy;
+
     @Id
     @Column(name = "sent_at")
     private LocalDateTime sentAt;

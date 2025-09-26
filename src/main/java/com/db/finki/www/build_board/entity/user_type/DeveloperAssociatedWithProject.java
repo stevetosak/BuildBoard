@@ -10,16 +10,20 @@ import java.time.LocalDateTime;
 @Table(name = "developer_associated_with_project")
 @IdClass(DeveloperAssociatedWithProjectId.class)
 public class DeveloperAssociatedWithProject {
+    @Id
+    @ManyToOne
+    @JoinColumn(name = "about_dev")
+    private BBUser developer;
 
     @Id
     @ManyToOne
-    private BBUser developer;
-    @Id
-    @ManyToOne
+    @JoinColumn(name = "in_project")
     private Project project;
+
     @Id
     @Column(name = "started_at")
     private LocalDateTime startedAt;
+
     @Column(name = "ended_at")
     private LocalDateTime endedAt;
 }

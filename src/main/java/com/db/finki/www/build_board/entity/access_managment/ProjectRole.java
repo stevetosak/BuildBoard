@@ -19,10 +19,13 @@ public class ProjectRole {
     @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "project_role_id_gen")
     @SequenceGenerator(name = "project_role_id_gen",sequenceName = "project_role_id_seq",allocationSize=1)
     private Integer id;
+
     String name;
+
     @ManyToOne
-    @JoinColumn(name = "project_id",referencedColumnName = "id")
+    @JoinColumn(name = "valid_in",referencedColumnName = "id")
     Project project;
+
     @Column(name = "override_type",nullable = false)
     private String overrideType = "EXCLUDE";
 

@@ -23,7 +23,7 @@ public class Topic extends EmbeddableThread implements NamedThread {
     private List<Guideline> guidelines;
 
     @ManyToOne
-    @JoinColumn(name = "parent_id")
+    @JoinColumn(name = "referenced_by")
     private Project parent;
 
     @OneToMany(mappedBy = "topic")

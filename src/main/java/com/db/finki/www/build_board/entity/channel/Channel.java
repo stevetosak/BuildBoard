@@ -16,7 +16,6 @@ import java.util.UUID;
 @NoArgsConstructor
 public class Channel {
 
-
     @Id
     @GeneratedValue
     private UUID id;
@@ -24,13 +23,13 @@ public class Channel {
     private String name;
 
     @ManyToOne
-    @JoinColumn(name = "project_id",referencedColumnName = "id",nullable = false)
+    @JoinColumn(name = "project_has",referencedColumnName = "id",nullable = false)
     private Project project;
 
     private String description;
 
     @ManyToOne
-    @JoinColumn(name = "developer_id",referencedColumnName = "id",nullable = false)
+    @JoinColumn(name = "constructed_by",referencedColumnName = "id",nullable = false)
     private Developer developer;
 
 

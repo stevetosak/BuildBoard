@@ -21,11 +21,11 @@ import java.util.Objects;
 public class ProjectRolePermissionId implements Serializable {
 
     @ManyToOne
-    @JoinColumn(name = "permission_name", referencedColumnName = "name")
+    @JoinColumn(name = "for_permission", referencedColumnName = "name")
     private Permission permission;
 
     @ManyToOne
-    @JoinColumn(name = "role_id", referencedColumnName = "id")
+    @JoinColumn(name = "for_role", referencedColumnName = "id")
     private ProjectRole role;
 
 

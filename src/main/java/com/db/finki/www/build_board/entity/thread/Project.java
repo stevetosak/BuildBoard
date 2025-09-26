@@ -38,8 +38,8 @@ public class Project extends BBThread implements NamedThread {
     @ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.MERGE})
     @JoinTable(
             name ="developer_associated_with_project",
-            joinColumns = @JoinColumn(name = "project_id"),
-            inverseJoinColumns = @JoinColumn(name = "developer_id")
+            joinColumns = @JoinColumn(name = "in_project"),
+            inverseJoinColumns = @JoinColumn(name = "about_dev")
     )
     private Set<BBUser> developers = new HashSet<>(); // NE GO KORISTI GETTEROT OVDE
 
