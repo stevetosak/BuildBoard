@@ -203,7 +203,7 @@
         <div class="list-group w-75">
             <div class="list-group-item p-0 border-0" th:each="thread : ${threads}">
                 <!-- Make the entire card clickable -->
-                <a th:href="@{/{type}/{title}(title=${thread.getId()}, type=${thread.getTypeName()})}"
+                <a th:href="@{/{type}/{title}(title=${thread.getId()},type=${thread.getType()})}"
                    class="text-decoration-none">
                     <div class="card shadow-sm mb-4 border-0 transition-card">
                         <div class="card-header bg-light p-3 d-flex justify-content-between align-items-center">
@@ -211,8 +211,8 @@
                                 style="max-width: 70%;">Thread Title</h4>
                             <div>
                                 <img alt="user-logo" class="rounded-circle border border-1 border-info"
-                                     style="width: 3em; height: 3em" th:src="${thread.getUser().getAvatarUrl()}">
-                                <small class="fst-italic" th:text="${thread.getUser().getUsername()}"></small>
+                                     style="width: 3em; height: 3em" th:src="${thread.getUsersAvatarUrl()}">
+                                <small class="fst-italic" th:text="${thread.getUsername()}"></small>
                             </div>
                         </div>
                         <div class="card-body">

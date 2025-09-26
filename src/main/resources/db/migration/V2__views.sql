@@ -64,4 +64,42 @@ FROM channel c
                    ON rpo.for_role_permission_role_id = pr.id
                        AND rpo.for_role_permission_permission_name = rp.for_permission
                        AND rpo.for_resource = c.id
-GROUP BY c.id, c.name,pr.id
+GROUP BY c.id, c.name,pr.id;
+
+create or replace view v_named_threads as
+WITH topics_projects AS (SELECT pr.id,
+                                pr.title,
+                                'projects'::text AS "type"
+                         FROM project_thread pr
+                         UNION
+                         SELECT topic_thread.id,
+                                topic_thread.title,
+                                'topics'::text AS "type"
+                         FROM topic_thread),
+     topics_projects_threads AS (SELECT t.id,
+                                        t.content,
+                                        tp.type,
+                                        tp.title,
+                                        u.username,
+                                        u.id        AS user_id,
+                                        t.created_at
+                                 FROM thread t
+                                          JOIN users u ON u.id = t.is_created_by
+                                          JOIN topics_projects tp ON tp.id = t.id)
+        ,
+     named_threads_tags as (select tt.thread_id           as "id",
+                                   array_agg(tt.tag_name) as "tags"
+                            from tag_assigned_to_thread tt
+                            where tt.thread_id in (select id from topics_projects_threads)
+                            group by tt.thread_id)
+SELECT tpt.id,
+       tpt.content,
+       tpt.title,
+       tpt.type,
+       tpt.username,
+       tpt.user_id,
+       tpt.created_at,
+       coalesce((select ntt.tags as "tags"
+                 from named_threads_tags ntt
+                 where ntt.id = tpt.id),'{}') as "tags"
+FROM topics_projects_threads tpt;

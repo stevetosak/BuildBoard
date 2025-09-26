@@ -2,10 +2,8 @@ package com.db.finki.www.build_board.controller.thread_controller;
 
 import com.db.finki.www.build_board.entity.blacklisted_user.BlacklistedUser;
 import com.db.finki.www.build_board.entity.entity_enum.Status;
-import com.db.finki.www.build_board.entity.thread.Project;
 import com.db.finki.www.build_board.entity.user_type.BBUser;
 import com.db.finki.www.build_board.entity.thread.Topic;
-import com.db.finki.www.build_board.entity.user_type.Moderator;
 import com.db.finki.www.build_board.service.BlacklistedUserService;
 import com.db.finki.www.build_board.service.BlacklistedUserType;
 import com.db.finki.www.build_board.service.ReportService;

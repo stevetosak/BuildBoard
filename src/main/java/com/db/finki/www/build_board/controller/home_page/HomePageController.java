@@ -2,8 +2,8 @@ package com.db.finki.www.build_board.controller.home_page;
 
 import com.db.finki.www.build_board.entity.user_type.BBUser;
 import com.db.finki.www.build_board.service.user.BBUserDetailsService;
-import com.db.finki.www.build_board.service.search.SearchService;
 import com.db.finki.www.build_board.service.thread.itf.TagService;
+import com.db.finki.www.build_board.service.util.NamedThreadService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -19,34 +19,43 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
 @Controller
 public class HomePageController {
-    private final SearchService searchService;
     private final TagService tagService;
     private final BBUserDetailsService bbUserDetailsService;
     private final SecurityContextRepository securityContextRepository;
+    private final NamedThreadService  namedThreadService;
 
-    public HomePageController(SearchService searchService, TagService tagService, BBUserDetailsService bbUserDetailsService, SecurityContextRepository securityContextRepository) {
-        this.searchService = searchService;
+    public HomePageController(TagService tagService, BBUserDetailsService bbUserDetailsService,
+            SecurityContextRepository securityContextRepository, NamedThreadService namedThreadService
+                             ) {
         this.tagService = tagService;
         this.bbUserDetailsService = bbUserDetailsService;
         this.securityContextRepository = securityContextRepository;
+        this.namedThreadService = namedThreadService;
     }
 
     @GetMapping("/")
-    public String search( @RequestParam(required = false)String query, @RequestParam(required = false) List<String> filters,  @RequestParam(required = false) String type , Model model) {
-        if(filters == null || filters.isEmpty()) {
-            filters = new ArrayList<>();
-            filters.add("all");
-        }
+    public String search(
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String content,
+            @RequestParam(required = false, name = "threadType") String type,
+            @RequestParam(required = false) List<String> tag,
+            Model model
+                        ) {
+        if(title!=null)
+            title= URLDecoder.decode(title, StandardCharsets.UTF_8);
+        if(content!=null)
+            content=URLDecoder.decode(content, StandardCharsets.UTF_8);
 
-        model.addAttribute("threads", searchService.search(query,filters,type));
-
-        System.out.println("TAGS: " + tagService.getAll());
+        model.addAttribute("threads", namedThreadService.getAll(title,content,type,tag));
         model.addAttribute("tags",tagService.getAll());
+
         return "home_pages/home";
     }
 
