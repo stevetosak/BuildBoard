@@ -134,18 +134,18 @@ CREATE TABLE tag_assigned_to_thread
 CREATE TABLE blacklisted_user
 (
     id serial primary key,
-    blacklisted_from     INT REFERENCES topic_thread (id) ON DELETE CASCADE,
-    refers_to      INT REFERENCES users (id) ON DELETE CASCADE,
-    blacklisted_by INT REFERENCES moderator (id) ON DELETE CASCADE,
-    start_date   TIMESTAMP,
+    blacklisted_from     INT REFERENCES topic_thread (id) ON DELETE CASCADE NOT NULL ,
+    refers_to      INT REFERENCES users (id) ON DELETE CASCADE NOT NULL,
+    blacklisted_by INT REFERENCES moderator (id) ON DELETE CASCADE NOT NULL,
+    start_date   TIMESTAMP NOT NULL,
     end_date     TIMESTAMP,
     reason       TEXT,
     UNIQUE (refers_to, blacklisted_by, blacklisted_from, start_date)
 );
 CREATE TABLE developer_associated_with_project
 (
-    in_project   INT REFERENCES project_thread (id) on delete cascade,
-    about_dev INT REFERENCES developer (id) on delete cascade,
+    in_project   INT REFERENCES project_thread (id) on delete cascade NOT NULL,
+    about_dev INT REFERENCES developer (id) on delete cascade NOT NULL,
     started_at   TIMESTAMP DEFAULT NOW() NOT NULL,
     ended_at     TIMESTAMP,
     PRIMARY KEY (in_project, about_dev, started_at)
