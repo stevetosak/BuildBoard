@@ -148,8 +148,15 @@
                         <label for="filterType" class="me-2">Type:</label>
                         <select class="form-select form-select-sm w-auto" id="filterType" name="type">
                             <option value="all">All</option>
-                            <option value="topic">Topic</option>
-                            <option value="project">Project</option>
+                            <option value="topic">Topics</option>
+                            <option value="project">Projects</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="filterType" class="me-2">Tags:</label>
+                        <select class="form-select form-select-sm w-auto" id="tags" name="tags">
+                            <option value=""></option>
+                            <option th:each="tag:${tags}" th:text="${tag.getName()}" th:value="${tag.getName()}"></option>
                         </select>
                     </div>
                 </div>

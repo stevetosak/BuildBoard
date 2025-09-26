@@ -42,16 +42,29 @@ public class HomePageController {
 
     @GetMapping("/")
     public String search(
-            @RequestParam(required = false) String title,
-            @RequestParam(required = false) String content,
-            @RequestParam(required = false, name = "threadType") String type,
-            @RequestParam(required = false) List<String> tag,
+            @RequestParam(required = false, defaultValue = "") String query,
+            @RequestParam(required = false, defaultValue = "all") String type,
+            @RequestParam(required = false, defaultValue = "") List<String> filters,
+            @RequestParam(required = false,name = "tags") List<String> tag,
             Model model
                         ) {
-        if(title!=null)
-            title= URLDecoder.decode(title, StandardCharsets.UTF_8);
-        if(content!=null)
-            content=URLDecoder.decode(content, StandardCharsets.UTF_8);
+
+        if(type.equals("all"))
+            type=null;
+
+        String title = null;
+        String content = null;
+
+        if(query != null && filters.contains("title"))
+            title= URLDecoder.decode(query, StandardCharsets.UTF_8);
+
+        if(query != null && filters.contains("content"))
+            content=URLDecoder.decode(query, StandardCharsets.UTF_8);
+
+        if(filters.isEmpty()){
+            title=URLDecoder.decode(query, StandardCharsets.UTF_8);
+            content=URLDecoder.decode(query, StandardCharsets.UTF_8);
+        }
 
         model.addAttribute("threads", namedThreadService.getAll(title,content,type,tag));
         model.addAttribute("tags",tagService.getAll());
